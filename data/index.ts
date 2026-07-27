@@ -1,0 +1,12 @@
+export { certifications } from "./certifications";
+export { communities } from "./communities";
+export { creativeExperience } from "./creative-experience";
+export { education } from "./education";
+export { experience } from "./experience";
+export { hackathons } from "./hackathons";
+export { profile } from "./profile";
+export { projects } from "./projects";
+export { skills } from "./skills";
+export { socials } from "./socials";
+export { statistics } from "./statistics";
+export { timeline } from "./timeline";

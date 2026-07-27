@@ -1,0 +1,27 @@
+# dependencies
+/node_modules
+
+# Next.js
+/.next
+/out
+
+# testing
+/coverage
+
+# local environment files
+.env*
+
+# TypeScript
+*.tsbuildinfo
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+
+# local dev server logs
+.next-dev*.log
+
+# local visual verification
+.screenshots/
+.next-start*.log
+
