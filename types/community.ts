@@ -8,4 +8,6 @@ export interface Community {
   highlights?: string[];
   href?: string;
   logo?: string;
+  image?: string;
+  shortName?: string;
 }

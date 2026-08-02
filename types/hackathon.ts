@@ -9,4 +9,5 @@ export interface Hackathon {
   highlights: string[];
   tags: string[];
   href?: string;
+  footer?: string[];
 }

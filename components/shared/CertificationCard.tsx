@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Award } from "lucide-react";
 import type { ReactElement } from "react";
 import type { Certification } from "@/types";
@@ -12,8 +13,8 @@ export function CertificationCard({ certification }: CertificationCardProps): Re
   return (
     <GlassCard tone="solid" padding="md" className="h-full">
       <div className="flex gap-4">
-        <span aria-hidden="true" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[rgb(139_124_255_/_10%)] text-[var(--color-lavender)]">
-          <Award size={20} />
+        <span aria-hidden="true" className="relative inline-flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-md)] bg-[rgb(139_124_255_/_10%)] text-[var(--color-lavender)]">
+          {certification.badge ? <Image src={certification.badge} alt="" width={28} height={28} className="h-7 w-7 object-contain" /> : <Award size={20} />}
         </span>
         <div>
           <h3 className="text-sm font-semibold leading-snug text-[var(--color-ink)]">{certification.name}</h3>

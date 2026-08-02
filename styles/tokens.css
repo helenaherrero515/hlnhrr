@@ -18,7 +18,7 @@
 
   --font-display: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-script: "Segoe Script", "Brush Script MT", cursive;
+  --font-script: var(--font-allura), Allura, "Segoe Script", cursive;
 
   --type-display: clamp(3.25rem, 12vw, 10rem);
   --type-script: clamp(2.5rem, 9vw, 7rem);

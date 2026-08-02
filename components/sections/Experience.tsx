@@ -33,7 +33,7 @@ export function Experience({ experience }: ExperienceProps): ReactElement {
                 <h3 className="text-sm font-semibold text-[var(--color-ink)]">{item.company}</h3>
                 <p className="mt-1 text-xs font-medium text-[var(--color-ink-muted)]">{item.location} · {item.employmentType}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {item.highlights.slice(0, 2).map((highlight) => <Badge key={highlight} tone="sky">{highlight}</Badge>)}
+                  {item.topics.map((topic) => <Badge key={`${item.company}-${topic}`} tone="sky">{topic}</Badge>)}
                 </div>
               </article>
             ))}
@@ -43,4 +43,3 @@ export function Experience({ experience }: ExperienceProps): ReactElement {
     </Section>
   );
 }
-

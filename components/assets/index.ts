@@ -6,3 +6,4 @@ export { GridDots } from "./GridDots";
 export { PrototypeConnector } from "./PrototypeConnector";
 export { SelectionBox } from "./SelectionBox";
 export { Sparkles } from "./Sparkles";
+export { IntpScientist } from "./IntpScientist";

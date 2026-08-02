@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { PageShell, SiteHeader } from "@/components/layout";
-import { Footer } from "@/components/sections";
-import { ProjectCard, RouteIntro, Section } from "@/components/shared";
+import { SiteHeader } from "@/components/layout";
+import { ProjectShowcase } from "@/components/sections/ProjectShowcase";
 import { projects } from "@/data";
 import { createMetadata } from "@/lib";
 
@@ -11,20 +10,34 @@ export const metadata: Metadata = createMetadata({
   path: "/projects",
 });
 
+const showcaseOrder = ["lingap", "gising", "guidher", "tinig", "purifai", "convex"];
+
 export default function ProjectsPage(): React.ReactElement {
+  const showcaseProjects = showcaseOrder
+    .map((slug) => projects.find((project) => project.slug === slug))
+    .filter((project): project is (typeof projects)[number] => Boolean(project));
+
   return (
     <>
       <SiteHeader />
-      <PageShell>
-        <RouteIntro eyebrow="Projects" title="Selected product work, built from verified project records." description="Project cards currently use code-native interface visuals until approved case-study images and destinations are added." />
-        <Section id="project-archive" aria-labelledby="project-archive-title" className="pt-0">
-          <h2 id="project-archive-title" className="sr-only">Project archive</h2>
-          <div className="grid gap-5 md:grid-cols-12">
-            {projects.map((project, index) => <ProjectCard key={project.slug} project={project} size={index === 0 ? "feature" : "standard"} />)}
-          </div>
-        </Section>
-      </PageShell>
-      <Footer />
+      <main id="main-content" className="projects-showcase-page relative isolate min-h-screen overflow-hidden px-4 pb-24 pt-36 sm:px-8 lg:px-16 lg:pt-40">
+        <div aria-hidden="true" className="projects-orb projects-orb-left" />
+        <div aria-hidden="true" className="projects-orb projects-orb-right" />
+        <div aria-hidden="true" className="projects-dot-field" />
+
+        <header className="mx-auto max-w-6xl text-center">
+          <span className="inline-flex rounded-[var(--radius-pill)] border border-[rgb(139_124_255_/_16%)] bg-white/55 px-8 py-2 text-sm font-bold text-[var(--color-lavender)] shadow-sm backdrop-blur-xl">Projects</span>
+          <h1 className="mx-auto mt-8 max-w-5xl text-[clamp(3rem,6.8vw,5.35rem)] font-black leading-[0.95] tracking-[-0.06em] text-[var(--color-ink)]">
+            Building award-winning<br /><span className="bg-[linear-gradient(100deg,#ff4fa8_0%,#8b5cf6_44%,#5b7cff_72%)] bg-clip-text text-transparent">digital products</span> with purpose.
+          </h1>
+          <p className="mx-auto mt-7 max-w-3xl text-lg leading-[1.65] text-[var(--color-ink-muted)]">
+            A curated collection of AI, blockchain, and cybersecurity projects that showcase product thinking, user-centered design, and modern frontend engineering.
+          </p>
+        </header>
+
+        <ProjectShowcase projects={showcaseProjects} />
+
+      </main>
     </>
   );
 }

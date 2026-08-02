@@ -7,5 +7,6 @@ export interface Experience {
   endDate?: string;
   summary: string;
   highlights: string[];
+  topics: string[];
   logo?: string;
 }
