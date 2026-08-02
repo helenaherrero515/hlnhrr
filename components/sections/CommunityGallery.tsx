@@ -37,6 +37,7 @@ export function CommunityGallery({ communities }: CommunityGalleryProps): ReactE
   const dragStateRef = useRef<{ pointerId: number; startX: number; scrollLeft: number } | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   function scrollToIndex(index: number): void {
     const track = trackRef.current;
@@ -63,7 +64,8 @@ export function CommunityGallery({ communities }: CommunityGalleryProps): ReactE
     const track = trackRef.current;
     if (!track) return;
 
-    pauseBriefly();
+    setIsPaused(true);
+    setIsDragging(true);
     dragStateRef.current = { pointerId: event.pointerId, startX: event.clientX, scrollLeft: track.scrollLeft };
     track.setPointerCapture(event.pointerId);
   }
@@ -74,7 +76,8 @@ export function CommunityGallery({ communities }: CommunityGalleryProps): ReactE
 
     if (!track || !dragState || dragState.pointerId !== event.pointerId) return;
 
-    track.scrollLeft = dragState.scrollLeft - (event.clientX - dragState.startX);
+    const walk = event.clientX - dragState.startX;
+    track.scrollLeft = dragState.scrollLeft - walk;
   }
 
   function handlePointerUp(event: PointerEvent<HTMLDivElement>): void {
@@ -87,13 +90,28 @@ export function CommunityGallery({ communities }: CommunityGalleryProps): ReactE
       track.releasePointerCapture(event.pointerId);
     }
 
+    const dragOffset = event.clientX - dragState.startX;
     dragStateRef.current = null;
+    setIsDragging(false);
+
+    if (track.clientWidth > 0) {
+      let targetIndex = activeIndex;
+      if (Math.abs(dragOffset) > 50) {
+        if (dragOffset > 0 && activeIndex > 0) {
+          targetIndex = activeIndex - 1;
+        } else if (dragOffset < 0 && activeIndex < communities.length - 1) {
+          targetIndex = activeIndex + 1;
+        }
+      }
+      scrollToIndex(targetIndex);
+    }
+
     pauseBriefly();
   }
 
   function handleScroll(): void {
     const track = trackRef.current;
-    if (!track || track.clientWidth === 0) return;
+    if (!track || track.clientWidth === 0 || isDragging) return;
 
     const nextIndex = Math.round(track.scrollLeft / track.clientWidth);
     setActiveIndex(Math.min(Math.max(nextIndex, 0), communities.length - 1));
@@ -139,7 +157,7 @@ export function CommunityGallery({ communities }: CommunityGalleryProps): ReactE
       </div>
       <div
         ref={trackRef}
-        className="community-gallery-track"
+        className={`community-gallery-track ${isDragging ? "is-dragging" : ""}`}
         onBlur={() => setIsPaused(false)}
         onFocus={() => setIsPaused(true)}
         onPointerDown={handlePointerDown}

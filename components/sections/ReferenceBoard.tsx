@@ -208,7 +208,7 @@ export function ReferenceBoard({ profile, experience, hackathons, skills, commun
       <Card id="experience" className="flex min-h-[32rem] flex-col lg:col-span-6">
         <HeaderLabel icon={<Briefcase size={21} />} action="View Full Experience" actionHref="/experience">Experience</HeaderLabel>
         <div className="relative flex flex-1 flex-col justify-between gap-5 pl-7 before:absolute before:left-2 before:top-2 before:h-[calc(100%-1rem)] before:w-px before:bg-[var(--color-line)]">
-          {experience.map((item) => (
+          {experience.slice(0, 3).map((item) => (
             <article key={`${item.company}-${item.role}`} className="relative grid gap-3 sm:grid-cols-[3rem_1fr]">
               <span aria-hidden="true" className="absolute -left-[1.75rem] top-3 size-3.5 rounded-full border-2 border-[var(--color-periwinkle)] bg-white" />
               <span aria-hidden="true" className="relative grid size-12 place-items-center overflow-hidden rounded-[1rem] bg-white text-[0.68rem] font-black text-[var(--color-periwinkle)] shadow-[0_12px_30px_rgb(65_92_255_/_16%)] ring-1 ring-[var(--color-line)]">{item.logo ? <Image src={item.logo} alt="" width={34} height={34} className="h-8 w-8 object-contain" /> : item.company.split(" ").map((word) => word[0]).join("").slice(0, 4)}</span>
