@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Github, X } from "lucide-react";
+import { ExternalLink, Github, X } from "lucide-react";
 import type { CSSProperties, ReactElement } from "react";
 import { useEffect, useState } from "react";
 import type { Project } from "@/types";
@@ -11,7 +12,6 @@ type ProjectModalStyle = CSSProperties & {
   "--project-secondary": string;
   "--project-tertiary": string;
   "--project-ink": string;
-  "--project-logo": string;
 };
 
 interface ProjectShowcaseProps {
@@ -24,7 +24,6 @@ function modalStyle(project: Project): ProjectModalStyle {
     "--project-secondary": project.palette.secondary,
     "--project-tertiary": project.palette.tertiary ?? project.palette.secondary,
     "--project-ink": project.palette.ink ?? "var(--color-ink)",
-    "--project-logo": `url(${project.logoImage ?? `/images/projects/logos/${project.slug}-logo.png`})`,
   };
 }
 
@@ -63,9 +62,9 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps): ReactElemen
           <button type="button" className="project-detail-backdrop" aria-label="Close project details" onClick={() => setSelectedProject(null)} />
           <div className="project-detail-panel">
             <button type="button" className="project-detail-close" aria-label="Close project details" onClick={() => setSelectedProject(null)}><X size={18} /></button>
-            <div className="project-detail-visual" aria-hidden="true">
-              <div className="project-logo-mark project-logo-mark-large">
-                <span>{selectedProject.title.slice(0, 2)}</span>
+            <div className="project-detail-visual">
+              <div className="project-screenshot-frame project-screenshot-frame-detail">
+                <img className="project-screenshot-image" src={selectedProject.coverImage} alt={`${selectedProject.title} landing page screenshot`} />
               </div>
             </div>
             <div className="project-detail-copy">
@@ -79,9 +78,11 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps): ReactElemen
               <div className="project-detail-tags">
                 {selectedProject.tags.map((tag) => <span key={`${selectedProject.slug}-${tag}`}>{tag}</span>)}
               </div>
-              <a className="project-detail-github" href={selectedProject.githubHref ?? "https://github.com/helenaherrero515"} target="_blank" rel="noreferrer">
-                <Github aria-hidden="true" size={17} /> GitHub Repository
-              </a>
+              <div className="project-detail-actions">
+                {selectedProject.href ? <a className="project-detail-github" href={selectedProject.href} target="_blank" rel="noreferrer"><ExternalLink aria-hidden="true" size={17} /> View Website</a> : null}
+                {selectedProject.githubHref ? <a className="project-detail-github" href={selectedProject.githubHref} target="_blank" rel="noreferrer"><Github aria-hidden="true" size={17} /> GitHub Repository</a> : null}
+                {selectedProject.caseStudyHref ? <a className="project-detail-github" href={selectedProject.caseStudyHref} target="_blank" rel="noreferrer"><ExternalLink aria-hidden="true" size={17} /> Project Link</a> : null}
+              </div>
             </div>
           </div>
         </div>

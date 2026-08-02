@@ -10,7 +10,6 @@ type ProjectCardSize = "feature" | "standard" | "compact";
 interface ProjectCardProps {
   project: Project;
   size?: ProjectCardSize;
-  priority?: boolean;
   className?: string;
   onSelect?: (project: Project) => void;
   ctaLabel?: string;

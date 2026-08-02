@@ -26,8 +26,7 @@ export default function ProjectsPage(): React.ReactElement {
         <div aria-hidden="true" className="projects-dot-field" />
 
         <header className="mx-auto max-w-6xl text-center">
-          <span className="inline-flex rounded-[var(--radius-pill)] border border-[rgb(139_124_255_/_16%)] bg-white/55 px-8 py-2 text-sm font-bold text-[var(--color-lavender)] shadow-sm backdrop-blur-xl">Projects</span>
-          <h1 className="mx-auto mt-8 max-w-5xl text-[clamp(3rem,6.8vw,5.35rem)] font-black leading-[0.95] tracking-[-0.06em] text-[var(--color-ink)]">
+          <h1 className="mx-auto max-w-5xl text-[clamp(3rem,6.8vw,5.35rem)] font-black leading-[0.95] tracking-[-0.06em] text-[var(--color-ink)]">
             Building award-winning<br /><span className="bg-[linear-gradient(100deg,#ff4fa8_0%,#8b5cf6_44%,#5b7cff_72%)] bg-clip-text text-transparent">digital products</span> with purpose.
           </h1>
           <p className="mx-auto mt-7 max-w-3xl text-lg leading-[1.65] text-[var(--color-ink-muted)]">

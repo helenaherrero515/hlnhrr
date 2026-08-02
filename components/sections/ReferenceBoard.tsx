@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { ArrowRight, Atom, Award, BrainCircuit, Briefcase, FlaskConical, Github, Heart, Lightbulb, Linkedin, Mail, Medal, Palette, Puzzle, Quote, Sparkles, Trophy, UserRound, UsersRound } from "lucide-react";
-import type { CSSProperties, ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Certification, Community, Experience, Hackathon, Profile, Skill } from "@/types";
 import { GridDots, IntpScientist, SelectionBox } from "@/components/assets";
+import { CommunityGallery } from "@/components/sections/CommunityGallery";
 import { Badge, GlassCard, SkillChip } from "@/components/ui";
 import { formatDate } from "@/utils";
 
@@ -93,17 +94,7 @@ function statToneClass(tone: StatTile["tone"]): string {
   return "border-[rgb(139_124_255_/_22%)] bg-[linear-gradient(145deg,rgb(139_124_255_/_16%),rgb(255_255_255_/_78%))] text-[var(--color-lavender)] hover:border-[rgb(139_124_255_/_46%)] hover:shadow-[0_18px_45px_rgb(139_124_255_/_16%)]";
 }
 
-type CommunityGalleryStyle = CSSProperties & {
-  "--community-image": string;
-  "--community-index": string;
-};
 
-function communityGalleryStyle(community: Community, index: number): CommunityGalleryStyle {
-  return {
-    "--community-image": `url(${community.image ?? "/images/communities/community-placeholder.jpg"})`,
-    "--community-index": `${index}`,
-  };
-}
 function hackathonAwardStyle(index: number): { icon: ReactNode; className: string } {
   const styles = [
     {
@@ -272,27 +263,11 @@ export function ReferenceBoard({ profile, experience, hackathons, skills, commun
       </Card>
 
       <Card id="communities" className="community-gallery-card lg:col-span-4">
-        <div className="community-gallery" aria-label="Automatic community gallery slideshow">
-          <div className="community-gallery-heading">
-            <UsersRound aria-hidden="true" size={20} />
-            <span>Communities & Leadership</span>
-          </div>
-          <div className="community-gallery-track">
-            {communities.map((community, index) => (
-              <article key={community.name} className="community-gallery-slide" style={communityGalleryStyle(community, index)}>
-                <div className="community-gallery-overlay">
-                  <p className="text-base font-black leading-tight text-white drop-shadow-sm">{community.shortName ?? community.name}</p>
-                  <p className="mt-1 max-w-[17rem] text-[0.72rem] font-semibold leading-snug text-white/88 drop-shadow-sm">{community.role}</p>
-                  <p className="mt-2 text-[0.66rem] font-bold uppercase tracking-[0.08em] text-white/68 drop-shadow-sm">{communityMeta(community)}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
+        <CommunityGallery communities={communities} />
       </Card>
 
       <Card id="certifications" className="lg:col-span-4">
-        <HeaderLabel icon={<Sparkles size={20} />} action="View All" actionHref="/certifications">Certifications</HeaderLabel>
+        <HeaderLabel icon={<Sparkles size={20} />} action="View All" actionHref="/experience">Certifications</HeaderLabel>
         <div className="space-y-3">
           {certifications.map((certification) => <div key={certification.name} className="grid grid-cols-[3rem_1fr_auto] items-center gap-3 border-b border-[var(--color-line)] pb-3 last:border-0"><span className="relative grid size-11 place-items-center overflow-hidden rounded-[var(--radius-md)] bg-white text-xl font-black text-[var(--color-periwinkle)] shadow-sm">{certification.badge ? <Image src={certification.badge} alt="" width={28} height={28} className="h-7 w-7 object-contain" /> : certification.name[0]}</span><p className="text-xs font-black leading-tight text-[var(--color-ink)]">{certification.name}</p><p className="text-[0.68rem] font-semibold text-[var(--color-ink-muted)]">{formatDate(certification.issuedDate)}</p></div>)}
         </div>
@@ -319,8 +294,4 @@ export function ReferenceBoard({ profile, experience, hackathons, skills, commun
       </div>
     </section>
   );
-}
-function communityMeta(community: Community): string {
-  const dates = community.startDate ? compactDate(community.startDate, community.endDate) : "";
-  return [community.location, dates].filter(Boolean).join(" • ");
 }

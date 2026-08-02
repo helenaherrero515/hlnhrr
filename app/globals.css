@@ -108,16 +108,6 @@ select {
   100% { background-position: 30px -24px, 42px -18px, 54px -8px; opacity: 0.28; }
 }
 
-@keyframes communityGallerySlide {
-  0%, 10% { transform: translateX(0); }
-  13%, 23% { transform: translateX(-100%); }
-  26%, 36% { transform: translateX(-200%); }
-  39%, 49% { transform: translateX(-300%); }
-  52%, 62% { transform: translateX(-400%); }
-  65%, 75% { transform: translateX(-500%); }
-  78%, 90% { transform: translateX(-600%); }
-  100% { transform: translateX(0); }
-}
 @keyframes personalityVioletFlow {
   0% { background-position: 0% 50%; transform: scale(1) rotate(0deg); }
   50% { background-position: 100% 50%; transform: scale(1.04) rotate(1deg); }
@@ -460,8 +450,7 @@ select {
 }
 
 .personality-card:hover::after,
-.personality-card:focus-within::after,
-  .community-gallery-track {
+.personality-card:focus-within::after {
   animation: personalityStarDrift 5.6s linear infinite alternate;
   opacity: 1;
 }
@@ -520,7 +509,45 @@ select {
     radial-gradient(circle at 50% 40%, rgb(255 239 248 / 56%), transparent 31rem),
     radial-gradient(circle at 8% 88%, rgb(255 105 188 / 36%), transparent 34rem),
     radial-gradient(circle at 28% 101%, rgb(255 188 126 / 18%), transparent 27rem),
-    linear-gradient(180deg, #fbfaff 0%, #ffffff 44%, #fff8fd 100%);
+    linear-gradient(115deg, #fbfaff 0%, #fff4fb 22%, #ffffff 44%, #eef4ff 68%, #fff8fd 100%);
+}
+
+.projects-showcase-page::before {
+  content: "";
+  position: absolute;
+  inset: -28% -18%;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, transparent 0%, rgb(255 79 168 / 24%) 18%, rgb(139 92 246 / 22%) 42%, rgb(91 124 255 / 26%) 64%, rgb(255 188 126 / 16%) 84%, transparent 100%),
+    conic-gradient(from 135deg at 50% 48%, rgb(255 255 255 / 0%), rgb(255 114 184 / 28%), rgb(139 124 255 / 24%), rgb(141 207 255 / 26%), rgb(255 255 255 / 0%));
+  background-position: 0% 50%, 50% 50%;
+  background-size: 180% 180%, 160% 160%;
+  filter: blur(26px) saturate(1.08);
+  opacity: 0.9;
+  transform: translate3d(-8%, -3%, 0) scale(1.08) rotate(-2deg);
+  animation: projectsGradientSweep 9s ease-in-out infinite alternate;
+}
+
+@keyframes projectsGradientSweep {
+  from {
+    background-position: 0% 50%, 36% 44%;
+    transform: translate3d(-8%, -3%, 0) scale(1.08) rotate(-2deg);
+  }
+  to {
+    background-position: 100% 50%, 66% 58%;
+    transform: translate3d(7%, 4%, 0) scale(1.14) rotate(2deg);
+  }
+}
+
+@keyframes projectsOrbFloatLeft {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(5rem, -3rem, 0) scale(1.08); }
+}
+
+@keyframes projectsOrbFloatRight {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-4rem, 2.5rem, 0) scale(1.06); }
 }
 
 .projects-orb {
@@ -537,6 +564,7 @@ select {
   width: 46rem;
   height: 46rem;
   background: radial-gradient(circle, rgb(255 114 184 / 45%), rgb(255 196 144 / 20%) 44%, transparent 74%);
+  animation: projectsOrbFloatLeft 12s ease-in-out infinite;
 }
 
 .projects-orb-right {
@@ -545,6 +573,7 @@ select {
   width: 42rem;
   height: 42rem;
   background: radial-gradient(circle, rgb(189 211 255 / 52%), rgb(139 124 255 / 18%) 46%, transparent 74%);
+  animation: projectsOrbFloatRight 14s ease-in-out infinite;
 }
 
 .projects-dot-field {
@@ -630,6 +659,77 @@ select {
   min-height: 14rem;
   border-color: rgb(255 255 255 / 66%);
   background: linear-gradient(145deg, rgb(255 255 255 / 42%), color-mix(in srgb, var(--project-primary) 16%, transparent));
+}
+
+.project-screenshot-frame {
+  position: relative;
+  width: min(18rem, 100%);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 74%);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 92%) 0 1.9rem, transparent 1.9rem),
+    linear-gradient(145deg, color-mix(in srgb, var(--project-primary) 16%, white), color-mix(in srgb, var(--project-secondary) 12%, white));
+  box-shadow: 0 24px 54px color-mix(in srgb, var(--project-secondary) 20%, rgb(32 27 58 / 14%)), inset 0 1px 0 rgb(255 255 255 / 78%);
+  transform: rotateX(6deg) rotateY(-7deg);
+  transition: transform 300ms var(--ease-emphasized), filter 300ms var(--ease-emphasized), box-shadow 300ms var(--ease-emphasized);
+}
+
+.project-screenshot-frame::before {
+  content: "";
+  position: absolute;
+  left: 0.85rem;
+  top: 0.72rem;
+  z-index: 2;
+  width: 2.4rem;
+  height: 0.46rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 0.25rem 50%, rgb(255 114 184 / 72%) 0 0.22rem, transparent 0.24rem),
+    radial-gradient(circle at 1.1rem 50%, rgb(255 188 126 / 70%) 0 0.22rem, transparent 0.24rem),
+    radial-gradient(circle at 1.95rem 50%, rgb(139 124 255 / 58%) 0 0.22rem, transparent 0.24rem);
+}
+
+.project-screenshot-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgb(255 255 255 / 32%), transparent 42%, rgb(255 255 255 / 18%));
+}
+
+.project-screenshot-image {
+  display: block;
+  object-fit: cover;
+  object-position: top center;
+  padding-top: 1.9rem;
+}
+
+.group:hover .project-screenshot-frame,
+.group:focus-visible .project-screenshot-frame {
+  transform: translateY(-4px) rotateX(8deg) rotateY(-3deg) rotateZ(2deg);
+  filter: drop-shadow(0 26px 38px color-mix(in srgb, var(--project-secondary) 24%, rgb(32 27 58 / 16%)));
+}
+
+
+.project-screenshot-frame-detail {
+  width: fit-content;
+  max-width: min(64vw, 58rem);
+  height: auto;
+  min-height: 0;
+  aspect-ratio: auto;
+  padding-top: 1.9rem;
+  transform: none;
+}
+
+.project-screenshot-frame-detail .project-screenshot-image {
+  width: auto;
+  max-width: min(64vw, 58rem);
+  max-height: min(64vh, 36rem);
+  height: auto;
+  padding-top: 0;
+  object-fit: contain;
 }
 
 .project-arc-card .project-folder-scene,
@@ -750,9 +850,11 @@ select {
   position: relative;
   z-index: 1;
   display: grid;
-  width: min(58rem, 100%);
-  max-height: min(42rem, calc(100vh - 2.5rem));
-  grid-template-columns: minmax(15rem, 0.92fr) minmax(0, 1.08fr);
+  width: fit-content;
+  max-width: min(92rem, calc(100vw - 2.5rem));
+  max-height: min(44rem, calc(100vh - 2.5rem));
+  grid-template-columns: minmax(0, auto) minmax(20rem, 27rem);
+  align-items: center;
   gap: clamp(1.25rem, 4vw, 2rem);
   overflow: auto;
   border: 1px solid color-mix(in srgb, var(--project-secondary) 34%, white);
@@ -786,8 +888,11 @@ select {
 
 .project-detail-visual {
   display: grid;
-  min-height: 21rem;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 0;
   place-items: center;
+  padding: clamp(0.75rem, 2vw, 1.15rem);
   border-radius: 1.5rem;
   border: 1px solid rgb(255 255 255 / 70%);
   background: linear-gradient(145deg, rgb(255 255 255 / 48%), color-mix(in srgb, var(--project-primary) 22%, transparent));
@@ -874,8 +979,14 @@ select {
   font-weight: 800;
 }
 
-.project-detail-github {
+.project-detail-actions {
   margin-top: 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.project-detail-github {
   display: inline-flex;
   width: fit-content;
   align-items: center;
@@ -1341,3 +1452,108 @@ select {
     animation: none;
   }
 }
+/* Experience page — full-bleed pastel hero and organized resume cards */
+.experience-playground {
+  position: relative;
+  width: 100%;
+  max-width: none !important;
+  overflow: hidden;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  padding-bottom: clamp(5rem, 9vw, 8rem);
+}
+
+.experience-hero {
+  position: relative;
+  width: 100vw;
+  min-height: clamp(37rem, 72svh, 47rem);
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.experience-hero-panel {
+  position: relative;
+  width: 100%;
+  min-height: clamp(37rem, 72svh, 47rem);
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: radial-gradient(circle at 8% 78%, rgb(113 134 255 / 28%), transparent 15rem), radial-gradient(circle at 89% 6%, rgb(255 114 184 / 22%), transparent 19rem), radial-gradient(circle at 97% 86%, rgb(255 217 92 / 30%), transparent 14rem), radial-gradient(circle at 78% 64%, rgb(141 207 255 / 15%), transparent 21rem), radial-gradient(circle at 18% 5%, rgb(139 124 255 / 10%), transparent 18rem), linear-gradient(180deg, #fbfbff 0%, #ffffff 44%, #fffefa 100%) !important;
+  box-shadow: none !important;
+}
+
+.experience-background-shape,
+.experience-floating-card,
+.experience-menu-card,
+.experience-floating-star,
+.experience-dot { position: absolute; pointer-events: none; }
+.experience-background-shape { z-index: 0; filter: blur(3px); }
+.shape-blue { left: -5rem; bottom: 4.5rem; width: 18rem; height: 22rem; border-radius: 44% 56% 62% 38% / 50% 44% 56% 50%; background: linear-gradient(145deg, rgb(113 134 255 / 34%), rgb(141 207 255 / 15%)); --float-rotate: -8deg; animation: softFloat 9s ease-in-out infinite; }
+.shape-pink { right: -5rem; top: -3rem; width: 22rem; height: 18rem; border-radius: 44% 56% 58% 42% / 42% 52% 48% 58%; background: linear-gradient(145deg, rgb(255 114 184 / 24%), rgb(255 201 174 / 16%)); --float-rotate: 4deg; animation: softFloat 11s ease-in-out infinite reverse; }
+.shape-yellow { right: -3.5rem; bottom: -4rem; width: 16rem; height: 16rem; border-radius: 999px; background: radial-gradient(circle, rgb(255 217 92 / 40%), transparent 68%); --float-rotate: 0deg; animation: softFloat 10s ease-in-out infinite; }
+.shape-mint-ring { right: -2rem; top: 15rem; width: 11rem; height: 11rem; border: 1.5rem solid rgb(101 219 165 / 22%); border-radius: 999px; filter: blur(2px); --float-rotate: 0deg; animation: softFloat 12s ease-in-out infinite reverse; }
+
+.experience-hero-copy { position: relative; z-index: 3; display: grid; justify-items: center; padding: clamp(8rem, 15vh, 10rem) clamp(1.25rem, 5vw, 5rem) 0; text-align: center; }
+.experience-hero-copy h1 { margin-top: 0; max-width: 55rem; color: var(--color-ink); font-size: 5.7rem; font-weight: 950; line-height: 0.95; }
+.experience-hero-copy h1 span { color: transparent; background: linear-gradient(92deg, var(--color-periwinkle), #4f7cff 72%); background-clip: text; }
+.experience-hero-copy h1 em { color: transparent; font-style: normal; background: linear-gradient(92deg, var(--color-lavender), var(--color-pink)); background-clip: text; }
+.experience-hero-copy p { margin-top: 1.6rem; max-width: 39rem; color: var(--color-ink-muted); font-size: 1.16rem; font-weight: 650; line-height: 1.55; }
+
+.experience-floating-card { z-index: 1; display: grid; place-items: center; border: 1px solid rgb(255 255 255 / 78%); border-radius: 2rem; background: rgb(255 255 255 / 52%); box-shadow: 0 24px 60px rgb(75 63 131 / 8%), inset 0 1px 0 rgb(255 255 255 / 86%); backdrop-filter: blur(16px); }
+.experience-chart-card { left: 6.6rem; top: 17.5rem; width: 12.6rem; height: 12.6rem; color: var(--color-lavender); --float-rotate: -14deg; animation: softFloat 7s ease-in-out infinite; }
+.experience-pie-card { right: 7rem; top: 20rem; width: 13.6rem; height: 13.6rem; color: #55c878; --float-rotate: 14deg; animation: softFloat 7.5s ease-in-out infinite reverse; }
+.experience-pie-card svg { color: transparent; }
+.experience-pie-card::before { content: ""; width: 7.2rem; height: 7.2rem; border: 0.5rem solid rgb(255 255 255 / 70%); border-radius: 999px; background: conic-gradient(from -32deg, var(--color-pink) 0 25%, #65dba5 25% 49%, var(--color-periwinkle) 49% 72%, var(--color-peach) 72% 100%); box-shadow: 0 18px 38px rgb(75 63 131 / 10%); }
+.experience-menu-card { right: 3.6rem; top: 2rem; z-index: 4; display: grid; width: 5.8rem; height: 5.8rem; align-content: center; justify-items: center; gap: 0.38rem; border: 1px solid rgb(255 255 255 / 82%); border-radius: 1.35rem; background: rgb(255 255 255 / 72%); box-shadow: 0 18px 48px rgb(75 63 131 / 9%), inset 0 1px 0 rgb(255 255 255 / 84%); backdrop-filter: blur(18px); }
+.experience-menu-card span { display: block; width: 1.9rem; height: 0.24rem; border-radius: 999px; background: linear-gradient(90deg, var(--color-sky), var(--color-periwinkle)); }
+.experience-menu-card::after { content: ""; position: absolute; right: -0.8rem; bottom: -0.55rem; width: 1.85rem; height: 1.85rem; border-radius: 0.55rem; background: linear-gradient(135deg, #ffd95c, #ffbf4f); }
+.experience-floating-star { z-index: 1; width: 4rem; height: 4rem; --float-rotate: 0deg; animation: softFloat 6.6s ease-in-out infinite; clip-path: polygon(50% 0%, 61% 35%, 98% 50%, 61% 65%, 50% 100%, 39% 65%, 2% 50%, 39% 35%); filter: drop-shadow(0 18px 22px rgb(75 63 131 / 10%)); }
+.star-left { left: 13.5rem; top: 10.4rem; background: linear-gradient(135deg, #65dba5, #8dcfff); }
+.star-right { right: 18.5rem; top: 12.5rem; width: 5.8rem; height: 5.8rem; background: linear-gradient(135deg, #ffd95c, #ffc9ae); }
+.experience-dot { z-index: 1; width: 1.35rem; height: 1.35rem; border-radius: 999px; box-shadow: 0 16px 30px rgb(75 63 131 / 12%); }
+.dot-left { left: 4.4rem; top: 23.4rem; background: var(--color-pink); }
+.dot-right { right: 10.6rem; bottom: 13.2rem; background: #ffb14f; }
+.dot-blue { right: 5rem; top: 31.7rem; background: linear-gradient(135deg, var(--color-sky), var(--color-periwinkle)); border-radius: 0.45rem; }
+
+.experience-section { padding-inline: var(--space-gutter); padding-top: clamp(2.5rem, 5vw, 4.5rem); }
+.experience-section-heading { display: grid; max-width: 52rem; gap: 1rem; }
+.experience-section-heading-wide { max-width: 60rem; }
+.experience-section-heading h2 { color: var(--color-ink); font-size: clamp(2.4rem, 5vw, 4.8rem); font-weight: 950; line-height: 0.98; }
+.experience-section-heading p { max-width: 46rem; color: var(--color-ink-muted); font-size: 1.02rem; line-height: 1.7; }
+.experience-certificate-grid { margin-top: 2rem; display: grid; gap: 1.1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.experience-certificate-card, .experience-role-card { position: relative; overflow: hidden; border-radius: 2rem; }
+.experience-certificate-card { min-height: 100%; padding: clamp(1.2rem, 3vw, 1.65rem) !important; }
+.experience-certificate-card::before, .experience-role-card::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(circle, rgb(255 255 255 / 72%) 0 1px, transparent 1.4px), radial-gradient(circle, rgb(255 255 255 / 42%) 0 0.8px, transparent 1.2px); background-position: 0 0, 10px 8px; background-size: 18px 18px, 28px 28px; opacity: 0.38; mask-image: linear-gradient(135deg, black 0%, transparent 72%); }
+.experience-card-lavender { --experience-accent: var(--color-lavender); --experience-soft: rgb(139 124 255 / 16%); }
+.experience-card-sky { --experience-accent: var(--color-sky); --experience-soft: rgb(141 207 255 / 18%); }
+.experience-card-pink { --experience-accent: var(--color-pink); --experience-soft: rgb(255 114 184 / 16%); }
+.experience-card-mint { --experience-accent: #65dba5; --experience-soft: rgb(101 219 165 / 15%); }
+.experience-card-peach { --experience-accent: var(--color-peach); --experience-soft: rgb(255 201 174 / 18%); }
+.experience-certificate-topline { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.experience-badge-mark, .experience-role-icon { display: grid; place-items: center; border: 1px solid rgb(255 255 255 / 76%); border-radius: 1.1rem; background: rgb(255 255 255 / 68%); box-shadow: 0 16px 34px color-mix(in srgb, var(--experience-accent) 22%, rgb(75 63 131 / 10%)); }
+.experience-badge-mark { width: 3.5rem; height: 3.5rem; }
+.experience-certificate-card h3 { position: relative; z-index: 1; margin-top: 1.4rem; color: var(--color-ink); font-size: clamp(1.25rem, 2vw, 1.65rem); font-weight: 950; line-height: 1.05; }
+.experience-issuer { position: relative; z-index: 1; margin-top: 0.55rem; color: color-mix(in srgb, var(--experience-accent) 72%, var(--color-ink)); font-size: 0.82rem; font-weight: 950; text-transform: uppercase; }
+.experience-description, .experience-role-summary { position: relative; z-index: 1; color: var(--color-ink-muted); line-height: 1.65; }
+.experience-description { margin-top: 1rem; font-size: 0.92rem; }
+.experience-certificate-card ul, .experience-role-card ul { position: relative; z-index: 1; margin: 1rem 0 0; padding: 0; list-style: none; }
+.experience-certificate-card li, .experience-role-card li { position: relative; margin-top: 0.68rem; padding-left: 1.15rem; color: var(--color-ink); font-size: 0.84rem; font-weight: 650; line-height: 1.5; }
+.experience-certificate-card li::before, .experience-role-card li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 0.42rem; height: 0.42rem; border-radius: 999px; background: var(--experience-accent); box-shadow: 0 0 0 0.22rem var(--experience-soft); }
+.experience-board-grid { margin-top: 2rem; display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.experience-role-card { min-height: 100%; border: 1px solid rgb(255 255 255 / 72%); background: linear-gradient(145deg, rgb(255 255 255 / 86%), rgb(255 255 255 / 58%)), linear-gradient(135deg, var(--experience-soft), transparent 62%); padding: clamp(1rem, 2.5vw, 1.35rem); box-shadow: 0 20px 54px rgb(75 63 131 / 10%), inset 0 1px 0 rgb(255 255 255 / 76%); backdrop-filter: blur(18px); }
+.experience-role-glow { position: absolute; right: -2rem; top: -2rem; width: 8rem; height: 8rem; border: 1.1rem solid color-mix(in srgb, var(--experience-accent) 24%, transparent); border-radius: 999px; opacity: 0.7; }
+.experience-role-header { position: relative; z-index: 1; display: flex; align-items: flex-start; gap: 0.9rem; }
+.experience-role-icon { flex: 0 0 auto; width: 2.8rem; height: 2.8rem; color: color-mix(in srgb, var(--experience-accent) 72%, var(--color-ink)); }
+.experience-role-card h3 { color: var(--color-ink); font-size: 1.02rem; font-weight: 950; line-height: 1.15; }
+.experience-role-card h3 + p { margin-top: 0.42rem; color: color-mix(in srgb, var(--experience-accent) 76%, var(--color-ink)); font-size: 0.76rem; font-weight: 900; line-height: 1.35; text-transform: uppercase; }
+.experience-role-meta, .experience-topic-row { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.experience-role-meta { margin-top: 1rem; }
+.experience-role-meta span, .experience-topic-row span { display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid rgb(255 255 255 / 74%); border-radius: 999px; background: rgb(255 255 255 / 62%); box-shadow: 0 8px 20px rgb(75 63 131 / 7%); }
+.experience-role-meta span { padding: 0.43rem 0.62rem; color: var(--color-ink-muted); font-size: 0.72rem; font-weight: 850; }
+.experience-role-summary { margin-top: 1rem; font-size: 0.9rem; }
+.experience-topic-row { margin-top: 1rem; }
+.experience-topic-row span { padding: 0.38rem 0.58rem; color: color-mix(in srgb, var(--experience-accent) 72%, var(--color-ink)); font-size: 0.68rem; font-weight: 900; }
+
+@media (max-width: 1280px) { .experience-hero-copy { padding-top: clamp(7.5rem, 13vh, 9rem); } .experience-hero-copy h1 { font-size: 4.65rem; } .experience-floating-card { opacity: 0.58; } .experience-chart-card { left: 3.5rem; } .experience-pie-card { right: 3.5rem; } }
+@media (max-width: 1100px) { .experience-hero, .experience-hero-panel { min-height: clamp(34rem, 62svh, 42rem); } .experience-menu-card, .experience-floating-card, .star-right, .dot-blue { display: none; } .experience-certificate-grid, .experience-board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 767px) { .experience-hero, .experience-hero-panel { min-height: 31rem; } .experience-hero-copy { padding: 6rem 1rem 0; } .experience-hero-copy h1 { font-size: 3.15rem; } .experience-hero-copy p { font-size: 1rem; } .experience-background-shape, .experience-floating-star, .experience-dot { opacity: 0.42; } .experience-certificate-grid, .experience-board-grid { grid-template-columns: 1fr; } }
