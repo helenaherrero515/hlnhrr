@@ -1,8 +1,14 @@
-import { Allura, Inter, Parisienne } from "next/font/google";
+import { Allura, Inter, Parisienne, Lexend } from "next/font/google";
 
 export const sans = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+export const lexend = Lexend({
+  subsets: ["latin"],
+  variable: "--font-lexend",
   display: "swap",
 });
 

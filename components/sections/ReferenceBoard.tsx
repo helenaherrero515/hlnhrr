@@ -128,6 +128,7 @@ export function ReferenceBoard({ profile, experience, hackathons, skills, commun
         <button type="button" aria-label="Hover or focus to flip About Me card" className="atm-flip-card">
           <span className="atm-card-inner">
             <span className="atm-card-face atm-card-front">
+              <span aria-hidden="true" className="atm-hologram-overlay" />
               <span className="relative z-10 flex items-center justify-between gap-4">
                 <span className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wide text-white/92"><UserRound aria-hidden="true" size={18} /> About Me</span>
                 <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.22em] text-white/80">Portfolio</span>
@@ -149,6 +150,7 @@ export function ReferenceBoard({ profile, experience, hackathons, skills, commun
             </span>
 
             <span className="atm-card-face atm-card-back">
+              <span aria-hidden="true" className="atm-hologram-overlay" />
               <span aria-hidden="true" className="atm-card-stripe" />
               <span className="relative z-10 flex items-center gap-2 border-b border-white/24 pb-3 text-sm font-black uppercase tracking-wide text-white/92"><UserRound size={18} /> About Me</span>
               <span className="relative z-10 mt-4 grid gap-4 text-white/88 sm:grid-cols-2">

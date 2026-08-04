@@ -1,2 +1,2 @@
-export { heroSignature, sans, signature } from "./fonts";
+export { heroSignature, lexend, sans, signature } from "./fonts";
 export { createMetadata } from "./seo";

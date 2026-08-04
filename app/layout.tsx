@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { siteMetadata } from "@/constants";
-import { heroSignature, sans, signature } from "@/lib";
+import { heroSignature, lexend, sans, signature } from "@/lib";
 import "./globals.css";
 
 export const metadata: Metadata = siteMetadata;
@@ -11,7 +11,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>): React.ReactElement {
   return (
-    <html lang="en" className={`${sans.variable} ${signature.variable} ${heroSignature.variable}`}>
+    <html lang="en" className={`${sans.variable} ${lexend.variable} ${signature.variable} ${heroSignature.variable}`}>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content

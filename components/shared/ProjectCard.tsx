@@ -64,10 +64,10 @@ function ProjectFolder({ title }: { title: string }): ReactElement {
 export function ProjectCard({ project, size = "standard", className, onSelect, ctaLabel = "View Project" }: ProjectCardProps): ReactElement {
   const destination = project.caseStudyHref ?? project.href ?? `/projects#${project.slug}`;
   const cardContent = (
-    <GlassCard tone="default" padding="none" className="project-showcase-card relative flex h-full min-h-[35rem] overflow-hidden rounded-[1.5rem] border border-white/70 bg-[linear-gradient(145deg,rgb(255_255_255_/_78%),rgb(255_255_255_/_48%))] p-5 shadow-[0_22px_70px_rgb(32_27_58_/_10%)] backdrop-blur-[var(--blur-glass)] sm:p-6">
+    <GlassCard tone="default" padding="none" className="project-showcase-card relative flex h-full min-h-[30rem] flex-col overflow-hidden rounded-[1.5rem] border border-white/70 bg-[linear-gradient(145deg,rgb(255_255_255_/_78%),rgb(255_255_255_/_48%))] p-5 shadow-[0_22px_70px_rgb(32_27_58_/_10%)] backdrop-blur-[var(--blur-glass)] sm:min-h-[35rem] sm:p-6 lg:p-7">
       <div aria-hidden="true" className="project-card-aura absolute inset-0" />
-      <div className="relative z-10 flex min-h-full w-full flex-col">
-        <div className="project-visual grid min-h-52 place-items-center rounded-[1.25rem] border border-white/70 bg-white/35 shadow-[inset_0_1px_0_rgb(255_255_255_/_70%)] backdrop-blur-xl">
+      <div className="relative z-10 flex flex-1 flex-col">
+        <div className="project-visual grid min-h-44 place-items-center rounded-[1.25rem] border border-white/70 bg-white/35 shadow-[inset_0_1px_0_rgb(255_255_255_/_70%)] backdrop-blur-xl sm:min-h-52">
           <ProjectFolder title={project.title} />
         </div>
 
@@ -77,20 +77,20 @@ export function ProjectCard({ project, size = "standard", className, onSelect, c
         </div>
 
         <div className="project-copy mt-5">
-          <h3 className="project-title text-2xl font-black leading-tight text-[var(--color-ink)]">{project.title}</h3>
-          <p className="project-event mt-2 text-xs font-black uppercase leading-snug text-[var(--project-ink)] opacity-80">{project.event}</p>
-          <p className="project-role mt-4 text-sm font-semibold leading-snug text-[var(--color-ink)]">{project.role}</p>
-          <p className="project-description mt-3 text-sm leading-[1.55] text-[var(--color-ink-muted)]">{project.description}</p>
+          <h3 className="project-title text-xl font-black leading-tight text-[var(--color-ink)] sm:text-2xl">{project.title}</h3>
+          <p className="project-event mt-2 text-[10px] font-black uppercase leading-snug text-[var(--project-ink)] opacity-80 sm:text-xs">{project.event}</p>
+          <p className="project-role mt-4 text-xs font-semibold leading-snug text-[var(--color-ink)] sm:text-sm">{project.role}</p>
+          <p className="project-description mt-3 text-xs leading-[1.55] text-[var(--color-ink-muted)] sm:text-sm">{project.description}</p>
         </div>
 
         <div className="project-footer mt-auto pt-6">
-          <p className="project-achievement rounded-[1rem] border border-white/70 bg-white/50 px-4 py-3 text-xs font-semibold leading-[1.45] text-[var(--color-ink-muted)] shadow-sm backdrop-blur-sm">{project.achievement}</p>
-          <span className="project-cta mt-5 inline-flex items-center gap-2 text-sm font-black text-[var(--color-ink)]">
+          <p className="project-achievement rounded-[1rem] border border-white/70 bg-white/50 px-4 py-3 text-[10px] font-semibold leading-[1.45] text-[var(--color-ink-muted)] shadow-sm backdrop-blur-sm sm:text-xs">{project.achievement}</p>
+          <span className="project-cta mt-5 inline-flex items-center gap-2 text-xs font-black text-[var(--color-ink)] sm:text-sm">
             {ctaLabel} <ArrowRight aria-hidden="true" size={16} />
           </span>
         </div>
       </div>
-      <span aria-hidden="true" className="project-location-pin absolute bottom-6 right-6 grid size-11 place-items-center rounded-full border border-white/70 bg-white/60 text-[var(--project-secondary)] shadow-sm backdrop-blur-md">
+      <span aria-hidden="true" className="project-location-pin absolute bottom-6 right-6 grid size-10 place-items-center rounded-full border border-white/70 bg-white/60 text-[var(--project-secondary)] shadow-sm backdrop-blur-md sm:size-11">
         <MapPin size={19} />
       </span>
     </GlassCard>

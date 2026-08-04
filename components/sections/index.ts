@@ -9,6 +9,7 @@ export { Footer } from "./Footer";
 export { Hackathons } from "./Hackathons";
 export { Hero } from "./Hero";
 export { ProjectGrid } from "./ProjectGrid";
+export { ProjectsInteractiveBackground } from "./ProjectsInteractiveBackground";
 export { ReferenceBoard } from "./ReferenceBoard";
 export { ShowcaseHero } from "./ShowcaseHero";
 export { Skills } from "./Skills";
