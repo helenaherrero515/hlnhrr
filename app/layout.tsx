@@ -25,8 +25,8 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>): React.ReactElement {
   return (
-    <html lang="en" className={`${sans.variable} ${lexend.variable} ${signature.variable} ${heroSignature.variable}`}>
-      <body>
+    <html lang="en" className={`${sans.variable} ${lexend.variable} ${signature.variable} ${heroSignature.variable}`} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>

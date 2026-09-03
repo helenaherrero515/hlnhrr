@@ -3726,6 +3726,19 @@ select {
   background-size: 18px 18px;
 }
 
+.figma-work-card-button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
 .figma-work-image {
   position: relative;
   height: 226px;
@@ -3842,6 +3855,213 @@ select {
   flex: 0 0 16px;
   width: 16px;
   height: 15px;
+}
+
+.figma-work-modal {
+  --figma-red: #1261ff;
+  --figma-blue: #8dbbff;
+  --figma-black: #010101;
+  --figma-dot: rgb(18 97 255 / 10%);
+  --figma-grid: rgb(18 97 255 / 4%);
+  --figma-display: "Iosevka Charon", "Iosevka", "Consolas", "Cascadia Mono", "JetBrains Mono", "Intel One Mono", "Courier New", monospace;
+  --figma-body: "Iosevka Charon Mono", "Iosevka", "Consolas", "Cascadia Mono", "JetBrains Mono", "Intel One Mono", "Courier New", monospace;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  color: var(--figma-black);
+  font-family: var(--figma-body);
+  isolation: isolate;
+}
+
+.figma-work-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: rgb(1 1 1 / 56%);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.figma-work-modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, calc(100vw - 56px));
+  max-height: calc(100dvh - 56px);
+  overflow: auto;
+  border: 3px solid var(--figma-black);
+  background:
+    linear-gradient(45deg, var(--figma-grid) 25%, transparent 25% 75%, var(--figma-grid) 75%),
+    linear-gradient(45deg, var(--figma-grid) 25%, transparent 25% 75%, var(--figma-grid) 75%),
+    radial-gradient(circle, var(--figma-dot) 0 1.15px, transparent 1.3px),
+    #ffffff;
+  background-position: 0 0, 11px 11px, 0 0;
+  background-size: 22px 22px, 22px 22px, 22px 22px;
+  box-shadow:
+    8px 8px 0 var(--figma-red),
+    0 26px 90px rgb(0 0 0 / 34%);
+  animation: figmaModalRise 220ms ease-out both;
+  scrollbar-color: rgb(1 1 1 / 48%) transparent;
+  scrollbar-width: thin;
+}
+
+.figma-work-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 3px solid var(--figma-black);
+  background:
+    linear-gradient(90deg, rgb(18 97 255 / 8%), transparent 44%),
+    #ffffff;
+  padding: 18px 82px 18px 22px;
+}
+
+.figma-work-modal-header span {
+  display: block;
+  margin-bottom: 6px;
+  color: rgb(1 1 1 / 56%);
+  font-family: var(--figma-body);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.figma-work-modal-header h3 {
+  margin: 0;
+  color: var(--figma-red);
+  font-family: var(--figma-display);
+  font-size: clamp(42px, 5vw, 62px);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 0.88;
+  text-transform: uppercase;
+  text-shadow: 2px 0 0 rgb(18 97 255 / 18%);
+}
+
+.figma-work-modal-header p {
+  margin: 12px 0 0;
+  font-family: var(--figma-body);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.figma-work-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  display: inline-grid;
+  width: auto;
+  height: 34px;
+  place-items: center;
+  border: 2px solid var(--figma-black);
+  background: var(--figma-black);
+  color: #ffffff;
+  cursor: pointer;
+  font-family: var(--figma-body);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 9px 14px 7px;
+  text-transform: uppercase;
+  transition: background-color 160ms ease, box-shadow 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.figma-work-modal-close:hover,
+.figma-work-modal-close:focus-visible {
+  background: var(--figma-red);
+  box-shadow: 3px 3px 0 var(--figma-black);
+  color: #ffffff;
+  transform: translate(-1px, -1px);
+}
+
+.figma-work-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px 20px 22px;
+  background: transparent;
+}
+
+.figma-work-modal-item {
+  min-width: 0;
+  margin: 0;
+  border: 2px solid var(--figma-black);
+  background: #ffffff;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.figma-work-modal-item:hover,
+.figma-work-modal-item:focus-within {
+  box-shadow: 4px 4px 0 var(--figma-red);
+  transform: translate(-1px, -1px);
+}
+
+.figma-work-modal-item div {
+  position: relative;
+  aspect-ratio: 1.06;
+  overflow: hidden;
+  border-bottom: 2px solid var(--figma-black);
+}
+
+.figma-work-modal-item img {
+  object-fit: cover;
+  filter: grayscale(0) contrast(1.03);
+}
+
+.figma-work-modal-item figcaption {
+  min-height: 42px;
+  padding: 9px 10px 8px;
+  color: var(--figma-black);
+  font-family: var(--figma-body);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.figma-work-modal-empty {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  align-content: center;
+  gap: 13px;
+  margin: 20px;
+  border: 2px dashed var(--figma-black);
+  background:
+    linear-gradient(90deg, transparent 0 16px, rgb(18 97 255 / 14%) 16px 18px, transparent 18px 36px),
+    repeating-linear-gradient(to bottom, #ffffff 0 13px, #eeeeee 13px 14px);
+  color: var(--figma-black);
+  font-family: var(--figma-display);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.figma-work-modal-empty span,
+.figma-work-modal-empty small {
+  background: var(--figma-black);
+  color: #ffffff;
+  font-family: var(--figma-body);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px 8px 3px;
+}
+
+.figma-work-modal-empty strong {
+  color: var(--figma-red);
+  font-size: clamp(28px, 5vw, 50px);
+  font-weight: 800;
+  line-height: 0.95;
 }
 
 .figma-contact-section {
@@ -4023,6 +4243,18 @@ select {
 
   100% {
     transform: translate3d(0, 8px, 0);
+  }
+}
+
+@keyframes figmaModalRise {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -4466,6 +4698,10 @@ select {
     gap: 16px;
   }
 
+  .figma-work-modal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .figma-contact-grid {
     grid-template-columns: 1fr;
   }
@@ -4666,6 +4902,43 @@ select {
     display: block;
     grid-column: 3;
     justify-self: end;
+  }
+
+  .figma-work-modal {
+    padding: 16px;
+  }
+
+  .figma-work-modal-panel {
+    width: calc(100vw - 32px);
+    max-height: calc(100dvh - 32px);
+  }
+
+  .figma-work-modal-header {
+    gap: 12px;
+    padding: 22px 60px 16px 20px;
+  }
+
+  .figma-work-modal-header h3 {
+    font-size: 38px;
+  }
+
+  .figma-work-modal-header p {
+    font-size: 13px;
+  }
+
+  .figma-work-modal-close {
+    top: 18px;
+    right: 18px;
+  }
+
+  .figma-work-modal-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .figma-work-modal-item div {
+    aspect-ratio: 1.12;
   }
 }
 

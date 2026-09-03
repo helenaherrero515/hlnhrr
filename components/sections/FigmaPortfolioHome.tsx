@@ -3,6 +3,7 @@ import type { CSSProperties, ReactElement, ReactNode } from "react";
 import { FigmaRefreshScroll } from "@/components/sections/FigmaRefreshScroll";
 import { FigmaScrollReveal } from "@/components/sections/FigmaScrollReveal";
 import { FigmaTypingLabel } from "@/components/sections/FigmaTypingLabel";
+import { FigmaWorksGallery } from "@/components/sections/FigmaWorksGallery";
 import { profile, projects } from "@/data";
 
 interface ExperienceEntry {
@@ -187,33 +188,6 @@ function ProjectCard({ slug, image, index, revealDelay = 0 }: ProjectCardProps):
   );
 }
 
-function WorkCategoryCard({ title, subtitle, images, revealDelay = 0 }: WorkCategoryCardProps): ReactElement {
-  return (
-    <article className="figma-work-card figma-scroll-rise" style={revealDelayStyle(revealDelay)}>
-      <div className={images ? "figma-work-image figma-work-image-collage" : "figma-work-image figma-work-image-category"}>
-        {images ? (
-          images.map((image) => (
-            <div key={image.title} className="figma-work-collage-tile">
-              <Image src={image.image} alt={`${image.title} pubmat`} fill sizes="(max-width: 780px) 45vw, 16vw" style={{ objectPosition: image.position ?? "center" }} />
-            </div>
-          ))
-        ) : (
-          <div className="figma-work-category-message">
-            <span>POSTING SOON</span>
-            <strong>{title}</strong>
-            <small>UNDER CONSTRUCTION</small>
-          </div>
-        )}
-      </div>
-      <div className="figma-work-caption">
-        <span>{title}</span>
-        <small>{subtitle}</small>
-        <Image src="/images/figma-portfolio/arrow-project.svg" alt="" width={16} height={15} />
-      </div>
-    </article>
-  );
-}
-
 export function FigmaPortfolioHome(): ReactElement {
   return (
     <main id="main-content" className="figma-portfolio-page">
@@ -294,11 +268,7 @@ export function FigmaPortfolioHome(): ReactElement {
 
         <section id="works" className="figma-works-section">
           <SectionLabel>WORKS</SectionLabel>
-          <div className="figma-work-grid">
-            {workCategories.map((work, index) => (
-              <WorkCategoryCard key={work.title} {...work} revealDelay={index * 90} />
-            ))}
-          </div>
+          <FigmaWorksGallery categories={workCategories} />
         </section>
 
         <section id="contact" className="figma-contact-section">
