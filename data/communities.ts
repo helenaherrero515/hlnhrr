@@ -26,7 +26,7 @@ export const communities: Community[] = [
     description: "Optimizes program flow and supports content development for machine learning and data science workshops.",
     highlights: ["Aligned workshops with ML and data science objectives while tracking participant skill outcomes."],
     image: "/images/communities/gdg-on-campus-pup-group.jpg",
-    logo: "/images/logos/google-developer-group-pup.png",
+    logo: "/images/logos/google-cloud-data-analytics.png",
   },
   {
     name: "AWS User Group Philippines (AWSUG PH)",
