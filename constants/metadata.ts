@@ -10,6 +10,11 @@ export const siteMetadata: Metadata = {
   description: defaultSeo.description,
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
+  icons: {
+    icon: [{ url: "/images/profile/helena-portrait.png", type: "image/png" }],
+    shortcut: [{ url: "/images/profile/helena-portrait.png", type: "image/png" }],
+    apple: [{ url: "/images/profile/helena-portrait.png", type: "image/png" }],
+  },
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
   publisher: siteConfig.name,
