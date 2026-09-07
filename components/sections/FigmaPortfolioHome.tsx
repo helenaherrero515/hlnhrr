@@ -32,6 +32,10 @@ interface WorkImage {
   title: string;
   image: string;
   position?: string;
+  pdf?: string;
+  organization?: string;
+  width?: number;
+  height?: number;
 }
 
 interface WorkCategoryCardProps {
@@ -83,27 +87,62 @@ const projectImages: ProjectCardProps[] = [
 ];
 
 const pubmatWorks: WorkImage[] = [
-  { title: "Founders Live Manila", image: "/images/figma-portfolio/raw-11.png" },
-  { title: "AWS Community Day", image: "/images/figma-portfolio/raw-15.png", position: "top" },
-  { title: "AWS Build Night", image: "/images/figma-portfolio/raw-14.png" },
-  { title: "AWS User Group PH", image: "/images/figma-portfolio/raw-20.png" },
-  { title: "AWSSBG PUP", image: "/images/figma-portfolio/raw-10.png" },
-  { title: "Microsoft Build", image: "/images/figma-portfolio/raw-02.png" },
+  { title: "Teaser", organization: "Founders Live Manila", image: "/images/figma-portfolio/pubmats/founders live manila/teaser.png", width: 913, height: 911 },
+  { title: "Kiro Night Pubs", organization: "AWS User Group PH", image: "/images/figma-portfolio/pubmats/aws user group ph/kiro night pubs.png", width: 666, height: 557 },
+  { title: "Agentic Football Cup Pubs", organization: "AWS User Group PH", image: "/images/figma-portfolio/pubmats/aws user group ph/agentic football cup pubs.png", width: 342, height: 822 },
+  { title: "Meet the Speaker and Fun Fact Pubs", organization: "AWS User Group PH", image: "/images/figma-portfolio/pubmats/aws user group ph/meet the speaker and fun fact pubs.png", width: 707, height: 727 },
+  { title: "Cover Photo", organization: "AWS User Group PH", image: "/images/figma-portfolio/pubmats/aws user group ph/cover photo.png", width: 1401, height: 347 },
+  { title: "Logo", organization: "AWS User Group PH", image: "/images/figma-portfolio/pubmats/aws user group ph/logo.png", width: 907, height: 910 },
+  { title: "Workshop 1 Poster", organization: "AWS Student Builder Group PUP", image: "/images/figma-portfolio/pubmats/aws sbg pup/workshop 1 poster.png", width: 737, height: 737 },
+  { title: "Top DataCamp Scholars", organization: "AWS Student Builder Group PUP", image: "/images/figma-portfolio/pubmats/aws sbg pup/top datacamp scholars.png", width: 782, height: 780 },
+  { title: "Meet the Winners", organization: "AWS Build Night", image: "/images/figma-portfolio/pubmats/aws build night/meet the winners.png", width: 965, height: 812 },
+  { title: "Recap Pics", organization: "AWS Build Night", image: "/images/figma-portfolio/pubmats/aws build night/recap pics.png", width: 770, height: 762 },
+  { title: "Meet the Judges", organization: "AWS Build Night", image: "/images/figma-portfolio/pubmats/aws build night/meet the judgess.png", width: 772, height: 651 },
+  { title: "Registration", organization: "AWS Build Night", image: "/images/figma-portfolio/pubmats/aws build night/registration.png", width: 767, height: 395 },
+  { title: "Reveal and Onboarding", organization: "AWS Build Night", image: "/images/figma-portfolio/pubmats/aws build night/reveal and onboarding.png", width: 1111, height: 557 },
+  { title: "Email Header", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/email header.png", width: 953, height: 248 },
+  { title: "Countdown", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/countdown.png", width: 1075, height: 242 },
+  { title: "Meet the Host", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/meet the host.png", width: 315, height: 798 },
+  { title: "Program Flow", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/program flow.png", width: 1152, height: 422 },
+  { title: "Banner", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/banner.png", width: 222, height: 832 },
+  { title: "Call for Media Team", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/call for media team.png", width: 818, height: 418 },
+  { title: "Application Closed", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/application closed.png", width: 592, height: 602 },
+  { title: "Venue Reveal", organization: "AWS Community Day 2026", image: "/images/figma-portfolio/pubmats/aws community day 2026/venue reveal.png", width: 602, height: 738 },
+];
+
+const pptDeckWorks: WorkImage[] = [
+  {
+    title: "GuidHER Pitch Deck",
+    image: "/images/figma-portfolio/ppt-decks/guidher-pitch-deck-cover.png",
+    pdf: "/images/figma-portfolio/ppt-decks/Copy of GUIDHER PITCH DECK.pdf",
+  },
+  {
+    title: "ACT1 Presentation Deck",
+    image: "/images/figma-portfolio/ppt-decks/act1-herrero-helena-cover.png",
+    pdf: "/images/figma-portfolio/ppt-decks/ACT1_HERRERO, HELENA.pdf",
+  },
+];
+
+const swagDesignWorks: WorkImage[] = [
+  { title: "AWS Community Day 2026", image: "/images/figma-portfolio/swags-design/aws-community-day-2026.png" },
+  { title: "Microsoft Build 2026", image: "/images/figma-portfolio/swags-design/microsoft-build-2026.png" },
 ];
 
 const workCategories: WorkCategoryCardProps[] = [
   {
     title: "PUBMATS",
-    subtitle: "6 org publication materials",
+    subtitle: "publication materials gallery",
     images: pubmatWorks,
   },
   {
     title: "SWAGS DESIGN",
-    subtitle: "merch and event collateral",
+    subtitle: "2 merch and event collateral designs",
+    images: swagDesignWorks,
   },
   {
-    title: "BRANDING",
-    subtitle: "identity systems and visual direction",
+    title: "PPT DECKS",
+    subtitle: "presentation design and storytelling",
+    images: pptDeckWorks,
   },
 ];
 
@@ -226,11 +265,12 @@ export function FigmaPortfolioHome(): ReactElement {
             <FigmaTypingLabel />
             <div className="figma-about-text">
               <p>
-                I’m <strong>Helena Herrero</strong>, I started doing projects back when i was in Highschool. It first started as doing robotics research, but it ended up being more.
+                I’m <strong>Helena Herrero</strong>. I started getting into tech back in high school through robotics research, and honestly, it just kept growing from there.
               </p>
-              <p>What we built back then were data science, data analytics, web development, information system, and machine learning experiments.</p>
-              <p>We have spent a lot thinking of topics and created a space for our innovative minds, not just because it’s requirement, but we enjoyed sharing ideas as much as we do building them.</p>
-              <p>Right now, I’m studying and focusing on data science, artificial intelligence, and machine learning. I also learned how to write code through experimenting with different projects and technologies. More recently, I’ve started exploring cybersecurity as well, particularly digital forensics and cyber forensic investigation, as I’ve become increasingly interested in understanding how cyber incidents happen, analyzing digital evidence, and investigating what happened behind them.</p>
+              <p>I started working on different projects in data science, analytics, web development, information systems, and machine learning. Most of the time, I was just curious about something and wanted to see if I could build it.</p>
+              <p>I’m currently focused on data science, AI, and machine learning. I also enjoy learning by experimenting, breaking things, fixing them, and trying new technologies.</p>
+              <p>Lately, I’ve been getting into cybersecurity, especially digital forensics. I find it interesting how you can look at digital evidence and piece together what actually happened.</p>
+              <p>I don’t really have everything figured out yet. I’m just enjoying the process of learning, building, and seeing where it takes me.</p>
             </div>
           </div>
 
@@ -267,7 +307,12 @@ export function FigmaPortfolioHome(): ReactElement {
         </section>
 
         <section id="works" className="figma-works-section">
-          <SectionLabel>WORKS</SectionLabel>
+          <div className="figma-works-heading-row">
+            <SectionLabel>WORKS</SectionLabel>
+            <a className="figma-more-designs-button" href="https://artletsstudentcouncilmock.my.canva.site/helena-herrero" target="_blank" rel="noreferrer">
+              MORE DESIGNS →
+            </a>
+          </div>
           <FigmaWorksGallery categories={workCategories} />
         </section>
 

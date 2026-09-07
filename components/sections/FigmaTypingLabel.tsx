@@ -17,7 +17,9 @@ const pauseMs = 980;
 
 export function FigmaTypingLabel(): ReactElement {
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const [visibleLength, setVisibleLength] = useState(0);
+  // Render a real label on the server and on first paint. Starting at zero
+  // leaves the banner blank until the client-side typing timer first runs.
+  const [visibleLength, setVisibleLength] = useState(phrases[0].length);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
@@ -39,13 +41,17 @@ export function FigmaTypingLabel(): ReactElement {
         return;
       }
 
-      if (isDeleting && visibleLength > 0) {
+      if (isDeleting && visibleLength > 1) {
         setVisibleLength((length) => length - 1);
         return;
       }
 
+      const nextPhraseIndex = (phraseIndex + 1) % phrases.length;
+      setPhraseIndex(nextPhraseIndex);
+      // Keep the last letter visible, then change it into the next phrase's
+      // first letter. The banner never falls back to an empty state.
+      setVisibleLength(1);
       setIsDeleting(false);
-      setPhraseIndex((index) => (index + 1) % phrases.length);
     }, delay);
 
     return () => window.clearTimeout(timeoutId);

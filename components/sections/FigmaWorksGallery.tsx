@@ -9,6 +9,10 @@ interface WorkImage {
   title: string;
   image: string;
   position?: string;
+  organization?: string;
+  width?: number;
+  height?: number;
+  pdf?: string;
 }
 
 interface WorkCategory {
@@ -30,7 +34,7 @@ function WorkCategoryCard({ title, subtitle, images, revealDelay = 0, onSelect }
   return (
     <article className="figma-work-card figma-scroll-rise" style={revealDelayStyle(revealDelay)}>
       <button className="figma-work-card-button" type="button" onClick={onSelect} aria-label={`Open ${title} gallery`}>
-        <div className={images ? "figma-work-image figma-work-image-collage" : "figma-work-image figma-work-image-category"}>
+        <div className={images ? `figma-work-image figma-work-image-collage${images.length === 2 ? " figma-work-image-two-up" : ""}` : "figma-work-image figma-work-image-category"}>
           {images ? (
             images.slice(0, 6).map((image) => (
               <div key={image.title} className="figma-work-collage-tile">
@@ -61,6 +65,7 @@ export function FigmaWorksGallery({ categories }: FigmaWorksGalleryProps): React
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const selectedCategory = categories.find((category) => category.title === selectedTitle);
   const selectedImages = selectedCategory?.images ?? [];
+  const isPubmatsGallery = selectedCategory?.title === "PUBMATS";
 
   useEffect(() => {
     setIsMounted(true);
@@ -108,13 +113,31 @@ export function FigmaWorksGallery({ categories }: FigmaWorksGalleryProps): React
               </button>
             </header>
             {selectedImages.length > 0 ? (
-              <div className="figma-work-modal-grid">
+              <div className={`figma-work-modal-grid${selectedCategory.title === "PPT DECKS" ? " figma-work-modal-grid-decks" : ""}${isPubmatsGallery ? " figma-work-modal-grid-pubmats" : ""}`}>
                 {selectedImages.map((image) => (
-                  <figure key={image.title} className="figma-work-modal-item">
+                  <figure key={image.title} className={`figma-work-modal-item${image.pdf ? " figma-work-modal-item-deck" : ""}${isPubmatsGallery ? " figma-work-modal-item-pubmat" : ""}`}>
                     <div>
-                      <Image src={image.image} alt={image.title} fill sizes="(max-width: 780px) 86vw, 28vw" style={{ objectPosition: image.position ?? "center" }} />
+                      {isPubmatsGallery ? (
+                        <Image className="figma-work-modal-pubmat-image" src={image.image} alt={image.title} width={image.width ?? 1000} height={image.height ?? 1000} sizes="(max-width: 780px) 86vw, 28vw" />
+                      ) : (
+                        <Image src={image.image} alt={image.title} fill sizes="(max-width: 780px) 86vw, 28vw" style={{ objectPosition: image.position ?? "center" }} />
+                      )}
+                      {isPubmatsGallery && image.organization ? (
+                        <span className="figma-work-modal-org">
+                          <strong>{image.title}</strong>
+                          <small>{image.organization}</small>
+                        </span>
+                      ) : null}
                     </div>
-                    <figcaption>{image.title}</figcaption>
+                    <figcaption>
+                      <span>{image.title}</span>
+                      {image.pdf ? (
+                        <span className="figma-work-modal-actions">
+                          <a href={image.pdf} target="_blank" rel="noreferrer">Preview</a>
+                          <a href={image.pdf} download>Download PDF</a>
+                        </span>
+                      ) : null}
+                    </figcaption>
                   </figure>
                 ))}
               </div>
