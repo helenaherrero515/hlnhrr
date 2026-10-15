@@ -73,6 +73,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   const [pgColor, setPgColor] = useState<BrickColorKey>("red");
   const [pgSize, setPgSize] = useState<{ w: number; d: number }>({ w: 2, d: 2 });
   const [pgBrickCount, setPgBrickCount] = useState<number>(0);
+  const [pgBuildLabel, setPgBuildLabel] = useState<string>("");
   const [pgName, setPgName] = useState<string>("");
   const [pgSaveMsg, setPgSaveMsg] = useState<string>(
     "Type your name, then save your build as a PNG, ready to post on your Instagram story."
@@ -102,6 +103,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   const stepLabelRef = useRef<HTMLSpanElement | null>(null);
   const stepBarRef = useRef<HTMLDivElement | null>(null);
   const chipRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const buildIndexRef = useRef<number>(0);
 
   // Playground builder internals ref
   const pgRef = useRef<{
@@ -183,31 +185,17 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       localStorage.setItem("hln_brick_notes", JSON.stringify(updated));
     } catch {}
     setGuestMessage("");
-    setGuestStatus("Posting to the community wall…");
+    setGuestStatus("thank you for your note! 🧱");
     setIsBmoHappy(true);
     setTimeout(() => setIsBmoHappy(false), 2200);
 
     try {
-      const res = await fetch("/api/guestbook", {
+      await fetch("/api/guestbook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newEntry),
       });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.notes && Array.isArray(json.notes)) {
-          setGuestNotes(json.notes);
-          try {
-            localStorage.setItem("hln_brick_notes", JSON.stringify(json.notes));
-          } catch {}
-        }
-        setGuestStatus("Posted live to the wall! Thank you! 🧱");
-      } else {
-        setGuestStatus("Saved to this device! Thank you! 🧱");
-      }
-    } catch {
-      setGuestStatus("Saved locally! Thank you! 🧱");
-    }
+    } catch {}
   };
 
   // Main Three.js Scene + Lenis + ScrollTrigger Sequence
@@ -1221,7 +1209,149 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
           bricks: Array<[number, number, number, number, BrickColorKey]>;
         }> = [
           {
-            name: "Cozy Brick Cottage",
+            name: "Helena Avatar 🎧",
+            bricks: [
+              // Blue Pants / Legs & Shoes
+              [5, 5, 2, 2, "blue"], [7, 5, 2, 2, "blue"],
+              [5, 5, 2, 2, "blue"], [7, 5, 2, 2, "blue"],
+              // Black Hoodie Torso
+              [4, 5, 6, 2, "black"],
+              [4, 5, 6, 2, "black"],
+              [4, 5, 6, 2, "black"],
+              // Yellow Head
+              [5, 5, 4, 2, "yellow"],
+              [5, 5, 4, 2, "yellow"],
+              // Black Hair & Headphones
+              [4, 5, 1, 2, "black"], [9, 5, 1, 2, "black"],
+              [5, 5, 4, 2, "black"],
+              [5, 5, 4, 1, "black"],
+            ],
+          },
+          {
+            name: "Mulan & Cri-Kee ⚔️",
+            bricks: [
+              // Hanfu / warrior boots
+              [5, 5, 2, 2, "brown"], [7, 5, 2, 2, "brown"],
+              // Green & Cream Hanfu robe skirt
+              [4, 5, 6, 2, "green"],
+              [4, 5, 6, 2, "white"],
+              // Imperial Red sash waistband
+              [5, 5, 4, 2, "red"],
+              // Armor tunic with Great Stone Dragon crest
+              [5, 5, 4, 2, "blue"],
+              [6, 5, 2, 1, "yellow"],
+              // Heroine Sword in scabbard
+              [3, 6, 1, 1, "grey"], [3, 6, 1, 1, "white"], [3, 6, 1, 1, "yellow"],
+              // Noble face
+              [5, 5, 4, 2, "yellow"],
+              // Long flowing black warrior hair & topknot bun
+              [4, 5, 6, 2, "black"],
+              [6, 6, 2, 2, "black"],
+              // Lucky cricket Cri-Kee cage lantern
+              [10, 6, 1, 1, "yellow"], [10, 6, 1, 1, "green"],
+            ],
+          },
+          {
+            name: "Christmas Tree 🎄",
+            bricks: [
+              // Trunk
+              [6, 6, 2, 2, "brown"], [6, 6, 2, 2, "brown"],
+              // Wide bottom branches + colorful baubles
+              [4, 5, 6, 2, "green"], [5, 4, 2, 6, "green"],
+              [4, 4, 1, 1, "red"], [9, 4, 1, 1, "yellow"], [4, 9, 1, 1, "blue"], [9, 9, 1, 1, "red"],
+              // Mid tier
+              [5, 5, 4, 2, "green"], [5, 7, 4, 2, "green"],
+              [4, 6, 1, 1, "yellow"], [9, 6, 1, 1, "blue"],
+              // Upper tier
+              [5, 5, 4, 4, "green"],
+              [6, 6, 2, 2, "green"],
+              // Golden star
+              [6, 6, 1, 1, "yellow"],
+              [6, 6, 1, 1, "yellow"],
+              // Gift box under tree
+              [2, 3, 2, 2, "red"], [2, 3, 1, 1, "yellow"],
+            ],
+          },
+          {
+            name: "T-Rex Dinosaur 🦖",
+            bricks: [
+              // Feet
+              [4, 7, 2, 2, "green"], [8, 7, 2, 2, "green"],
+              // Tail
+              [6, 11, 2, 2, "green"], [6, 9, 2, 2, "green"],
+              // Body & Thighs
+              [5, 6, 4, 4, "green"],
+              [5, 5, 4, 3, "green"],
+              // Tiny arms
+              [4, 5, 1, 1, "green"], [9, 5, 1, 1, "green"],
+              // Neck
+              [5, 4, 4, 2, "green"],
+              // Snout & sharp white teeth
+              [5, 3, 4, 3, "green"],
+              [6, 2, 1, 1, "white"],
+              // Cranium & yellow eyes
+              [5, 4, 4, 2, "green"],
+              [5, 4, 1, 1, "yellow"], [8, 4, 1, 1, "yellow"],
+            ],
+          },
+          {
+            name: "Mini Robot 🤖",
+            bricks: [
+              // Treads
+              [4, 5, 2, 4, "grey"], [8, 5, 2, 4, "grey"],
+              // Chassis
+              [5, 5, 4, 4, "blue"],
+              [5, 5, 4, 2, "white"],
+              // Arms & grabber claws
+              [3, 6, 2, 2, "yellow"], [9, 6, 2, 2, "yellow"],
+              [3, 5, 1, 1, "red"], [10, 5, 1, 1, "red"],
+              // Visor head
+              [6, 6, 2, 2, "grey"],
+              [5, 5, 4, 2, "yellow"],
+              // Antenna & beacon light
+              [6, 6, 1, 1, "blue"],
+              [6, 6, 1, 1, "red"],
+            ],
+          },
+          {
+            name: "Workstation Setup 💻",
+            bricks: [
+              // Desk legs & surface
+              [4, 4, 2, 2, "brown"], [8, 4, 2, 2, "brown"], [4, 8, 2, 2, "brown"], [8, 8, 2, 2, "brown"],
+              [3, 4, 4, 4, "grey"], [7, 4, 4, 4, "grey"],
+              // PC Tower with power light
+              [3, 5, 2, 2, "black"], [3, 5, 2, 2, "black"], [3, 5, 1, 1, "blue"],
+              // Monitor & screen
+              [6, 6, 2, 2, "grey"],
+              [5, 6, 4, 1, "black"],
+              [5, 6, 4, 1, "blue"],
+              // Keyboard, mouse, coffee mug
+              [6, 5, 2, 1, "white"],
+              [8, 5, 1, 1, "red"],
+              [4, 7, 1, 1, "yellow"],
+            ],
+          },
+          {
+            name: "Cat 🐱",
+            bricks: [
+              // Paws
+              [5, 5, 2, 2, "yellow"], [7, 5, 2, 2, "yellow"],
+              [5, 8, 2, 2, "yellow"], [7, 8, 2, 2, "yellow"],
+              // Curled tail with white tip
+              [6, 10, 1, 1, "yellow"], [6, 10, 1, 1, "yellow"], [6, 10, 1, 1, "white"],
+              // Torso & white chest
+              [5, 5, 4, 4, "yellow"],
+              [5, 5, 4, 2, "white"],
+              // Cat face with green eyes & pink nose
+              [5, 4, 4, 3, "yellow"],
+              [5, 4, 1, 1, "green"], [8, 4, 1, 1, "green"],
+              [6, 4, 2, 1, "white"], [6, 4, 1, 1, "red"],
+              // Pointy ears
+              [5, 5, 1, 1, "yellow"], [8, 5, 1, 1, "yellow"],
+            ],
+          },
+          {
+            name: "Cozy Brick Cottage 🏡",
             bricks: [
               [4, 4, 4, 2, "red"],
               [4, 6, 4, 2, "red"],
@@ -1241,46 +1371,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
             ],
           },
           {
-            name: "Evergreen Pine Tree",
-            bricks: [
-              [6, 6, 2, 2, "brown"],
-              [6, 6, 2, 2, "brown"],
-              [4, 5, 6, 2, "green"],
-              [5, 4, 2, 6, "green"],
-              [4, 4, 2, 2, "green"],
-              [8, 4, 2, 2, "green"],
-              [4, 8, 2, 2, "green"],
-              [8, 8, 2, 2, "green"],
-              [5, 5, 4, 2, "green"],
-              [5, 7, 4, 2, "green"],
-              [5, 5, 2, 2, "green"],
-              [6, 6, 2, 2, "green"],
-              [6, 6, 1, 1, "yellow"],
-              [2, 3, 1, 1, "red"],
-              [10, 10, 1, 1, "yellow"],
-            ],
-          },
-          {
-            name: "Minifig Mech Guardian",
-            bricks: [
-              [4, 6, 2, 2, "grey"],
-              [8, 6, 2, 2, "grey"],
-              [4, 6, 2, 2, "blue"],
-              [8, 6, 2, 2, "blue"],
-              [4, 6, 6, 2, "blue"],
-              [5, 6, 4, 2, "red"],
-              [5, 6, 4, 2, "red"],
-              [3, 6, 2, 2, "yellow"],
-              [9, 6, 2, 2, "yellow"],
-              [3, 6, 1, 1, "grey"],
-              [10, 6, 1, 1, "grey"],
-              [6, 6, 2, 2, "yellow"],
-              [6, 6, 2, 2, "red"],
-              [6, 6, 1, 1, "white"],
-            ],
-          },
-          {
-            name: "Castle Watchtower",
+            name: "Castle Watchtower 🏰",
             bricks: [
               [5, 5, 4, 2, "grey"],
               [5, 7, 4, 2, "grey"],
@@ -1300,18 +1391,22 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
           },
         ];
 
-        const chosenBuild = CREATIVE_BUILDS[Math.floor(Math.random() * CREATIVE_BUILDS.length)];
+        const chosenBuild = CREATIVE_BUILDS[buildIndexRef.current % CREATIVE_BUILDS.length];
+        buildIndexRef.current++;
+        setPgBuildLabel(`Building ${chosenBuild.name}…`);
         let step = 0;
         funTimer = window.setInterval(() => {
           if (step >= chosenBuild.bricks.length) {
             clearInterval(funTimer);
             funTimer = 0;
+            setPgBuildLabel(chosenBuild.name);
             return;
           }
           const [cx, cz, w, d, c] = chosenBuild.bricks[step++];
           putBrick(cx, cz, w, d, c);
           posGhost();
-        }, 90);
+          setPgBuildLabel(chosenBuild.name);
+        }, 85);
       },
       snapStory: (width: number, height: number) => {
         const gv = ghost ? ghost.visible : false;
@@ -1623,13 +1718,22 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
         const data = await res.json();
         if (!data || !Array.isArray(data.contributions) || !data.contributions.length) throw new Error("Invalid payload");
 
+        // Ensure exactly 53 weeks (53 * 7 = 371 cells) so no column is left incomplete or clipped
+        const padded = [...data.contributions];
+        while (padded.length < 371) {
+          padded.push({ count: 0, level: 0, date: "" });
+        }
+        if (padded.length > 371) {
+          padded.splice(0, padded.length - 371);
+        }
+
         let act = 0;
         let bestStreak = 0;
         let curStreak = 0;
         let sumCount = 0;
         let gh = "";
 
-        for (const c of data.contributions) {
+        for (const c of padded) {
           sumCount += (c.count || 0);
           if (c.count > 0) {
             act++;
@@ -1639,8 +1743,8 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
             curStreak = 0;
           }
           const cls = c.level ? `l${c.level}` : "";
-          const title = `${c.count || 0} contribution${c.count === 1 ? "" : "s"} on ${c.date}`;
-          gh += `<i class="${cls}" title="${title}"></i>`;
+          const title = c.date ? `${c.count || 0} contribution${c.count === 1 ? "" : "s"} on ${c.date}` : "";
+          gh += `<i class="${cls}"${title ? ` title="${title}"` : ""}></i>`;
         }
 
         const total = data.total?.lastYear || sumCount;
@@ -2225,7 +2329,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                 </div>
 
                 <span className="mono" id="pCount">
-                  Bricks {pgBrickCount}
+                  Bricks {pgBrickCount}{pgBuildLabel ? ` · ${pgBuildLabel}` : ""}
                 </span>
               </div>
 
@@ -2296,7 +2400,6 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   <span>active days</span>
                 </div>
               </div>
-              <div className="nt">{"// Real-time commits synced directly from @helenaherrero515 on GitHub."}</div>
             </div>
           </div>
         </section>
@@ -2422,28 +2525,6 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   <i /><i /><i /><i /><i /><i />
                 </div>
               </form>
-
-              <div>
-                <div className="log" id="gb" aria-live="polite">
-                  {guestNotes.length === 0 ? (
-                    <p>No notes yet. Be the first.</p>
-                  ) : (
-                    guestNotes.map((note, idx) => {
-                      const d = new Date(note.t);
-                      const timeStr = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                      return (
-                        <p key={idx}>
-                          <b>{timeStr}</b>
-                          <span>
-                            <em>{note.n}</em> {note.m}
-                          </span>
-                        </p>
-                      );
-                    })
-                  )}
-                </div>
-                <div className="nt">{"// Live Community Guestbook · Notes sync live across visitors!"}</div>
-              </div>
             </div>
           </div>
         </section>
