@@ -790,12 +790,12 @@
     .lego-modal-overlay.open { opacity: 1; pointer-events: auto; }
     .lego-modal-box {
       width: 100%;
-      max-width: 980px;
-      max-height: 88vh;
+      max-width: 1220px;
+      max-height: 92vh;
       background: var(--panel);
       border: 3px solid var(--ink);
       border-radius: 12px;
-      box-shadow: 0 16px 0 #0004;
+      box-shadow: 0 16px 0 #0004, 0 32px 64px #0006;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -807,7 +807,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 20px;
+      padding: 16px 22px;
       background: var(--c, var(--red));
       color: var(--on, #fff);
       box-shadow: inset 0 -5px 0 #0000002e;
@@ -817,22 +817,280 @@
       flex: 1;
       overflow-y: auto;
       padding: 24px;
+      display: block;
+    }
+    /* Exhibit Filter Bar */
+    .exhibit-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--bg2);
+      border-bottom: 2px solid var(--line);
+    }
+    .exhibit-filter-btn {
+      padding: 6px 14px;
+      border-radius: 4px;
+      background: var(--paper);
+      color: var(--ink);
+      border: 1.5px solid var(--line);
+      font: 700 11px var(--fm);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .exhibit-filter-btn:hover, .exhibit-filter-btn.active {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+    /* Exhibit Gallery Masonry - uncropped, visible in all sizes */
+    .exhibit-gallery {
+      columns: 3 320px;
+      column-gap: 20px;
+      padding: 24px;
+    }
+    @media (max-width: 820px) {
+      .exhibit-gallery {
+        columns: 2 240px;
+        column-gap: 16px;
+        padding: 16px;
+      }
+    }
+    @media (max-width: 520px) {
+      .exhibit-gallery {
+        columns: 1;
+        padding: 12px;
+      }
+    }
+    .exhibit-card {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 0 #0003;
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .exhibit-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 0 #0004;
+    }
+    .exhibit-media {
+      position: relative;
+      width: 100%;
+      background: #0f141d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 2px solid var(--line);
+    }
+    .exhibit-media img {
+      width: 100%;
+      height: auto;
+      max-height: 520px;
+      display: block;
+      object-fit: contain;
+      transition: transform .25s ease;
+    }
+    .exhibit-card:hover .exhibit-media img {
+      transform: scale(1.02);
+    }
+    .exhibit-caption {
+      padding: 14px 16px;
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .exhibit-pill {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font: 600 10px var(--fm);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--red);
+    }
+    .exhibit-title {
+      margin: 0;
+      font: 700 16px/1.25 var(--fd);
+      color: var(--ink);
+    }
+    .exhibit-action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .exhibit-inspect {
+      font: 600 11px var(--fm);
+      color: var(--mut);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .exhibit-card:hover .exhibit-inspect {
+      color: var(--red);
+    }
+
+    /* Traditional Grid for Swags & Decks */
+    .lego-work-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
+      padding: 24px;
     }
     .lego-work-item {
       background: var(--paper);
-      border: 2px solid var(--line);
+      border: 2px solid var(--ink);
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 4px 0 #0002;
       display: flex;
       flex-direction: column;
     }
-    .lego-work-item-img { position: relative; width: 100%; aspect-ratio: 1.2; overflow: hidden; background: var(--bg2); }
-    .lego-work-item-img img { width: 100%; height: 100%; object-fit: cover; }
-    .lego-work-item-info { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+    .lego-work-item-img {
+      position: relative;
+      width: 100%;
+      background: #0f141d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid var(--line);
+    }
+    .lego-work-item-img img {
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      object-fit: contain;
+      display: block;
+    }
+    .lego-work-item-info {
+      padding: 14px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--paper);
+    }
+
+    /* Lightbox */
+    .exhibit-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .exhibit-lightbox[hidden] {
+      display: none !important;
+    }
+    .exhibit-lightbox-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 12, 18, 0.94);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .exhibit-lightbox-box {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1100px;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      background: #141a24;
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    .exhibit-lightbox-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: #0d121b;
+      border-bottom: 2px solid #232b38;
+      color: #fff;
+    }
+    .exhibit-lightbox-viewer {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      min-height: 280px;
+      max-height: calc(94vh - 120px);
+      overflow: hidden;
+    }
+    .exhibit-lightbox-img-wrap {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .exhibit-lightbox-img-wrap img {
+      max-width: 100%;
+      max-height: calc(94vh - 150px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+    .exhibit-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: #fff;
+      font: 700 24px/1 var(--fd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background .15s, transform .15s;
+    }
+    .exhibit-nav-btn:hover {
+      background: var(--red);
+      border-color: var(--red);
+      transform: translateY(-50%) scale(1.08);
+    }
+    .exhibit-nav-btn.prev { left: 16px; }
+    .exhibit-nav-btn.next { right: 16px; }
+    .exhibit-lightbox-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      background: #0d121b;
+      border-top: 2px solid #232b38;
+    }
 
     /* Project Details Modal */
     .p-modal-dialog {
@@ -1416,12 +1674,37 @@
 
   <!-- Works Gallery Modal Popup -->
   <div class="lego-modal-overlay" id="legoModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="lego-modal-box">
+    <div class="lego-modal-box exhibit-box">
       <div class="lego-modal-hd" id="modalHd">
         <h3 id="modalTitle">Works Gallery</h3>
         <button type="button" class="btn bt c-red" id="modalClose" style="padding:6px 14px; font-size:14px;">✕ Close</button>
       </div>
+      <div id="modalFilterWrap"></div>
       <div class="lego-modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Exhibit Lightbox Popup -->
+  <div class="exhibit-lightbox" id="exhibitLightbox" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+    <div class="exhibit-lightbox-backdrop" id="elbBackdrop"></div>
+    <div class="exhibit-lightbox-box">
+      <div class="exhibit-lightbox-top">
+        <div class="exhibit-lightbox-meta">
+          <span class="exhibit-pill" id="elbOrg"></span>
+          <h3 id="elbTitle" style="margin:4px 0 0; font:700 20px/1.2 var(--fd); color:#fff;"></h3>
+        </div>
+        <button type="button" class="pm-close" id="elbClose" aria-label="Close Lightbox">✕</button>
+      </div>
+      <div class="exhibit-lightbox-viewer">
+        <button type="button" class="exhibit-nav-btn prev" id="elbPrev" aria-label="Previous artwork">‹</button>
+        <div class="exhibit-lightbox-img-wrap">
+          <img id="elbImg" src="" alt="" loading="eager" />
+        </div>
+        <button type="button" class="exhibit-nav-btn next" id="elbNext" aria-label="Next artwork">›</button>
+      </div>
+      <div class="exhibit-lightbox-bar">
+        <span class="mono" id="elbCounter" style="color:#a0a9b8; font-size:12px;"></span>
+      </div>
     </div>
   </div>
 
@@ -1908,20 +2191,35 @@
     /* ===== Works Modal Gallery Handler ===== */
     const MODAL_DATA = {
       pubmats: {
-        title: "Publication Materials",
+        title: "Publication Materials Exhibit",
         color: "c-red",
         items: [
+          // AWS Community Day PH 2026
           { org: "AWS Community Day PH", title: "Venue Reveal Poster", img: "assets/images/works/pubmats/aws community day 2026/venue reveal.png" },
-          { org: "AWS Community Day PH", title: "Banner", img: "assets/images/works/pubmats/aws community day 2026/banner.png" },
-          { org: "AWS Community Day PH", title: "Countdown Teaser", img: "assets/images/works/pubmats/aws community day 2026/countdown.png" },
-          { org: "AWS Community Day PH", title: "Program Flow Schedule", img: "assets/images/works/pubmats/aws community day 2026/program flow.png" },
-          { org: "AWS Community Day PH", title: "Meet The Host", img: "assets/images/works/pubmats/aws community day 2026/meet the host.png" },
+          { org: "AWS Community Day PH", title: "Official Event Banner", img: "assets/images/works/pubmats/aws community day 2026/banner.png" },
+          { org: "AWS Community Day PH", title: "Countdown Teaser Poster", img: "assets/images/works/pubmats/aws community day 2026/countdown.png" },
+          { org: "AWS Community Day PH", title: "Program Flow & Schedule", img: "assets/images/works/pubmats/aws community day 2026/program flow.png" },
+          { org: "AWS Community Day PH", title: "Meet The Host Announcement", img: "assets/images/works/pubmats/aws community day 2026/meet the host.png" },
+          { org: "AWS Community Day PH", title: "Call for Media Team Volunteers", img: "assets/images/works/pubmats/aws community day 2026/call for media team.png" },
+          { org: "AWS Community Day PH", title: "Official Email Header", img: "assets/images/works/pubmats/aws community day 2026/email header.png" },
+          { org: "AWS Community Day PH", title: "Application Closed Notice", img: "assets/images/works/pubmats/aws community day 2026/application closed.png" },
+          // AWS BuildNights
           { org: "AWS BuildNights", title: "Meet The Judges", img: "assets/images/works/pubmats/aws build night/meet the judgess.png" },
           { org: "AWS BuildNights", title: "Meet The Winners", img: "assets/images/works/pubmats/aws build night/meet the winners.png" },
+          { org: "AWS BuildNights", title: "Event Highlights & Recap", img: "assets/images/works/pubmats/aws build night/recap pics.png" },
           { org: "AWS BuildNights", title: "Registration Call", img: "assets/images/works/pubmats/aws build night/registration.png" },
-          { org: "AWS SBG PUP", title: "Workshop 1 Poster", img: "assets/images/works/pubmats/aws sbg pup/workshop 1 poster.png" },
-          { org: "AWS User Group PH", title: "Agentic Football Cup", img: "assets/images/works/pubmats/aws user group ph/agentic football cup pubs.png" },
-          { org: "Founders Live Manila", title: "Teaser Poster", img: "assets/images/works/pubmats/founders live manila/teaser.png" }
+          { org: "AWS BuildNights", title: "Challenge Reveal & Onboarding", img: "assets/images/works/pubmats/aws build night/reveal and onboarding.png" },
+          // AWS SBG PUP
+          { org: "AWS SBG PUP", title: "Cloud Workshop 1 Poster", img: "assets/images/works/pubmats/aws sbg pup/workshop 1 poster.png" },
+          { org: "AWS SBG PUP", title: "Top DataCamp Scholars Recognition", img: "assets/images/works/pubmats/aws sbg pup/top datacamp scholars.png" },
+          // AWS User Group PH
+          { org: "AWS User Group PH", title: "Agentic Football Cup Poster", img: "assets/images/works/pubmats/aws user group ph/agentic football cup pubs.png" },
+          { org: "AWS User Group PH", title: "Community Cover Photo", img: "assets/images/works/pubmats/aws user group ph/cover photo.png" },
+          { org: "AWS User Group PH", title: "Kiro Night Community Pub", img: "assets/images/works/pubmats/aws user group ph/kiro night pubs.png" },
+          { org: "AWS User Group PH", title: "Community Logo & Brand Identity", img: "assets/images/works/pubmats/aws user group ph/logo.png" },
+          { org: "AWS User Group PH", title: "Meet The Speaker & Fun Fact", img: "assets/images/works/pubmats/aws user group ph/meet the speaker and fun fact pubs.png" },
+          // Founders Live Manila
+          { org: "Founders Live Manila", title: "Founders Live Manila Pitch Teaser", img: "assets/images/works/pubmats/founders live manila/teaser.png" }
         ]
       },
       swags: {
@@ -1945,41 +2243,185 @@
     const modal = $('#legoModal');
     const modalTitle = $('#modalTitle');
     const modalHd = $('#modalHd');
+    const modalFilterWrap = $('#modalFilterWrap');
     const modalBody = $('#modalBody');
     const modalClose = $('#modalClose');
+
+    // Lightbox elements
+    const elb = $('#exhibitLightbox');
+    const elbBackdrop = $('#elbBackdrop');
+    const elbClose = $('#elbClose');
+    const elbImg = $('#elbImg');
+    const elbTitle = $('#elbTitle');
+    const elbOrg = $('#elbOrg');
+    const elbCounter = $('#elbCounter');
+    const elbPrev = $('#elbPrev');
+    const elbNext = $('#elbNext');
+
+    let currentPubmatList = [];
+    let currentPubmatIdx = 0;
+
+    const updateLightbox = () => {
+      if (!currentPubmatList.length) return;
+      const cur = currentPubmatList[currentPubmatIdx];
+      elbImg.src = cur.img;
+      elbImg.alt = cur.title;
+      elbTitle.textContent = cur.title;
+      elbOrg.textContent = cur.org;
+      elbCounter.textContent = `Artwork ${currentPubmatIdx + 1} of ${currentPubmatList.length} · Use ‹ › or Arrow keys`;
+    };
+
+    const openLightbox = (items, idx) => {
+      currentPubmatList = items;
+      currentPubmatIdx = idx;
+      updateLightbox();
+      elb.removeAttribute('hidden');
+      elb.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeLightbox = () => {
+      elb.setAttribute('hidden', '');
+      elb.setAttribute('aria-hidden', 'true');
+      if (!modal.classList.contains('open')) {
+        document.body.style.overflow = '';
+      }
+    };
+
+    const navLightbox = dir => {
+      if (!currentPubmatList.length) return;
+      currentPubmatIdx = (currentPubmatIdx + dir + currentPubmatList.length) % currentPubmatList.length;
+      updateLightbox();
+    };
+
+    elbClose.addEventListener('click', closeLightbox);
+    elbBackdrop.addEventListener('click', closeLightbox);
+    elbPrev.addEventListener('click', () => navLightbox(-1));
+    elbNext.addEventListener('click', () => navLightbox(1));
+
+    const renderPubmatsExhibit = (filterOrg = 'all') => {
+      const allItems = MODAL_DATA.pubmats.items;
+      const filtered = filterOrg === 'all' ? allItems : allItems.filter(item => item.org === filterOrg);
+
+      modalBody.innerHTML = `
+        <div class="exhibit-gallery" id="exhibitGrid">
+          ${filtered.map((item, idx) => `
+            <div class="exhibit-card" data-idx="${idx}" role="button" tabindex="0" aria-label="View ${item.title} full size">
+              <div class="exhibit-media">
+                <img src="${item.img}" alt="${item.title}" loading="lazy" />
+              </div>
+              <div class="exhibit-caption">
+                <span class="exhibit-pill">${item.org}</span>
+                <h4 class="exhibit-title">${item.title}</h4>
+                <div class="exhibit-action-row">
+                  <span class="exhibit-inspect">🔍 Inspect full size</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      $$('#exhibitGrid .exhibit-card').forEach(card => {
+        const handler = () => {
+          const idx = parseInt(card.dataset.idx, 10);
+          openLightbox(filtered, idx);
+        };
+        card.addEventListener('click', handler);
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handler();
+          }
+        });
+      });
+    };
 
     const openModal = type => {
       const data = MODAL_DATA[type];
       if (!data) return;
       modalTitle.textContent = data.title;
       modalHd.style.background = COL[data.color];
-      modalBody.innerHTML = data.items.map(item => `
-        <div class="lego-work-item">
-          <div class="lego-work-item-img">
-            <img src="${item.img}" alt="${item.title}" loading="lazy">
+
+      if (type === 'pubmats') {
+        const orgCategories = [
+          { key: 'all', label: `All (${data.items.length})` },
+          { key: 'AWS Community Day PH', label: 'AWS Community Day' },
+          { key: 'AWS BuildNights', label: 'AWS BuildNights' },
+          { key: 'AWS SBG PUP', label: 'AWS SBG PUP' },
+          { key: 'AWS User Group PH', label: 'AWS User Group' },
+          { key: 'Founders Live Manila', label: 'Founders Live' }
+        ];
+
+        modalFilterWrap.innerHTML = `
+          <div class="exhibit-filter-bar">
+            ${orgCategories.map(c => `
+              <button type="button" class="exhibit-filter-btn ${c.key === 'all' ? 'active' : ''}" data-filter="${c.key}">
+                ${c.label}
+              </button>
+            `).join('')}
           </div>
-          <div class="lego-work-item-info">
-            <div>
-              <span class="mono" style="color:var(--mut); font-size:11px;">${item.org}</span>
-              <b style="display:block; font:700 16px/1.2 var(--fd); margin-top:4px;">${item.title}</b>
-            </div>
-            ${item.pdf ? `<a class="btn bt c-blue" href="${item.pdf}" target="_blank" rel="noopener noreferrer" style="font-size:12px; padding:8px 12px; justify-content:center;">View Presentation PDF ↗</a>` : ''}
+        `;
+
+        $$('.exhibit-filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            $$('.exhibit-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderPubmatsExhibit(btn.dataset.filter);
+          });
+        });
+
+        renderPubmatsExhibit('all');
+      } else {
+        modalFilterWrap.innerHTML = '';
+        modalBody.innerHTML = `
+          <div class="lego-work-grid">
+            ${data.items.map(item => `
+              <div class="lego-work-item">
+                <div class="lego-work-item-img">
+                  <img src="${item.img}" alt="${item.title}" loading="lazy">
+                </div>
+                <div class="lego-work-item-info">
+                  <div>
+                    <span class="mono" style="color:var(--mut); font-size:11px;">${item.org}</span>
+                    <b style="display:block; font:700 16px/1.2 var(--fd); margin-top:4px;">${item.title}</b>
+                  </div>
+                  ${item.pdf ? `<a class="btn bt c-blue" href="${item.pdf}" target="_blank" rel="noopener noreferrer" style="font-size:12px; padding:8px 12px; justify-content:center;">View Presentation PDF ↗</a>` : ''}
+                </div>
+              </div>
+            `).join('')}
           </div>
-        </div>
-      `).join('');
+        `;
+      }
+
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
     };
 
     const closeModal = () => {
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
+      if (elb.hasAttribute('hidden')) {
+        document.body.style.overflow = '';
+      }
     };
 
     $$('.wc').forEach(card => card.addEventListener('click', () => openModal(card.dataset.type)));
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-    addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+    addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (!elb.hasAttribute('hidden')) {
+          closeLightbox();
+        } else if (modal.classList.contains('open')) {
+          closeModal();
+        }
+      } else if (!elb.hasAttribute('hidden')) {
+        if (e.key === 'ArrowLeft') navLightbox(-1);
+        if (e.key === 'ArrowRight') navLightbox(1);
+      }
+    });
 
     /* ===== Shared Three.js Brick Factory ===== */
     const eob = x => {
