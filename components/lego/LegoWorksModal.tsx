@@ -280,7 +280,7 @@ export function LegoWorksModal({ type, onClose }: LegoWorksModalProps) {
                   Branding & Identity System
                 </h3>
                 <p style={{ color: "var(--mut)", fontSize: "15px", lineHeight: 1.6, margin: "0 0 24px" }}>
-                  I'm curating and refining case studies for visual brand identities, logo marks, typography guidelines, and design collateral created for student orgs and tech communities. Check back soon for the full breakdown!
+                  I&apos;m curating and refining case studies for visual brand identities, logo marks, typography guidelines, and design collateral created for student orgs and tech communities. Check back soon for the full breakdown!
                 </p>
                 <button
                   type="button"

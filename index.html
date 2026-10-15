@@ -283,6 +283,7 @@
       background: #dfe6e8;
       border-radius: 3px;
       overflow: hidden;
+      cursor: pointer;
     }
     .plate img {
       position: absolute;
@@ -291,6 +292,38 @@
       height: 100%;
       object-fit: cover;
       object-position: center 20%;
+      transition: filter .35s ease, transform .35s ease;
+    }
+    .plate .mat::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .35s ease;
+      z-index: 2;
+      /* Authentic 3D LEGO stud mosaic texture */
+      background-image:
+        radial-gradient(circle at 45% 35%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.45) 18%, transparent 24%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.22) 46%, transparent 52%),
+        radial-gradient(circle at 50% 62%, rgba(0, 0, 0, 0.45) 28%, transparent 56%),
+        linear-gradient(to right, rgba(0, 0, 0, 0.28) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.28) 1px, transparent 1px);
+      background-size:
+        16px 16px,
+        16px 16px,
+        16px 16px,
+        16px 16px,
+        16px 16px;
+      mix-blend-mode: hard-light;
+      box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.35);
+    }
+    .plate:hover .mat::after {
+      opacity: 1;
+    }
+    .plate:hover img {
+      filter: contrast(1.26) saturate(1.36) brightness(0.95);
+      transform: scale(1.02);
     }
     .plate figcaption { margin-top: 14px; text-align: center; color: var(--mut); }
     @media (max-width: 899px) {
@@ -596,25 +629,30 @@
 
     /* GitHub */
     .gh { background: var(--panel); border: 3px solid var(--ink); border-radius: 10px; padding: 22px; box-shadow: 0 7px 0 #0003; }
-    .gw { width: 100%; overflow: hidden; padding-bottom: 8px; }
+    .gw { width: 100%; overflow: hidden; padding: 4px 6px 10px; box-sizing: border-box; }
     #grid {
       display: grid;
-      grid-template-rows: repeat(7, 1fr);
+      grid-template-rows: repeat(7, minmax(0, 1fr));
+      grid-template-columns: repeat(53, minmax(0, 1fr));
       grid-auto-flow: column;
-      grid-auto-columns: 1fr;
-      gap: clamp(2px, 0.35vw, 5px);
+      gap: clamp(1px, 0.25vw, 4px);
       width: 100%;
       aspect-ratio: 53 / 7;
       max-height: 190px;
+      box-sizing: border-box;
     }
     #grid i {
       width: 100%;
       height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       aspect-ratio: 1;
       border-radius: 50%;
       background: var(--line);
       box-shadow: inset 0 -1.5px 0 #0000002e;
       transition: transform .2s, background .2s;
+      justify-self: center;
+      align-self: center;
     }
     #grid .l1 { background: var(--blue); }
     #grid .l2 { background: var(--green); }
@@ -661,9 +699,9 @@
     .btns .mono { color: var(--mut); }
 
     /* BMO Guestbook */
-    .gbk { display: grid; grid-template-columns: minmax(0, 470px) 1fr; gap: 34px; align-items: start; }
+    .gbk { display: flex; justify-content: center; align-items: center; width: 100%; }
     .gbk > * { min-width: 0; }
-    .nf.bmo { background: none; border: 0; box-shadow: none; padding: 30px 20px 0; position: relative; max-width: 470px; width: 100%; margin-inline: auto; }
+    .nf.bmo { background: none; border: 0; box-shadow: none; padding: 30px 20px 0; position: relative; max-width: 480px; width: 100%; margin-inline: auto; }
     .bmo { --t: #3ec9b0; --td: #1f8a78; --scr: #d6fbe8; --tx: #16665c; }
     .bmo-body {
       --c: var(--t);
@@ -1651,7 +1689,6 @@
             <div class="seg brk bt c-yellow"><b id="s2">0</b><span>longest streak</span></div>
             <div class="seg brk bt c-blue"><b id="s3">0</b><span>active days</span></div>
           </div>
-          <div class="nt">// Connect with @helenaherrero515 on GitHub.</div>
         </div>
       </div>
     </section>
@@ -1713,10 +1750,6 @@
             </div>
             <div class="bmo-ports" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           </form>
-          <div>
-            <div class="log" id="gb" aria-live="polite"></div>
-            <div class="nt">// Live Community Guestbook · Notes sync live across visitors!</div>
-          </div>
         </div>
       </div>
     </section>
@@ -2167,11 +2200,20 @@
 
     /* GitHub Contributions Studs (Live connection to helenaherrero515 with animated stats) */
     const renderGitHubGrid = (days, total, streak, active) => {
+      // Ensure exactly 53 weeks (53 * 7 = 371 cells) so no column is left incomplete or clipped
+      const padded = [...days];
+      while (padded.length < 371) {
+        padded.push({ count: 0, level: 0, date: '' });
+      }
+      if (padded.length > 371) {
+        padded.splice(0, padded.length - 371);
+      }
+
       let gh = '';
-      days.forEach(d => {
+      padded.forEach(d => {
         const cls = d.level ? `l${d.level}` : '';
-        const title = `${d.count || 0} contribution${d.count === 1 ? '' : 's'} on ${d.date}`;
-        gh += `<i class="${cls}" title="${title}"></i>`;
+        const title = d.date ? `${d.count || 0} contribution${d.count === 1 ? '' : 's'} on ${d.date}` : '';
+        gh += `<i class="${cls}"${title ? ` title="${title}"` : ''}></i>`;
       });
       $('#grid').innerHTML = gh;
       const gi = [...$('#grid').children];
@@ -2257,95 +2299,31 @@
       }
     })();
 
-    /* BMO Live Community Guestbook */
+    /* BMO Interactive Guestbook */
     (() => {
-      const gb = $('#gb'), gn = $('#gn'), gm = $('#gm'), st = $('#gst');
-      const KEY = 'hln_brick_notes';
-      let L = [
-        { n: 'Helena', m: 'Welcome to my LEGO guestbook! Feel free to leave a note or feedback.', t: Date.now() - 3600000 }
-      ];
-      try {
-        const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
-        if (Array.isArray(saved) && saved.length) L = saved;
-      } catch(e){}
-
-      const hm = t => {
-        const d = new Date(t);
-        return [d.getHours(), d.getMinutes()].map(x => String(x).padStart(2, '0')).join(':');
-      };
-
-      const render = () => {
-        gb.textContent = '';
-        if (!L.length) {
-          const p = document.createElement('p');
-          p.textContent = 'No notes yet. Be the first.';
-          gb.appendChild(p);
-          return;
-        }
-        L.forEach(x => {
-          const p = document.createElement('p'), b = document.createElement('b'), s = document.createElement('span'), e = document.createElement('em');
-          b.textContent = hm(+x.t || Date.now());
-          e.textContent = String(x.n || 'anonymous');
-          s.appendChild(e);
-          s.appendChild(document.createTextNode(' ' + String(x.m || '')));
-          p.appendChild(b);
-          p.appendChild(s);
-          gb.appendChild(p);
-        });
-      };
-      render();
-
-      // Fetch live notes from backend API
-      (async () => {
-        try {
-          const res = await fetch('/api/guestbook');
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data) && data.length) {
-              L = data;
-              try { localStorage.setItem(KEY, JSON.stringify(L)); } catch(e){}
-              render();
-            }
-          }
-        } catch(e) {}
-      })();
-
+      const gn = $('#gn'), gm = $('#gm'), st = $('#gst');
       $('#nf').addEventListener('submit', async e => {
         e.preventDefault();
         const m = gm.value.trim().slice(0, 160), n = gn.value.trim().slice(0, 24);
         if (!m) { st.textContent = 'type a note first.'; return; }
         const newNote = { n: n || 'anonymous', m, t: Date.now() };
-        L.unshift(newNote);
-        L = L.slice(0, 40);
-        try { localStorage.setItem(KEY, JSON.stringify(L)); } catch(x){}
-        render();
         gm.value = '';
-        st.textContent = 'Posting to the community wall…';
+        st.textContent = 'thank you for your note! 🧱';
 
         try {
-          const res = await fetch('/api/guestbook', {
+          await fetch('/api/guestbook', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newNote)
           });
-          if (res.ok) {
-            const json = await res.json();
-            if (json.notes && Array.isArray(json.notes)) {
-              L = json.notes;
-              try { localStorage.setItem(KEY, JSON.stringify(L)); } catch(e){}
-              render();
-            }
-            st.textContent = 'Posted live to the wall! Thank you! 🧱';
-          } else {
-            st.textContent = 'Saved to this device! Thank you! 🧱';
-          }
-        } catch(err) {
-          st.textContent = 'Saved locally! Thank you! 🧱';
-        }
+        } catch(err) {}
 
         const f = $('#nf');
         f.classList.add('happy');
-        setTimeout(() => f.classList.remove('happy'), 2200);
+        setTimeout(() => {
+          f.classList.remove('happy');
+          st.textContent = 'hi! write me a note';
+        }, 2600);
       });
     })();
 
@@ -3165,7 +3143,154 @@
 
       const CREATIVE_BUILDS = [
         {
-          name: "Cozy Brick Cottage",
+          name: "Helena Avatar 🎧",
+          bricks: [
+            // Blue Pants & Legs
+            [5, 6, 2, 2, 'blue'], [7, 6, 2, 2, 'blue'],
+            [5, 6, 4, 2, 'blue'],
+            // Black Hoodie Torso
+            [5, 6, 4, 2, 'black'],
+            [5, 6, 4, 2, 'black'],
+            // Arms & Hands
+            [3, 6, 2, 2, 'black'], [9, 6, 2, 2, 'black'],
+            [3, 6, 1, 1, 'yellow'], [10, 6, 1, 1, 'yellow'],
+            // Face
+            [6, 6, 2, 2, 'yellow'],
+            // Headphones & Hood
+            [5, 6, 1, 2, 'black'], [8, 6, 1, 2, 'black'],
+            [5, 6, 4, 2, 'black']
+          ]
+        },
+        {
+          name: "Mulan & Cri-Kee ⚔️",
+          bricks: [
+            // White boots
+            [5, 6, 2, 2, 'white'], [7, 6, 2, 2, 'white'],
+            // Navy robe skirt
+            [5, 6, 4, 2, 'blue'],
+            [5, 6, 4, 2, 'blue'],
+            // Crimson Sash & hanging ribbon
+            [5, 6, 4, 2, 'red'],
+            [7, 6, 1, 1, 'red'],
+            // Warrior Tunic & golden dragon crest
+            [5, 6, 4, 2, 'blue'],
+            [6, 6, 2, 1, 'yellow'],
+            // Teal sleeves & sword
+            [3, 6, 2, 2, 'green'], [9, 6, 2, 2, 'green'],
+            [3, 6, 1, 1, 'yellow'],
+            [3, 5, 1, 1, 'grey'], [3, 4, 1, 1, 'grey'],
+            // Face
+            [6, 6, 2, 2, 'yellow'],
+            // Long flowing black hair
+            [5, 6, 4, 2, 'black'],
+            [4, 6, 1, 2, 'black'], [9, 6, 1, 2, 'black'],
+            // Cri-Kee the lucky cricket lantern
+            [11, 6, 1, 1, 'yellow'],
+            [11, 6, 1, 1, 'white'],
+            [11, 6, 1, 1, 'red']
+          ]
+        },
+        {
+          name: "Christmas Tree 🎄",
+          bricks: [
+            // Trunk
+            [6, 6, 2, 2, 'brown'],
+            // Bottom tier & corner ornaments
+            [4, 5, 6, 2, 'green'], [5, 4, 2, 6, 'green'],
+            [4, 4, 1, 1, 'red'], [9, 4, 1, 1, 'yellow'], [4, 9, 1, 1, 'blue'], [9, 9, 1, 1, 'red'],
+            // Mid tier
+            [5, 5, 4, 2, 'green'], [5, 7, 4, 2, 'green'],
+            [4, 6, 1, 1, 'yellow'], [9, 6, 1, 1, 'blue'],
+            // Upper tier
+            [5, 5, 4, 4, 'green'],
+            [6, 6, 2, 2, 'green'],
+            // Golden star
+            [6, 6, 1, 1, 'yellow'],
+            [6, 6, 1, 1, 'yellow'],
+            // Gift box under tree
+            [2, 3, 2, 2, 'red'], [2, 3, 1, 1, 'yellow']
+          ]
+        },
+        {
+          name: "T-Rex Dinosaur 🦖",
+          bricks: [
+            // Feet
+            [4, 7, 2, 2, 'green'], [8, 7, 2, 2, 'green'],
+            // Tail
+            [6, 11, 2, 2, 'green'], [6, 9, 2, 2, 'green'],
+            // Body & Thighs
+            [5, 6, 4, 4, 'green'],
+            [5, 5, 4, 3, 'green'],
+            // Tiny arms
+            [4, 5, 1, 1, 'green'], [9, 5, 1, 1, 'green'],
+            // Neck
+            [5, 4, 4, 2, 'green'],
+            // Snout & sharp white teeth
+            [5, 3, 4, 3, 'green'],
+            [6, 2, 2, 1, 'white'],
+            // Cranium & yellow eyes
+            [5, 4, 4, 2, 'green'],
+            [5, 4, 1, 1, 'yellow'], [8, 4, 1, 1, 'yellow']
+          ]
+        },
+        {
+          name: "Mini Robot 🤖",
+          bricks: [
+            // Treads
+            [4, 5, 2, 4, 'grey'], [8, 5, 2, 4, 'grey'],
+            // Chassis
+            [5, 5, 4, 4, 'blue'],
+            [5, 5, 4, 2, 'white'],
+            // Arms & grabber claws
+            [3, 6, 2, 2, 'yellow'], [9, 6, 2, 2, 'yellow'],
+            [3, 5, 1, 1, 'red'], [10, 5, 1, 1, 'red'],
+            // Visor head
+            [6, 6, 2, 2, 'grey'],
+            [5, 5, 4, 2, 'yellow'],
+            // Antenna & beacon light
+            [6, 6, 1, 1, 'blue'],
+            [6, 6, 1, 1, 'red']
+          ]
+        },
+        {
+          name: "Workstation Setup 💻",
+          bricks: [
+            // Desk legs & surface
+            [4, 4, 2, 2, 'brown'], [8, 4, 2, 2, 'brown'], [4, 8, 2, 2, 'brown'], [8, 8, 2, 2, 'brown'],
+            [3, 4, 4, 4, 'grey'], [7, 4, 4, 4, 'grey'],
+            // PC Tower with power light
+            [3, 5, 2, 2, 'black'], [3, 5, 2, 2, 'black'], [3, 5, 1, 1, 'blue'],
+            // Monitor & screen
+            [6, 6, 2, 2, 'grey'],
+            [5, 6, 4, 1, 'black'],
+            [5, 6, 4, 1, 'blue'],
+            // Keyboard, mouse, coffee mug
+            [6, 5, 2, 1, 'white'],
+            [8, 5, 1, 1, 'red'],
+            [4, 7, 1, 1, 'yellow']
+          ]
+        },
+        {
+          name: "Cat 🐱",
+          bricks: [
+            // Paws
+            [5, 5, 2, 2, 'yellow'], [7, 5, 2, 2, 'yellow'],
+            [5, 8, 2, 2, 'yellow'], [7, 8, 2, 2, 'yellow'],
+            // Curled tail with white tip
+            [6, 10, 1, 1, 'yellow'], [6, 10, 1, 1, 'yellow'], [6, 10, 1, 1, 'white'],
+            // Torso & white chest
+            [5, 5, 4, 4, 'yellow'],
+            [5, 5, 4, 2, 'white'],
+            // Cat face with green eyes & pink nose
+            [5, 4, 4, 3, 'yellow'],
+            [5, 4, 1, 1, 'green'], [8, 4, 1, 1, 'green'],
+            [6, 4, 2, 1, 'white'], [6, 4, 1, 1, 'red'],
+            // Pointy ears
+            [5, 5, 1, 1, 'yellow'], [8, 5, 1, 1, 'yellow']
+          ]
+        },
+        {
+          name: "Cozy Brick Cottage 🏡",
           bricks: [
             [4, 4, 4, 2, 'red'], [4, 6, 4, 2, 'red'],
             [4, 4, 2, 2, 'yellow'], [6, 4, 2, 2, 'yellow'], [4, 6, 2, 2, 'yellow'], [6, 6, 2, 2, 'yellow'],
@@ -3176,33 +3301,7 @@
           ]
         },
         {
-          name: "Evergreen Pine Tree",
-          bricks: [
-            [6, 6, 2, 2, 'brown'], [6, 6, 2, 2, 'brown'],
-            [4, 5, 6, 2, 'green'], [5, 4, 2, 6, 'green'],
-            [4, 4, 2, 2, 'green'], [8, 4, 2, 2, 'green'], [4, 8, 2, 2, 'green'], [8, 8, 2, 2, 'green'],
-            [5, 5, 4, 2, 'green'], [5, 7, 4, 2, 'green'],
-            [5, 5, 2, 2, 'green'], [6, 6, 2, 2, 'green'],
-            [6, 6, 1, 1, 'yellow'],
-            [2, 3, 1, 1, 'red'], [10, 10, 1, 1, 'yellow']
-          ]
-        },
-        {
-          name: "Minifig Mech Guardian",
-          bricks: [
-            [4, 6, 2, 2, 'grey'], [8, 6, 2, 2, 'grey'],
-            [4, 6, 2, 2, 'blue'], [8, 6, 2, 2, 'blue'],
-            [4, 6, 6, 2, 'blue'],
-            [5, 6, 4, 2, 'red'], [5, 6, 4, 2, 'red'],
-            [3, 6, 2, 2, 'yellow'], [9, 6, 2, 2, 'yellow'],
-            [3, 6, 1, 1, 'grey'], [10, 6, 1, 1, 'grey'],
-            [6, 6, 2, 2, 'yellow'],
-            [6, 6, 2, 2, 'red'],
-            [6, 6, 1, 1, 'white']
-          ]
-        },
-        {
-          name: "Castle Watchtower",
+          name: "Castle Watchtower 🏰",
           bricks: [
             [5, 5, 4, 2, 'grey'], [5, 7, 4, 2, 'grey'],
             [5, 5, 2, 2, 'grey'], [7, 5, 2, 2, 'grey'], [5, 7, 2, 2, 'grey'], [7, 7, 2, 2, 'grey'],
@@ -3221,16 +3320,19 @@
         const build = CREATIVE_BUILDS[buildIndex % CREATIVE_BUILDS.length];
         buildIndex++;
         let i = 0;
+        $('#pCount').textContent = `Building ${build.name}…`;
         fun = setInterval(() => {
           if (i >= build.bricks.length) {
             clearInterval(fun);
             fun = 0;
+            $('#pCount').textContent = `Bricks ${placed.length} · ${build.name}`;
             return;
           }
           const [cx, cz, w, d, c] = build.bricks[i++];
           put(cx, cz, w, d, c);
           posGhost();
-        }, 90);
+          $('#pCount').textContent = `Bricks ${placed.length} · ${build.name}`;
+        }, 85);
       });
 
       [[5, 5, 2, 2, 'red'], [7, 5, 2, 1, 'yellow'], [5, 5, 2, 2, 'blue'], [3, 8, 4, 2, 'green'], [8, 8, 2, 2, 'blue'], [8, 8, 1, 1, 'yellow']].forEach(a => put(a[0], a[1], a[2], a[3], a[4], true));
