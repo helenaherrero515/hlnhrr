@@ -713,9 +713,9 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       // Card reveals
       document.querySelectorAll<HTMLElement>("[data-rv]").forEach((el) => {
         gsap.from(el, {
-          y: el.classList.contains("row") ? -34 : 40,
-          rotate: el.classList.contains("row") ? -1 : 0,
-          duration: 0.9,
+          y: el.classList.contains("row") ? 20 : 40,
+          rotate: 0,
+          duration: 0.8,
           ease: "power3.out",
           scrollTrigger: { trigger: el, start: "top 94%", once: true },
         });
@@ -1902,10 +1902,13 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
 
             {/* 3D Tilted Photo Plate */}
             <figure className="plate" id="plate" ref={plateRef}>
+              <div className="plate-float-stud stud-1" aria-hidden="true" />
+              <div className="plate-float-stud stud-2" aria-hidden="true" />
+              <div className="plate-float-brick brick-1" aria-hidden="true" />
               <div className="base">
                 <div className="mat">
                   <Image
-                    src="/images/profile/lego-portrait.jpg"
+                    src="/images/profile/helena-portrait.webp"
                     alt="Portrait of Helena Herrero"
                     width={400}
                     height={432}
@@ -1919,6 +1922,11 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                       objectPosition: "center 20%",
                     }}
                   />
+                  <span className="plate-badge">CREATOR · HLN</span>
+                  <div className="mat-corner tl" aria-hidden="true" />
+                  <div className="mat-corner tr" aria-hidden="true" />
+                  <div className="mat-corner bl" aria-hidden="true" />
+                  <div className="mat-corner br" aria-hidden="true" />
                 </div>
               </div>
               <figcaption className="mono">Minifig ID · HLN-2026</figcaption>
