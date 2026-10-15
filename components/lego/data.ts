@@ -171,16 +171,20 @@ export const LEGO_WORKS = [
     title: "Pubmats",
     subtitle: "Publication materials gallery",
     type: "pubmats" as const,
+    img: "/images/works/pubmats/aws community day 2026/venue reveal.png",
   },
   {
     title: "Swags design",
     subtitle: "2 merch and event collateral designs",
     type: "swags" as const,
+    img: "/images/works/swags-design/aws-community-day-2026.png",
   },
   {
-    title: "PPT decks",
-    subtitle: "Presentation design and storytelling",
-    type: "ppt" as const,
+    title: "Branding",
+    subtitle: "Visual identity & design systems",
+    badge: "Under construction",
+    type: "branding" as const,
+    img: "/images/works/branding-construction.svg",
   },
 ];
 
