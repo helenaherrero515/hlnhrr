@@ -21,7 +21,8 @@ import {
 import { renderIsoBrickSvg } from "./iso";
 import { BrickFactory, BrickColorKey, LEGO_PALETTE } from "./brickFactory";
 import { LegoWorksModal } from "./LegoWorksModal";
-import type { GuestbookEntry } from "./types";
+import { LegoProjectModal } from "./LegoProjectModal";
+import type { GuestbookEntry, ProjectItem } from "./types";
 
 interface LegoPortfolioProps {
   defaultSection?: string;
@@ -66,6 +67,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   // Theme state
   const [isDark, setIsDark] = useState<boolean>(false);
   const [worksModalType, setWorksModalType] = useState<"pubmats" | "swags" | "ppt" | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
   // Playground builder state
   const [pgColor, setPgColor] = useState<BrickColorKey>("red");
@@ -693,7 +695,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
               duration: 1.2,
               ease: "power3.out",
               onUpdate: () => {
-                el.textContent = String(Math.round(obj.n));
+                el.textContent = Math.round(obj.n) + "+";
               },
             });
           });
@@ -1753,19 +1755,19 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
               <div>
                 <div className="stl">
                   <div className="tile tilt brk bt c-yellow" data-rv>
-                    <b data-n="6">6</b>
+                    <b data-n="6">6+</b>
                     <span>Projects</span>
                   </div>
                   <div className="tile tilt brk bt c-blue" data-rv>
-                    <b data-n="7">7</b>
+                    <b data-n="7">7+</b>
                     <span>Hackathons</span>
                   </div>
                   <div className="tile tilt brk bt c-green" data-rv>
-                    <b data-n="7">7</b>
+                    <b data-n="7">7+</b>
                     <span>Volunteer roles</span>
                   </div>
                   <div className="tile tilt brk bt c-red" data-rv>
-                    <b data-n="6">6</b>
+                    <b data-n="6">6+</b>
                     <span>Org roles</span>
                   </div>
                   <div className="tile tilt w brk bt c-grey" data-rv>
@@ -1779,7 +1781,9 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   <span>Data science</span>
                   <span>AI / ML</span>
                   <span>Cybersecurity</span>
-                  <span>Digital forensics</span>
+                  <span>Cloud computing</span>
+                  <span>AI automation</span>
+                  <span>UI/UX Design</span>
                 </div>
               </div>
             </div>
@@ -1795,14 +1799,20 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
             </div>
             <div className="rows" id="pr">
               {LEGO_PROJECTS.map((p, idx) => (
-                <a
+                <div
                   key={idx}
                   className={`row ${p.color}`}
-                  href="#work"
                   data-rv
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setWorksModalType("ppt");
+                  tabIndex={0}
+                  role="button"
+                  aria-haspopup="dialog"
+                  aria-label={`View details for ${p.title}`}
+                  onClick={() => setSelectedProject(p)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedProject(p);
+                    }
                   }}
                 >
                   <div
@@ -1823,10 +1833,10 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                       ))}
                     </div>
                     <span className="go">
-                      Open project <span>↗</span>
+                      View project details <span>↗</span>
                     </span>
                   </div>
-                </a>
+                </div>
               ))}
             </div>
           </div>
@@ -2283,6 +2293,9 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
 
       {/* Creative Works Modal */}
       <LegoWorksModal type={worksModalType} onClose={() => setWorksModalType(null)} />
+
+      {/* Project Details Modal */}
+      <LegoProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
     </>
   );
 }
