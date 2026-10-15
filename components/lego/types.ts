@@ -27,7 +27,9 @@ export interface ExperienceCategory {
 export interface WorkCategory {
   title: string;
   subtitle: string;
-  type: "pubmats" | "swags" | "ppt";
+  type: "pubmats" | "swags" | "ppt" | "branding";
+  badge?: string;
+  img?: string;
 }
 
 export interface GuestbookEntry {
