@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 
 interface LegoWorksModalProps {
-  type: "pubmats" | "swags" | "ppt" | null;
+  type: "pubmats" | "swags" | "ppt" | "branding" | null;
   onClose: () => void;
 }
 
@@ -142,7 +142,13 @@ export function LegoWorksModal({ type, onClose }: LegoWorksModalProps) {
                   color: type === "swags" ? "#1b1400" : "#ffffff",
                 }}
               >
-                {type === "pubmats" ? "Publication Materials Exhibit" : type === "swags" ? "Swags & Merch Design" : "PPT Decks & Pitches"}
+                {type === "pubmats"
+                  ? "Publication Materials Exhibit"
+                  : type === "swags"
+                  ? "Swags & Merch Design"
+                  : type === "branding"
+                  ? "Branding & Visual Systems"
+                  : "PPT Decks & Pitches"}
               </span>
             </div>
             <button
@@ -236,6 +242,54 @@ export function LegoWorksModal({ type, onClose }: LegoWorksModalProps) {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {type === "branding" && (
+              <div style={{ padding: "40px 24px", textAlign: "center", maxWidth: "580px", margin: "0 auto" }}>
+                <div style={{ maxWidth: "240px", margin: "0 auto 24px" }}>
+                  <img
+                    src="/images/works/branding-construction.svg"
+                    alt="Branding Under Construction"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "12px",
+                      border: "3px solid var(--ink)",
+                      boxShadow: "4px 4px 0 var(--ink)",
+                    }}
+                  />
+                </div>
+                <span
+                  className="mono"
+                  style={{
+                    display: "inline-block",
+                    padding: "4px 12px",
+                    background: "var(--yellow)",
+                    color: "#000",
+                    fontWeight: 700,
+                    borderRadius: "4px",
+                    border: "2px solid var(--ink)",
+                    marginBottom: "14px",
+                    fontSize: "12px",
+                  }}
+                >
+                  🚧 WORK IN PROGRESS · REBUILDING BRICKS
+                </span>
+                <h3 style={{ font: "700 clamp(24px, 3.5vw, 32px)/1.2 var(--fd)", margin: "0 0 12px" }}>
+                  Branding & Identity System
+                </h3>
+                <p style={{ color: "var(--mut)", fontSize: "15px", lineHeight: 1.6, margin: "0 0 24px" }}>
+                  I'm curating and refining case studies for visual brand identities, logo marks, typography guidelines, and design collateral created for student orgs and tech communities. Check back soon for the full breakdown!
+                </p>
+                <button
+                  type="button"
+                  className="btn bt c-blue"
+                  onClick={onClose}
+                  style={{ margin: "0 auto", padding: "10px 24px", fontSize: "14px" }}
+                >
+                  Got it, keep building 🧱
+                </button>
               </div>
             )}
 
