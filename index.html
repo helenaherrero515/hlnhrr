@@ -268,6 +268,11 @@
       width: 290px;
       rotate: 3deg;
       transform-style: preserve-3d;
+      transition: rotate .35s cubic-bezier(.2, .8, .2, 1), transform .35s cubic-bezier(.2, .8, .2, 1);
+    }
+    .plate:hover {
+      rotate: 4.5deg;
+      transform: translateY(-4px);
     }
     .plate .base {
       background-color: var(--green);
@@ -276,14 +281,25 @@
       padding: 22px;
       border-radius: 8px;
       box-shadow: 0 8px 0 #00000040, 0 28px 44px #0005;
+      position: relative;
     }
     .plate .mat {
       position: relative;
       aspect-ratio: 1 / 1.08;
-      background: #dfe6e8;
-      border-radius: 3px;
+      border-radius: 6px;
       overflow: hidden;
       cursor: pointer;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.22);
+      background:
+        radial-gradient(circle at 50% 32%, rgba(255, 235, 120, 0.45) 0%, rgba(42, 167, 242, 0.2) 48%, transparent 74%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.7) 0 24%, transparent 26%) 0 0 / 18px 18px,
+        linear-gradient(145deg, #f0f7fb 0%, #d8e7f2 100%);
+    }
+    html[data-theme="dark"] .plate .mat {
+      background:
+        radial-gradient(circle at 50% 32%, rgba(255, 180, 0, 0.3) 0%, rgba(42, 167, 242, 0.2) 52%, transparent 75%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.16) 0 24%, transparent 26%) 0 0 / 18px 18px,
+        linear-gradient(145deg, #1e2630 0%, #10161d 100%);
     }
     .plate img {
       position: absolute;
@@ -292,38 +308,95 @@
       height: 100%;
       object-fit: cover;
       object-position: center 20%;
-      transition: filter .35s ease, transform .35s ease;
-    }
-    .plate .mat::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity .35s ease;
       z-index: 2;
-      /* Authentic 3D LEGO stud mosaic texture */
-      background-image:
-        radial-gradient(circle at 45% 35%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.45) 18%, transparent 24%),
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.22) 46%, transparent 52%),
-        radial-gradient(circle at 50% 62%, rgba(0, 0, 0, 0.45) 28%, transparent 56%),
-        linear-gradient(to right, rgba(0, 0, 0, 0.28) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.28) 1px, transparent 1px);
-      background-size:
-        16px 16px,
-        16px 16px,
-        16px 16px,
-        16px 16px,
-        16px 16px;
-      mix-blend-mode: hard-light;
-      box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.35);
-    }
-    .plate:hover .mat::after {
-      opacity: 1;
+      transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
     }
     .plate:hover img {
-      filter: contrast(1.26) saturate(1.36) brightness(0.95);
-      transform: scale(1.02);
+      transform: scale(1.04);
+    }
+    /* Plate corner studs */
+    .mat-corner {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--ink);
+      z-index: 3;
+      box-shadow: 0 2px 0 #0003;
+      transition: transform .25s ease;
+    }
+    .mat-corner.tl { top: 8px; left: 8px; background: var(--red); }
+    .mat-corner.tr { top: 8px; right: 8px; background: var(--yellow); }
+    .mat-corner.bl { bottom: 8px; left: 8px; background: var(--blue); }
+    .mat-corner.br { bottom: 8px; right: 8px; background: var(--green); }
+    .plate:hover .mat-corner {
+      transform: scale(1.18);
+    }
+    /* Plate badge pill */
+    .plate-badge {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--yellow);
+      color: var(--on-yellow);
+      font: 700 10px/1 var(--fm);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 2px solid var(--ink);
+      box-shadow: 0 3px 0 #0003;
+      z-index: 3;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    /* Floating accent bricks */
+    .plate-float-stud {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--ink);
+      z-index: 10;
+      box-shadow: 0 3px 0 #0004;
+      pointer-events: none;
+      animation: float-bob 3.2s ease-in-out infinite alternate;
+    }
+    .plate-float-stud.stud-1 {
+      top: -12px;
+      left: -14px;
+      background: var(--yellow);
+      animation-delay: 0s;
+    }
+    .plate-float-stud.stud-2 {
+      bottom: 24px;
+      right: -12px;
+      background: var(--blue);
+      animation-delay: 1.4s;
+    }
+    .plate-float-brick {
+      position: absolute;
+      border: 2px solid var(--ink);
+      border-radius: 4px;
+      z-index: 10;
+      box-shadow: 0 4px 0 #0004;
+      pointer-events: none;
+      animation: float-bob 3.8s ease-in-out infinite alternate;
+    }
+    .plate-float-brick.brick-1 {
+      bottom: -14px;
+      left: 20px;
+      width: 32px;
+      height: 18px;
+      background: var(--red);
+      rotate: -8deg;
+      animation-delay: 0.8s;
+    }
+    @keyframes float-bob {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-7px) rotate(4deg); }
     }
     .plate figcaption { margin-top: 14px; text-align: center; color: var(--mut); }
     @media (max-width: 899px) {
@@ -478,7 +551,10 @@
     .tg span { padding: 4px 14px; border: 2px solid var(--ink); border-radius: 20px; font: 500 11px var(--fm); letter-spacing: .06em; text-transform: uppercase; background: var(--paper); }
 
     /* Work rows */
-    .rows { border-top: 3px solid var(--ink); }
+    .rows {
+      border-top: 3px solid var(--ink);
+      position: relative;
+    }
     .row {
       --bl: 0px;
       position: relative;
@@ -486,17 +562,18 @@
       grid-template-columns: 120px minmax(0, 1.4fr) minmax(0, 1fr);
       gap: 18px 34px;
       align-items: center;
-      padding: 24px 22px;
+      padding: 28px 22px;
       margin-inline: -22px;
-      border-radius: 10px;
+      border-radius: 0;
       border-bottom: 3px solid var(--ink);
       text-decoration: none;
       color: inherit;
       cursor: pointer;
-      transition: background-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease;
+      transition: background-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease, border-radius .18s ease;
     }
     .row > * { min-width: 0; }
     .row:hover, .row:focus-visible {
+      border-radius: 10px;
       background-color: var(--c);
       color: var(--on);
       transform: translateY(-2px);
@@ -1471,11 +1548,19 @@
           <a class="btn bt c-red" href="#build">Start the build <span aria-hidden="true">↓</span></a>
           <a class="btn bt c-blue" href="#contact">Contact me</a>
         </div>
-        <!-- Hero Portrait Plate: Baseplate + Portrait Photo -->
+        <!-- Hero Portrait Plate: Baseplate + Transparent Portrait + LEGO Designs -->
         <figure class="plate" id="plate">
+          <div class="plate-float-stud stud-1" aria-hidden="true"></div>
+          <div class="plate-float-stud stud-2" aria-hidden="true"></div>
+          <div class="plate-float-brick brick-1" aria-hidden="true"></div>
           <div class="base">
             <div class="mat">
-              <img src="assets/images/profile/lego-portrait.jpg" alt="Portrait of Helena Herrero" width="290" height="313" loading="eager">
+              <img src="assets/images/profile/helena-portrait.webp" alt="Portrait of Helena Herrero" width="290" height="313" loading="eager">
+              <span class="plate-badge">CREATOR · HLN</span>
+              <div class="mat-corner tl" aria-hidden="true"></div>
+              <div class="mat-corner tr" aria-hidden="true"></div>
+              <div class="mat-corner bl" aria-hidden="true"></div>
+              <div class="mat-corner br" aria-hidden="true"></div>
             </div>
           </div>
           <figcaption class="mono">Minifig ID · HLN-2026</figcaption>
@@ -3734,9 +3819,9 @@
 
         // Content reveals
         $$('[data-rv]').forEach(el => gsap.from(el, {
-          y: el.classList.contains('row') ? -34 : 40,
-          rotate: el.classList.contains('row') ? -1 : 0,
-          duration: .9,
+          y: el.classList.contains('row') ? 20 : 40,
+          rotate: 0,
+          duration: .8,
           ease: 'power3.out',
           scrollTrigger: { trigger: el, start: 'top 94%', once: true }
         }));
