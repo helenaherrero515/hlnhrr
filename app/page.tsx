@@ -1,5 +1,5 @@
-import { FigmaPortfolioHome } from "@/components/sections/FigmaPortfolioHome";
+import { LegoPortfolio } from "@/components/lego";
 
 export default function HomePage(): React.ReactElement {
-  return <FigmaPortfolioHome />;
+  return <LegoPortfolio />;
 }

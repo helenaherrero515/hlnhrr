@@ -1,11 +1,5 @@
-import { FigmaPortfolioHome } from "@/components/sections/FigmaPortfolioHome";
-import { FigmaScrollToExperiences } from "@/components/sections/FigmaScrollToExperiences";
+import { LegoPortfolio } from "@/components/lego";
 
 export default function ExperiencePage(): React.ReactElement {
-  return (
-    <>
-      <FigmaPortfolioHome />
-      <FigmaScrollToExperiences />
-    </>
-  );
+  return <LegoPortfolio defaultSection="exp" />;
 }
