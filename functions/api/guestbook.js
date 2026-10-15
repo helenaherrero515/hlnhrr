@@ -1,6 +1,4 @@
-let cachedNotes = [
-  { n: "Helena", m: "Welcome to my LEGO guestbook! Feel free to leave a note or feedback.", t: Date.now() - 3600000 }
-];
+let cachedNotes = [];
 
 export async function onRequestGet({ env }) {
   try {
