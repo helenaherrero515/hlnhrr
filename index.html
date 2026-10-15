@@ -200,8 +200,18 @@
     [aria-pressed="true"] .sun { display: none; }
     [aria-pressed="true"] .moon { display: block; }
 
-    /* 3D Canvas */
-    #gl { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    /* 3D Canvas - hidden by default so loose lego bricks stay outside hero screen until scrolling down */
+    #gl {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease;
+    }
 
     /* Hero */
     #zone { position: relative; z-index: 2; }
@@ -564,6 +574,21 @@
       position: relative;
     }
     .wc-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .wc-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--yellow);
+      color: #000;
+      font: 700 11px/1 var(--fm);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0 var(--ink);
+      z-index: 2;
+    }
     .wc .cp { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; align-items: center; }
     .wc .cp b { font: 700 24px/1 var(--fd); }
     .wc .cp span { color: var(--mut); font-size: 13px; text-align: right; }
@@ -571,16 +596,33 @@
 
     /* GitHub */
     .gh { background: var(--panel); border: 3px solid var(--ink); border-radius: 10px; padding: 22px; box-shadow: 0 7px 0 #0003; }
-    .gw { overflow-x: auto; padding-bottom: 12px; }
-    #grid { display: grid; grid-template-rows: repeat(7, 14px); grid-auto-flow: column; grid-auto-columns: 14px; gap: 4px; width: max-content; }
-    #grid i { border-radius: 50%; background: var(--line); }
+    .gw { width: 100%; overflow: hidden; padding-bottom: 8px; }
+    #grid {
+      display: grid;
+      grid-template-rows: repeat(7, 1fr);
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+      gap: clamp(2px, 0.35vw, 5px);
+      width: 100%;
+      aspect-ratio: 53 / 7;
+      max-height: 190px;
+    }
+    #grid i {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--line);
+      box-shadow: inset 0 -1.5px 0 #0000002e;
+      transition: transform .2s, background .2s;
+    }
     #grid .l1 { background: var(--blue); }
     #grid .l2 { background: var(--green); }
     #grid .l3 { background: var(--yellow); }
     #grid .l4 { background: var(--red); }
     #grid i.tw { animation: tw .5s; }
-    @keyframes tw { 50% { scale: 1.7; } }
-    .sw2 { display: none; color: var(--mut); text-align: right; margin-bottom: 6px; }
+    @keyframes tw { 50% { scale: 1.5; } }
+    .sw2 { display: none !important; }
     .sg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 14px; margin-top: 26px; }
     .seg { --bl: 12px; padding: 10px 14px 8px; border-radius: 5px; }
     .seg b { display: block; font: 700 clamp(36px, 5vw, 60px)/1.05 var(--fd); font-variant-numeric: tabular-nums; }
@@ -589,10 +631,27 @@
 
     /* Contact */
     .ct { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: start; }
-    .ct > * { min-width: 0; }
-    .big { margin: 0 0 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-    .big span { display: inline-block; padding: 2px 16px 6px; border-radius: 5px; background: var(--c); color: var(--on); font: 700 clamp(34px, 6vw, 76px)/1 var(--fd); box-shadow: inset 0 -6px 0 #0000002e; }
-    .ct p { margin: 0 0 14px; max-width: 62ch; }
+    .big {
+      margin: 0 0 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .big span {
+      display: inline-block;
+      padding: 4px 18px 8px;
+      border-radius: 6px;
+      background: var(--c);
+      color: var(--on);
+      font: 700 clamp(32px, 5.5vw, 68px)/1.15 var(--fd);
+      box-shadow: inset 0 -6px 0 #0000002e, 0 4px 0 #0002;
+    }
+    .ct p {
+      margin: 0 0 16px;
+      max-width: 62ch;
+      line-height: 1.65;
+    }
     .ct p a { font-weight: 800; text-decoration: underline; }
     .tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
     .tags span { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px; border: 2px solid var(--ink); border-radius: 20px; font: 500 11px var(--fm); letter-spacing: .06em; text-transform: uppercase; background: var(--paper); }
@@ -1586,7 +1645,6 @@
           <h2 class="h2">Contributions</h2>
         </div>
         <div class="gh" data-rv>
-          <div class="sw2 mono">← swipe the plate →</div>
           <div class="gw"><div id="grid"></div></div>
           <div class="sg">
             <div class="seg brk bt c-red"><b id="s1">0</b><span>contributions</span></div>
@@ -1606,15 +1664,15 @@
           <h2 class="h2">Contact me!</h2>
         </div>
         <div class="ct">
-          <div>
-            <h3 class="big" data-rv>
+          <div class="ct-info" data-rv>
+            <h3 class="big">
               <span class="c-red">Projects /</span>
               <span class="c-yellow">Meetups /</span>
               <span class="c-blue">Collabs</span>
             </h3>
             <p>I'm a 2nd-year Bachelor of Science in Computer Science student at PUP Manila, based in Navotas, Philippines. For me, learning is more than just a part of college. It is something I genuinely enjoy and choose to pursue every day.</p>
             <p>I love attending tech conferences, meetups, and events where I can connect with people, exchange ideas, discover new perspectives, and be inspired by others in the field. Every conversation and experience reminds me why I chose this path and motivates me to keep growing with purpose and passion.</p>
-            <p>I'm always open to learning, creating, connecting, and taking on new opportunities. If you're looking for someone curious, creative, and passionate about technology, <a href="mailto:helenaherrero515@gmail.com">feel free to book a meeting with me</a>.</p>
+            <p>I'm always open to learning, creating, connecting, and taking on new opportunities. If you're looking for someone curious, creative, and passionate about technology, <a href="https://calendly.com/helenaherrero515/30min" target="_blank" rel="noopener noreferrer">feel free to book a meeting with me</a>.</p>
             <div class="tags">
               <span><i></i>Available for projects / meetups / collabs</span>
               <span>Based in Navotas, PH</span>
@@ -1657,7 +1715,7 @@
           </form>
           <div>
             <div class="log" id="gb" aria-live="polite"></div>
-            <div class="nt">// Saved on this device only.</div>
+            <div class="nt">// Live Community Guestbook · Notes sync live across visitors!</div>
           </div>
         </div>
       </div>
@@ -1900,11 +1958,12 @@
           type: "swags"
         },
         {
-          title: "PPT decks",
-          subtitle: "Presentation design & storytelling",
+          title: "Branding",
+          subtitle: "Visual identity & design systems",
+          badge: "Under construction",
           color: "c-blue",
-          img: "assets/images/works/ppt-decks/guidher-pitch-deck-cover.png",
-          type: "ppt"
+          img: "assets/images/works/branding-construction.svg",
+          type: "branding"
         }
       ],
       technicalSkills: [
@@ -2100,47 +2159,115 @@
       <div class="wc tilt" data-type="${w.type}" data-rv>
         <div class="wc-thumb">
           <img src="${w.img}" alt="${w.title} preview" width="260" height="260" loading="lazy">
+          ${w.badge ? `<span class="wc-badge">${w.badge}</span>` : ''}
         </div>
         <div class="cp"><b>${w.title}</b><span>${w.subtitle} ↗</span></div>
       </div>
     `).join('');
 
-    /* GitHub Contributions Studs (Template commit distribution) */
-    let seed = 42;
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    let tot = 0, act = 0, best = 0, run = 0, gh = '';
-    for (let i = 0; i < 371; i++) {
-      const d = i % 7, w = Math.floor(i / 7);
-      let l = 0;
-      const p = rnd() * (d === 0 || d === 6 ? .6 : 1) * (.5 + .5 * Math.sin(w / 5));
-      if (p > .78) l = 4;
-      else if (p > .55) l = 3;
-      else if (p > .32) l = 2;
-      else if (p > .15) l = 1;
-      tot += [0, 1, 3, 6, 10][l];
-      if (l) { act++; run++; best = Math.max(best, run); } else run = 0;
-      gh += `<i class="${l ? 'l' + l : ''}"></i>`;
-    }
-    $('#grid').innerHTML = gh;
-    const gi = [...$('#grid').children];
-    $('#s1').textContent = tot;
-    $('#s2').textContent = best;
-    $('#s3').textContent = act;
-    if (!reduce) setInterval(() => {
-      if (document.hidden) return;
-      for (let k = 0; k < 4; k++) {
-        const c = gi[Math.floor(Math.random() * gi.length)];
-        c.classList.add('tw');
-        setTimeout(() => c.classList.remove('tw'), 500);
-      }
-    }, 400);
+    /* GitHub Contributions Studs (Live connection to helenaherrero515 with animated stats) */
+    const renderGitHubGrid = (days, total, streak, active) => {
+      let gh = '';
+      days.forEach(d => {
+        const cls = d.level ? `l${d.level}` : '';
+        const title = `${d.count || 0} contribution${d.count === 1 ? '' : 's'} on ${d.date}`;
+        gh += `<i class="${cls}" title="${title}"></i>`;
+      });
+      $('#grid').innerHTML = gh;
+      const gi = [...$('#grid').children];
 
-    /* BMO Guestbook */
+      // Smooth count-up helper
+      const animateCount = (el, target) => {
+        if (!el) return;
+        const dur = 1000;
+        const startTime = performance.now();
+        const tick = (now) => {
+          const p = Math.min((now - startTime) / dur, 1);
+          const val = Math.round(target * (1 - Math.pow(1 - p, 3)));
+          el.textContent = val;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      };
+
+      animateCount($('#s1'), total);
+      animateCount($('#s2'), streak);
+      animateCount($('#s3'), active);
+
+      if (!reduce && gi.length) {
+        setInterval(() => {
+          if (document.hidden) return;
+          for (let k = 0; k < 4; k++) {
+            const c = gi[Math.floor(Math.random() * gi.length)];
+            if (c) {
+              c.classList.add('tw');
+              setTimeout(() => c.classList.remove('tw'), 500);
+            }
+          }
+        }, 400);
+      }
+    };
+
+    // Realistic fallback data generator
+    const generateFallbackGitHub = () => {
+      let seed = 42;
+      const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      let tot = 0, act = 0, best = 0, run = 0;
+      const days = [];
+      for (let i = 0; i < 371; i++) {
+        const d = i % 7, w = Math.floor(i / 7);
+        let l = 0;
+        const p = rnd() * (d === 0 || d === 6 ? .6 : 1) * (.5 + .5 * Math.sin(w / 5));
+        if (p > .78) l = 4;
+        else if (p > .55) l = 3;
+        else if (p > .32) l = 2;
+        else if (p > .15) l = 1;
+        const count = [0, 1, 3, 6, 10][l];
+        tot += count;
+        if (l) { act++; run++; best = Math.max(best, run); } else run = 0;
+        days.push({ count, level: l, date: `Day ${i + 1}` });
+      }
+      return { days, total: tot, streak: best, active: act };
+    };
+
+    (async () => {
+      try {
+        const res = await fetch('https://github-contributions-api.jogruber.de/v4/helenaherrero515?y=last');
+        if (!res.ok) throw new Error('API status ' + res.status);
+        const data = await res.json();
+        if (!data || !Array.isArray(data.contributions) || !data.contributions.length) throw new Error('Invalid payload');
+
+        let act = 0, bestStreak = 0, curStreak = 0, sumCount = 0;
+        const days = data.contributions;
+        for (const c of days) {
+          sumCount += (c.count || 0);
+          if (c.count > 0) {
+            act++;
+            curStreak++;
+            if (curStreak > bestStreak) bestStreak = curStreak;
+          } else {
+            curStreak = 0;
+          }
+        }
+        const total = data.total?.lastYear || sumCount;
+        renderGitHubGrid(days, total, bestStreak, act);
+      } catch (err) {
+        const fb = generateFallbackGitHub();
+        renderGitHubGrid(fb.days, fb.total, fb.streak, fb.active);
+      }
+    })();
+
+    /* BMO Live Community Guestbook */
     (() => {
       const gb = $('#gb'), gn = $('#gn'), gm = $('#gm'), st = $('#gst');
       const KEY = 'hln_brick_notes';
-      let L = [];
-      try { L = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e){ L = []; }
+      let L = [
+        { n: 'Helena', m: 'Welcome to my LEGO guestbook! Feel free to leave a note or feedback.', t: Date.now() - 3600000 }
+      ];
+      try {
+        const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+        if (Array.isArray(saved) && saved.length) L = saved;
+      } catch(e){}
 
       const hm = t => {
         const d = new Date(t);
@@ -2157,7 +2284,7 @@
         }
         L.forEach(x => {
           const p = document.createElement('p'), b = document.createElement('b'), s = document.createElement('span'), e = document.createElement('em');
-          b.textContent = hm(+x.t || 0);
+          b.textContent = hm(+x.t || Date.now());
           e.textContent = String(x.n || 'anonymous');
           s.appendChild(e);
           s.appendChild(document.createTextNode(' ' + String(x.m || '')));
@@ -2168,16 +2295,54 @@
       };
       render();
 
-      $('#nf').addEventListener('submit', e => {
+      // Fetch live notes from backend API
+      (async () => {
+        try {
+          const res = await fetch('/api/guestbook');
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length) {
+              L = data;
+              try { localStorage.setItem(KEY, JSON.stringify(L)); } catch(e){}
+              render();
+            }
+          }
+        } catch(e) {}
+      })();
+
+      $('#nf').addEventListener('submit', async e => {
         e.preventDefault();
         const m = gm.value.trim().slice(0, 160), n = gn.value.trim().slice(0, 24);
         if (!m) { st.textContent = 'type a note first.'; return; }
-        L.unshift({ n, m, t: Date.now() });
-        L = L.slice(0, 30);
+        const newNote = { n: n || 'anonymous', m, t: Date.now() };
+        L.unshift(newNote);
+        L = L.slice(0, 40);
         try { localStorage.setItem(KEY, JSON.stringify(L)); } catch(x){}
         render();
         gm.value = '';
-        st.textContent = 'saved on this device. thank you!';
+        st.textContent = 'Posting to the community wall…';
+
+        try {
+          const res = await fetch('/api/guestbook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newNote)
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.notes && Array.isArray(json.notes)) {
+              L = json.notes;
+              try { localStorage.setItem(KEY, JSON.stringify(L)); } catch(e){}
+              render();
+            }
+            st.textContent = 'Posted live to the wall! Thank you! 🧱';
+          } else {
+            st.textContent = 'Saved to this device! Thank you! 🧱';
+          }
+        } catch(err) {
+          st.textContent = 'Saved locally! Thank you! 🧱';
+        }
+
         const f = $('#nf');
         f.classList.add('happy');
         setTimeout(() => f.classList.remove('happy'), 2200);
@@ -2230,13 +2395,11 @@
           { org: "Microsoft Build 2026", title: "Developer Merch & Sticker Badge Set", img: "assets/images/works/swags-design/microsoft-build-2026.png" }
         ]
       },
-      ppt: {
-        title: "PPT Decks & Pitch Storytelling",
+      branding: {
+        title: "Branding & Visual Systems",
         color: "c-blue",
-        items: [
-          { org: "GuidHer Pitch Deck", title: "Champion Presentation (PUP Sta. Mesa)", img: "assets/images/works/ppt-decks/guidher-pitch-deck-cover.png", pdf: "assets/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" },
-          { org: "Academic CS Presentation", title: "Research & Systems Overview Deck", img: "assets/images/works/ppt-decks/act1-herrero-helena-cover.png", pdf: "assets/images/works/ppt-decks/ACT1_HERRERO, HELENA.pdf" }
-        ]
+        isUnderConstruction: true,
+        items: []
       }
     };
 
@@ -2372,6 +2535,23 @@
         });
 
         renderPubmatsExhibit('all');
+      } else if (data.isUnderConstruction) {
+        modalFilterWrap.innerHTML = '';
+        modalBody.innerHTML = `
+          <div style="padding: 40px 24px; text-align: center; max-width: 580px; margin: 0 auto;">
+            <div style="max-width: 240px; margin: 0 auto 24px;">
+              <img src="assets/images/works/branding-construction.svg" alt="Branding Under Construction" style="width:100%; height:auto; border-radius:12px; border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink);">
+            </div>
+            <span class="mono" style="display:inline-block; padding:4px 12px; background:var(--yellow); color:#000; font-weight:700; border-radius:4px; border:2px solid var(--ink); margin-bottom:14px; font-size:12px;">🚧 WORK IN PROGRESS · REBUILDING BRICKS</span>
+            <h3 style="font:700 clamp(24px, 3.5vw, 32px)/1.2 var(--fd); margin:0 0 12px;">Branding & Identity System</h3>
+            <p style="color:var(--mut); font-size:15px; line-height:1.6; margin:0 0 24px;">
+              I'm curating and refining case studies for visual brand identities, logo marks, typography guidelines, and design collateral created for student orgs and tech communities. Check back soon for the full breakdown!
+            </p>
+            <button type="button" class="btn bt c-blue" onclick="document.getElementById('modalClose').click()" style="margin:0 auto; padding:10px 24px; font-size:14px;">
+              Got it, keep building 🧱
+            </button>
+          </div>
+        `;
       } else {
         modalFilterWrap.innerHTML = '';
         modalBody.innerHTML = `
@@ -2710,14 +2890,14 @@
         const tg = new THREE.Vector3(0, 2, 0);
 
         bricks.forEach(b => {
-          const side = R() < .64, sg = R() < .5 ? -1 : 1, pad = b.rad + 2;
+          const side = R() < .64, sg = R() < .5 ? -1 : 1, pad = b.rad + hw * 0.4 + 10;
           let u, w;
           if (side) {
             u = sg * (hw + pad + R() * hw * .8);
-            w = (R() - .5) * 2 * hh * 1.15;
+            w = (R() - .5) * 2 * hh * 1.25;
           } else {
-            u = (R() - .5) * 2 * hw * 1.15;
-            w = hh + pad + R() * hh * .5;
+            u = (R() - .5) * 2 * hw * 1.25;
+            w = (sg > 0 ? 1 : -1) * (hh + pad + R() * hh * .6);
           }
           const p = tg.clone().addScaledVector(rv, u).addScaledVector(uv, w).addScaledVector(fv, (R() - .5) * 10).sub(rp);
           b.s.x = p.x;
@@ -2983,19 +3163,74 @@
       $('#pL').addEventListener('click', () => { angT -= Math.PI / 2; });
       $('#pR').addEventListener('click', () => { angT += Math.PI / 2; });
 
+      const CREATIVE_BUILDS = [
+        {
+          name: "Cozy Brick Cottage",
+          bricks: [
+            [4, 4, 4, 2, 'red'], [4, 6, 4, 2, 'red'],
+            [4, 4, 2, 2, 'yellow'], [6, 4, 2, 2, 'yellow'], [4, 6, 2, 2, 'yellow'], [6, 6, 2, 2, 'yellow'],
+            [4, 4, 2, 2, 'white'], [6, 4, 2, 2, 'white'], [4, 6, 2, 2, 'white'], [6, 6, 2, 2, 'white'],
+            [4, 4, 4, 2, 'blue'], [4, 6, 4, 2, 'blue'],
+            [5, 5, 2, 2, 'blue'],
+            [4, 4, 1, 1, 'grey'], [4, 4, 1, 1, 'grey']
+          ]
+        },
+        {
+          name: "Evergreen Pine Tree",
+          bricks: [
+            [6, 6, 2, 2, 'brown'], [6, 6, 2, 2, 'brown'],
+            [4, 5, 6, 2, 'green'], [5, 4, 2, 6, 'green'],
+            [4, 4, 2, 2, 'green'], [8, 4, 2, 2, 'green'], [4, 8, 2, 2, 'green'], [8, 8, 2, 2, 'green'],
+            [5, 5, 4, 2, 'green'], [5, 7, 4, 2, 'green'],
+            [5, 5, 2, 2, 'green'], [6, 6, 2, 2, 'green'],
+            [6, 6, 1, 1, 'yellow'],
+            [2, 3, 1, 1, 'red'], [10, 10, 1, 1, 'yellow']
+          ]
+        },
+        {
+          name: "Minifig Mech Guardian",
+          bricks: [
+            [4, 6, 2, 2, 'grey'], [8, 6, 2, 2, 'grey'],
+            [4, 6, 2, 2, 'blue'], [8, 6, 2, 2, 'blue'],
+            [4, 6, 6, 2, 'blue'],
+            [5, 6, 4, 2, 'red'], [5, 6, 4, 2, 'red'],
+            [3, 6, 2, 2, 'yellow'], [9, 6, 2, 2, 'yellow'],
+            [3, 6, 1, 1, 'grey'], [10, 6, 1, 1, 'grey'],
+            [6, 6, 2, 2, 'yellow'],
+            [6, 6, 2, 2, 'red'],
+            [6, 6, 1, 1, 'white']
+          ]
+        },
+        {
+          name: "Castle Watchtower",
+          bricks: [
+            [5, 5, 4, 2, 'grey'], [5, 7, 4, 2, 'grey'],
+            [5, 5, 2, 2, 'grey'], [7, 5, 2, 2, 'grey'], [5, 7, 2, 2, 'grey'], [7, 7, 2, 2, 'grey'],
+            [5, 5, 4, 2, 'red'], [5, 7, 4, 2, 'red'],
+            [4, 4, 2, 2, 'grey'], [8, 4, 2, 2, 'grey'], [4, 8, 2, 2, 'grey'], [8, 8, 2, 2, 'grey'],
+            [6, 6, 2, 2, 'blue'],
+            [6, 6, 1, 1, 'yellow']
+          ]
+        }
+      ];
+
+      let buildIndex = 0;
       $('#pFun').addEventListener('click', () => {
         if (fun) return;
-        let n = 0;
-        const C = ['red', 'yellow', 'blue', 'green', 'white'];
+        clear();
+        const build = CREATIVE_BUILDS[buildIndex % CREATIVE_BUILDS.length];
+        buildIndex++;
+        let i = 0;
         fun = setInterval(() => {
-          const w = [1, 2, 2, 4][Math.floor(Math.random() * 4)];
-          const d = [1, 1, 2, 2][Math.floor(Math.random() * 4)];
-          const cx = 2 + Math.floor(Math.random() * (N - 4 - w + 1));
-          const cz = 2 + Math.floor(Math.random() * (N - 4 - d + 1));
-          put(cx, cz, w, d, C[Math.floor(Math.random() * 5)]);
+          if (i >= build.bricks.length) {
+            clearInterval(fun);
+            fun = 0;
+            return;
+          }
+          const [cx, cz, w, d, c] = build.bricks[i++];
+          put(cx, cz, w, d, c);
           posGhost();
-          if (++n >= 14) { clearInterval(fun); fun = 0; }
-        }, 110);
+        }, 90);
       });
 
       [[5, 5, 2, 2, 'red'], [7, 5, 2, 1, 'yellow'], [5, 5, 2, 2, 'blue'], [3, 8, 4, 2, 'green'], [8, 8, 2, 2, 'blue'], [8, 8, 1, 1, 'yellow']].forEach(a => put(a[0], a[1], a[2], a[3], a[4], true));
@@ -3354,15 +3589,29 @@
         });
         seq(0);
 
-        // Hero intro
-        gsap.from('.lt i', {
-          y: () => -(260 + Math.random() * 420),
-          rotation: () => (Math.random() - .5) * 140,
-          duration: 1,
-          ease: 'power3.out',
-          stagger: { each: .0035, from: 'random' }
+        // Keep 3D lego scene outside screen display until scrolling down towards #build
+        ScrollTrigger.create({
+          trigger: '#top',
+          start: '50% top',
+          end: 'bottom top',
+          onUpdate: self => {
+            const c = $('#gl');
+            if (c) {
+              c.style.opacity = String(self.progress);
+              c.style.visibility = self.progress > 0.01 ? 'visible' : 'hidden';
+            }
+          }
         });
-        gsap.from('.hl,.lead,.cta', { y: 26, duration: .8, ease: 'power3.out', stagger: .1, delay: .5 });
+
+        // Hero name intro - keeps the lego name solid and intact, never destroyed into loose studs
+        gsap.from('.wd', {
+          y: -24,
+          opacity: 0,
+          duration: 0.9,
+          stagger: 0.15,
+          ease: 'power3.out'
+        });
+        gsap.from('.hl,.lead,.cta', { y: 26, duration: .8, ease: 'power3.out', stagger: .1, delay: .25 });
         gsap.to('#name', { y: -70, ease: 'none', scrollTrigger: { trigger: '#top', start: 'top top', end: 'bottom top', scrub: true } });
         gsap.to('#plate', { yPercent: -14, ease: 'none', scrollTrigger: { trigger: '#top', start: 'top top', end: 'bottom top', scrub: true } });
 
@@ -3426,8 +3675,15 @@
     new IntersectionObserver(es => {
       S.active = es[0].isIntersecting;
       const c = $('#gl');
-      if (c) c.style.visibility = S.active ? 'visible' : 'hidden';
-    }, { rootMargin: '100px' }).observe($('#zone'));
+      if (c) {
+        if (S.active) {
+          c.style.visibility = 'visible';
+        } else {
+          c.style.visibility = 'hidden';
+          c.style.opacity = '0';
+        }
+      }
+    }, { rootMargin: '100px' }).observe($('#build'));
 
     /* ===== Pointer effects: letter lift & 3D tilt ===== */
     if (matchMedia('(hover:hover)').matches && !reduce) {
