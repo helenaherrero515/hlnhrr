@@ -1,9 +1,15 @@
 export interface ProjectItem {
   title: string;
   award: string;
+  event?: string;
+  role?: string;
   description: string;
   tags: string[];
   color: "c-red" | "c-yellow" | "c-blue" | "c-green" | "c-grey";
+  img?: string;
+  live?: string;
+  github?: string;
+  caseStudy?: string;
 }
 
 export interface ExperienceRole {
