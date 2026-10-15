@@ -104,6 +104,24 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   const stepBarRef = useRef<HTMLDivElement | null>(null);
   const chipRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const buildIndexRef = useRef<number>(0);
+  const serialLogsRef = useRef<HTMLDivElement | null>(null);
+
+  // Format time helper for serial monitor
+  const formatTime = (ts: number) => {
+    const d = ts ? new Date(ts) : new Date();
+    return [
+      String(d.getHours()).padStart(2, "0"),
+      String(d.getMinutes()).padStart(2, "0"),
+      String(d.getSeconds()).padStart(2, "0"),
+    ].join(":");
+  };
+
+  // Auto-scroll serial monitor to bottom on new notes
+  useEffect(() => {
+    if (serialLogsRef.current) {
+      serialLogsRef.current.scrollTop = serialLogsRef.current.scrollHeight;
+    }
+  }, [guestNotes]);
 
   // Playground builder internals ref
   const pgRef = useRef<{
@@ -158,9 +176,10 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length) {
-            setGuestNotes(data);
+            const sorted = data.slice().sort((a: GuestbookEntry, b: GuestbookEntry) => (a.t || 0) - (b.t || 0));
+            setGuestNotes(sorted);
             try {
-              localStorage.setItem("hln_brick_notes", JSON.stringify(data));
+              localStorage.setItem("hln_brick_notes", JSON.stringify(sorted));
             } catch {}
           }
         }
@@ -179,7 +198,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       return;
     }
     const newEntry: GuestbookEntry = { n: n || "anonymous", m, t: Date.now() };
-    const updated = [newEntry, ...guestNotes].slice(0, 40);
+    const updated = [...guestNotes, newEntry].slice(-50);
     setGuestNotes(updated);
     try {
       localStorage.setItem("hln_brick_notes", JSON.stringify(updated));
@@ -187,7 +206,10 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     setGuestMessage("");
     setGuestStatus("thank you for your note! 🧱");
     setIsBmoHappy(true);
-    setTimeout(() => setIsBmoHappy(false), 2200);
+    setTimeout(() => {
+      setIsBmoHappy(false);
+      setGuestStatus("hi! write me a note");
+    }, 2600);
 
     try {
       await fetch("/api/guestbook", {
@@ -2533,6 +2555,33 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   <i /><i /><i /><i /><i /><i />
                 </div>
               </form>
+
+              {/* Serial Monitor Guestbook Terminal */}
+              <div className="serial-window" data-rv>
+                <div className="serial-header">
+                  <div className="serial-dots">
+                    <span className="dot-red" />
+                    <span className="dot-yellow" />
+                    <span className="dot-green" />
+                  </div>
+                  <div className="serial-title mono">Serial Monitor — guestbook.log</div>
+                  <div className="serial-baud mono">115200 baud</div>
+                </div>
+                <div className="serial-body" id="serialLogs" ref={serialLogsRef} aria-live="polite">
+                  {guestNotes.length === 0 ? (
+                    <div className="serial-line empty">// no notes yet — be the first! use the console.</div>
+                  ) : (
+                    guestNotes.map((entry, idx) => (
+                      <div className="serial-entry" key={idx}>
+                        <span className="ts">[{formatTime(entry.t)}]</span>
+                        <span className="tag-name">&lt;{entry.n}&gt;</span>
+                        <span className="msg">{entry.m}</span>
+                      </div>
+                    ))
+                  )}
+                  <div className="serial-line footer">// saved on this device only</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
