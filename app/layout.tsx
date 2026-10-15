@@ -1,22 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource/iosevka-charon/latin-300.css";
-import "@fontsource/iosevka-charon/latin-400.css";
-import "@fontsource/iosevka-charon/latin-500.css";
-import "@fontsource/iosevka-charon/latin-700.css";
-import "@fontsource/iosevka-charon/latin-700-italic.css";
-import "@fontsource/iosevka-charon-mono/latin-300.css";
-import "@fontsource/iosevka-charon-mono/latin-400.css";
-import "@fontsource/iosevka-charon-mono/latin-500.css";
-import "@fontsource/iosevka-charon-mono/latin-700.css";
 import { siteMetadata } from "@/constants";
-import { heroSignature, lexend, sans, signature } from "@/lib";
 import "./globals.css";
+import "@/styles/lego.css";
 
-export const metadata: Metadata = siteMetadata;
+export const metadata: Metadata = {
+  ...siteMetadata,
+  title: "Helena Herrero Brick Portfolio",
+  description: "BS Computer Science · PUP Manila · Navotas, PH. Obsessed with growth, robotics, data science, AI/ML, and building what I'm curious about.",
+};
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 interface RootLayoutProps {
@@ -25,11 +21,8 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>): React.ReactElement {
   return (
-    <html lang="en" className={`${sans.variable} ${lexend.variable} ${signature.variable} ${heroSignature.variable}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <a className="skip-link" href="#main-content">
-          Skip to content
-        </a>
         {children}
       </body>
     </html>
