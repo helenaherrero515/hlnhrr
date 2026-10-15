@@ -24,4 +24,5 @@ Thumbs.db
 # local visual verification
 .screenshots/
 .next-start*.log
-
+# cloudflare wrangler
+.wrangler/
