@@ -66,7 +66,7 @@ const easeOutBounce = (x: number) => {
 export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   // Theme state
   const [isDark, setIsDark] = useState<boolean>(false);
-  const [worksModalType, setWorksModalType] = useState<"pubmats" | "swags" | "ppt" | null>(null);
+  const [worksModalType, setWorksModalType] = useState<"pubmats" | "swags" | "ppt" | "branding" | null>(null);
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
   // Playground builder state
@@ -149,10 +149,26 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
         setGuestNotes(JSON.parse(saved));
       }
     } catch {}
+
+    const fetchLiveNotes = async () => {
+      try {
+        const res = await fetch("/api/guestbook");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length) {
+            setGuestNotes(data);
+            try {
+              localStorage.setItem("hln_brick_notes", JSON.stringify(data));
+            } catch {}
+          }
+        }
+      } catch {}
+    };
+    fetchLiveNotes();
   }, []);
 
   // Handle guestbook submission
-  const handleGuestbookSubmit = (e: React.FormEvent) => {
+  const handleGuestbookSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const m = guestMessage.trim().slice(0, 160);
     const n = guestName.trim().slice(0, 24);
@@ -161,15 +177,37 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       return;
     }
     const newEntry: GuestbookEntry = { n: n || "anonymous", m, t: Date.now() };
-    const updated = [newEntry, ...guestNotes].slice(0, 30);
+    const updated = [newEntry, ...guestNotes].slice(0, 40);
     setGuestNotes(updated);
     try {
       localStorage.setItem("hln_brick_notes", JSON.stringify(updated));
     } catch {}
     setGuestMessage("");
-    setGuestStatus("saved on this device. thank you!");
+    setGuestStatus("Posting to the community wall…");
     setIsBmoHappy(true);
     setTimeout(() => setIsBmoHappy(false), 2200);
+
+    try {
+      const res = await fetch("/api/guestbook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newEntry),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.notes && Array.isArray(json.notes)) {
+          setGuestNotes(json.notes);
+          try {
+            localStorage.setItem("hln_brick_notes", JSON.stringify(json.notes));
+          } catch {}
+        }
+        setGuestStatus("Posted live to the wall! Thank you! 🧱");
+      } else {
+        setGuestStatus("Saved to this device! Thank you! 🧱");
+      }
+    } catch {
+      setGuestStatus("Saved locally! Thank you! 🧱");
+    }
   };
 
   // Main Three.js Scene + Lenis + ScrollTrigger Sequence
@@ -616,20 +654,34 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       });
       updateSequence(0);
 
-      // Hero animations
-      gsap.from(".lt i", {
-        y: () => -(260 + Math.random() * 420),
-        rotation: () => (Math.random() - 0.5) * 140,
-        duration: 1,
+      // Keep 3D lego scene outside screen display until scrolling down towards #build
+      ScrollTrigger.create({
+        trigger: "#top",
+        start: "50% top",
+        end: "bottom top",
+        onUpdate: (self) => {
+          const c = glCanvasRef.current;
+          if (c) {
+            c.style.opacity = String(self.progress);
+            c.style.visibility = self.progress > 0.01 ? "visible" : "hidden";
+          }
+        },
+      });
+
+      // Hero name intro - keeps the lego name solid and intact, never destroyed into loose studs
+      gsap.from(".wd", {
+        y: -24,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.15,
         ease: "power3.out",
-        stagger: { each: 0.0035, from: "random" },
       });
       gsap.from(".hl, .lead, .cta", {
         y: 26,
         duration: 0.8,
         ease: "power3.out",
         stagger: 0.1,
-        delay: 0.5,
+        delay: 0.25,
       });
       gsap.to("#name", {
         y: -70,
@@ -1163,20 +1215,103 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       },
       surpriseMe: () => {
         if (funTimer) return;
-        let count = 0;
-        const colList: BrickColorKey[] = ["red", "yellow", "blue", "green", "white"];
+        clear();
+        const CREATIVE_BUILDS: Array<{
+          name: string;
+          bricks: Array<[number, number, number, number, BrickColorKey]>;
+        }> = [
+          {
+            name: "Cozy Brick Cottage",
+            bricks: [
+              [4, 4, 4, 2, "red"],
+              [4, 6, 4, 2, "red"],
+              [4, 4, 2, 2, "yellow"],
+              [6, 4, 2, 2, "yellow"],
+              [4, 6, 2, 2, "yellow"],
+              [6, 6, 2, 2, "yellow"],
+              [4, 4, 2, 2, "white"],
+              [6, 4, 2, 2, "white"],
+              [4, 6, 2, 2, "white"],
+              [6, 6, 2, 2, "white"],
+              [4, 4, 4, 2, "blue"],
+              [4, 6, 4, 2, "blue"],
+              [5, 5, 2, 2, "blue"],
+              [4, 4, 1, 1, "grey"],
+              [4, 4, 1, 1, "grey"],
+            ],
+          },
+          {
+            name: "Evergreen Pine Tree",
+            bricks: [
+              [6, 6, 2, 2, "brown"],
+              [6, 6, 2, 2, "brown"],
+              [4, 5, 6, 2, "green"],
+              [5, 4, 2, 6, "green"],
+              [4, 4, 2, 2, "green"],
+              [8, 4, 2, 2, "green"],
+              [4, 8, 2, 2, "green"],
+              [8, 8, 2, 2, "green"],
+              [5, 5, 4, 2, "green"],
+              [5, 7, 4, 2, "green"],
+              [5, 5, 2, 2, "green"],
+              [6, 6, 2, 2, "green"],
+              [6, 6, 1, 1, "yellow"],
+              [2, 3, 1, 1, "red"],
+              [10, 10, 1, 1, "yellow"],
+            ],
+          },
+          {
+            name: "Minifig Mech Guardian",
+            bricks: [
+              [4, 6, 2, 2, "grey"],
+              [8, 6, 2, 2, "grey"],
+              [4, 6, 2, 2, "blue"],
+              [8, 6, 2, 2, "blue"],
+              [4, 6, 6, 2, "blue"],
+              [5, 6, 4, 2, "red"],
+              [5, 6, 4, 2, "red"],
+              [3, 6, 2, 2, "yellow"],
+              [9, 6, 2, 2, "yellow"],
+              [3, 6, 1, 1, "grey"],
+              [10, 6, 1, 1, "grey"],
+              [6, 6, 2, 2, "yellow"],
+              [6, 6, 2, 2, "red"],
+              [6, 6, 1, 1, "white"],
+            ],
+          },
+          {
+            name: "Castle Watchtower",
+            bricks: [
+              [5, 5, 4, 2, "grey"],
+              [5, 7, 4, 2, "grey"],
+              [5, 5, 2, 2, "grey"],
+              [7, 5, 2, 2, "grey"],
+              [5, 7, 2, 2, "grey"],
+              [7, 7, 2, 2, "grey"],
+              [5, 5, 4, 2, "red"],
+              [5, 7, 4, 2, "red"],
+              [4, 4, 2, 2, "grey"],
+              [8, 4, 2, 2, "grey"],
+              [4, 8, 2, 2, "grey"],
+              [8, 8, 2, 2, "grey"],
+              [6, 6, 2, 2, "blue"],
+              [6, 6, 1, 1, "yellow"],
+            ],
+          },
+        ];
+
+        const chosenBuild = CREATIVE_BUILDS[Math.floor(Math.random() * CREATIVE_BUILDS.length)];
+        let step = 0;
         funTimer = window.setInterval(() => {
-          const w = [1, 2, 2, 4][Math.floor(Math.random() * 4)];
-          const d = [1, 1, 2, 2][Math.floor(Math.random() * 4)];
-          const cx = 2 + Math.floor(Math.random() * (N - 4 - w + 1));
-          const cz = 2 + Math.floor(Math.random() * (N - 4 - d + 1));
-          putBrick(cx, cz, w, d, colList[Math.floor(Math.random() * 5)]);
-          posGhost();
-          if (++count >= 14) {
+          if (step >= chosenBuild.bricks.length) {
             clearInterval(funTimer);
             funTimer = 0;
+            return;
           }
-        }, 110);
+          const [cx, cz, w, d, c] = chosenBuild.bricks[step++];
+          putBrick(cx, cz, w, d, c);
+          posGhost();
+        }, 90);
       },
       snapStory: (width: number, height: number) => {
         const gv = ghost ? ghost.visible : false;
@@ -1446,39 +1581,77 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     }
   };
 
-  // GitHub commit plate generation
+  // GitHub commit plate generation (connected to live helenaherrero515 with fallback)
   const [githubGridHtml, setGithubGridHtml] = useState<string>("");
   useEffect(() => {
-    let seed = 42;
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    let tot = 0;
-    let act = 0;
-    let best = 0;
-    let run = 0;
-    let gh = "";
+    const generateFallback = () => {
+      let seed = 42;
+      const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      let tot = 0;
+      let act = 0;
+      let best = 0;
+      let run = 0;
+      let gh = "";
 
-    for (let i = 0; i < 371; i++) {
-      const d = i % 7;
-      const w = Math.floor(i / 7);
-      let l = 0;
-      const p = rnd() * (d === 0 || d === 6 ? 0.6 : 1) * (0.5 + 0.5 * Math.sin(w / 5));
-      if (p > 0.78) l = 4;
-      else if (p > 0.55) l = 3;
-      else if (p > 0.32) l = 2;
-      else if (p > 0.15) l = 1;
-      tot += [0, 1, 3, 6, 10][l];
-      if (l) {
-        act++;
-        run++;
-        best = Math.max(best, run);
-      } else {
-        run = 0;
+      for (let i = 0; i < 371; i++) {
+        const d = i % 7;
+        const w = Math.floor(i / 7);
+        let l = 0;
+        const p = rnd() * (d === 0 || d === 6 ? 0.6 : 1) * (0.5 + 0.5 * Math.sin(w / 5));
+        if (p > 0.78) l = 4;
+        else if (p > 0.55) l = 3;
+        else if (p > 0.32) l = 2;
+        else if (p > 0.15) l = 1;
+        tot += [0, 1, 3, 6, 10][l];
+        if (l) {
+          act++;
+          run++;
+          best = Math.max(best, run);
+        } else {
+          run = 0;
+        }
+        gh += `<i class="${l ? "l" + l : ""}"></i>`;
       }
-      gh += `<i class="${l ? "l" + l : ""}"></i>`;
-    }
+      setGithubGridHtml(gh);
+      setStatTotals({ contributions: tot, streak: best, activeDays: act });
+    };
 
-    setGithubGridHtml(gh);
-    setStatTotals({ contributions: tot, streak: best, activeDays: act });
+    const fetchLiveContributions = async () => {
+      try {
+        const res = await fetch("https://github-contributions-api.jogruber.de/v4/helenaherrero515?y=last");
+        if (!res.ok) throw new Error("Status " + res.status);
+        const data = await res.json();
+        if (!data || !Array.isArray(data.contributions) || !data.contributions.length) throw new Error("Invalid payload");
+
+        let act = 0;
+        let bestStreak = 0;
+        let curStreak = 0;
+        let sumCount = 0;
+        let gh = "";
+
+        for (const c of data.contributions) {
+          sumCount += (c.count || 0);
+          if (c.count > 0) {
+            act++;
+            curStreak++;
+            if (curStreak > bestStreak) bestStreak = curStreak;
+          } else {
+            curStreak = 0;
+          }
+          const cls = c.level ? `l${c.level}` : "";
+          const title = `${c.count || 0} contribution${c.count === 1 ? "" : "s"} on ${c.date}`;
+          gh += `<i class="${cls}" title="${title}"></i>`;
+        }
+
+        const total = data.total?.lastYear || sumCount;
+        setGithubGridHtml(gh);
+        setStatTotals({ contributions: total, streak: bestStreak, activeDays: act });
+      } catch {
+        generateFallback();
+      }
+    };
+
+    fetchLiveContributions();
   }, []);
 
   // GitHub twinkling studs animation
@@ -1950,23 +2123,17 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                     setWorksModalType(work.type);
                   }}
                 >
-                  <div className="mx">
-                    {Array.from({ length: 64 }).map((_, studIdx) => {
-                      const colors = ["#e3000b", "#ffb400", "#2aa7f2", "#5bb838", "#b9bec7"];
-                      const c = colors[studIdx % colors.length];
-                      return (
-                        <i
-                          key={studIdx}
-                          className={studIdx % 2 === 0 ? "on" : ""}
-                          style={
-                            {
-                              "--k": c,
-                              background: studIdx % 2 === 0 ? c : undefined,
-                            } as React.CSSProperties
-                          }
-                        />
-                      );
-                    })}
+                  <div className="wc-thumb">
+                    {work.img && (
+                      <img
+                        src={work.img}
+                        alt={`${work.title} preview`}
+                        width={260}
+                        height={260}
+                        loading="lazy"
+                      />
+                    )}
+                    {work.badge && <span className="wc-badge">{work.badge}</span>}
                   </div>
                   <div className="cp">
                     <b>{work.title}</b>
@@ -2112,7 +2279,6 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
               <h2 className="h2">Contributions</h2>
             </div>
             <div className="gh" data-rv>
-              <div className="sw2 mono">← swipe the plate →</div>
               <div className="gw">
                 <div id="grid" dangerouslySetInnerHTML={{ __html: githubGridHtml }} />
               </div>
@@ -2130,7 +2296,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   <span>active days</span>
                 </div>
               </div>
-              <div className="nt">{"// Connect with @helenaherrero on GitHub for real-time commits."}</div>
+              <div className="nt">{"// Real-time commits synced directly from @helenaherrero515 on GitHub."}</div>
             </div>
           </div>
         </section>
@@ -2144,8 +2310,8 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
             </div>
 
             <div className="ct">
-              <div>
-                <h3 className="big" data-rv>
+              <div className="ct-info" data-rv>
+                <h3 className="big">
                   <span className="c-red">Projects /</span>
                   <span className="c-yellow">Meetups /</span>
                   <span className="c-blue">Collabs</span>
@@ -2158,7 +2324,9 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                 </p>
                 <p>
                   I&apos;m always open to learning, creating, connecting, and taking on new opportunities. If you&apos;re looking for someone curious, creative, and passionate about technology,{" "}
-                  <a href="mailto:helenaherrero515@gmail.com">feel free to book a meeting with me</a>.
+                  <a href="https://calendly.com/helenaherrero515/30min" target="_blank" rel="noopener noreferrer">
+                    feel free to book a meeting with me
+                  </a>.
                 </p>
                 <div className="tags">
                   <span>
@@ -2170,16 +2338,16 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
 
               <div className="btns" data-rv>
                 <div className="mono">Press a brick</div>
-                <a className="btn bt c-green" href="https://github.com/helenaherrero" target="_blank" rel="noreferrer">
+                <a className="btn bt c-green" href="https://github.com/helenaherrero515" target="_blank" rel="noopener noreferrer">
                   GitHub <span>↗</span>
                 </a>
-                <a className="btn bt c-blue" href="https://linkedin.com/in/helena-herrero" target="_blank" rel="noreferrer">
+                <a className="btn bt c-blue" href="https://www.linkedin.com/in/helenaherrero515/" target="_blank" rel="noopener noreferrer">
                   LinkedIn <span>↗</span>
                 </a>
                 <a className="btn bt c-yellow" href="mailto:helenaherrero515@gmail.com">
                   Email <span>↗</span>
                 </a>
-                <a className="btn bt c-red" href="/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" target="_blank" rel="noreferrer">
+                <a className="btn bt c-red" href="/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" target="_blank" rel="noopener noreferrer">
                   Download CV <span>↓</span>
                 </a>
               </div>
@@ -2274,7 +2442,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                     })
                   )}
                 </div>
-                <div className="nt">{"// Saved on this device only."}</div>
+                <div className="nt">{"// Live Community Guestbook · Notes sync live across visitors!"}</div>
               </div>
             </div>
           </div>
