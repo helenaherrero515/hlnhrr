@@ -1900,7 +1900,6 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
           <div className="wrap">
             <div className="hl">
               <span className="pill c-yellow">Hello, human!</span>
-              <span className="mono">BS Computer Science · PUP Manila · Navotas, PH</span>
             </div>
 
             {/* Brick-built Name */}
@@ -2569,7 +2568,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                 </div>
                 <div className="serial-body" id="serialLogs" ref={serialLogsRef} aria-live="polite">
                   {guestNotes.length === 0 ? (
-                    <div className="serial-line empty">// no notes yet — be the first! use the console.</div>
+                    <div className="serial-line empty">{"// no notes yet — be the first! use the console."}</div>
                   ) : (
                     guestNotes.map((entry, idx) => (
                       <div className="serial-entry" key={idx}>
@@ -2579,7 +2578,6 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                       </div>
                     ))
                   )}
-                  <div className="serial-line footer">// saved on this device only</div>
                 </div>
               </div>
             </div>
