@@ -1550,8 +1550,9 @@
     }
 
     /* Responsive queries */
-    @media (max-width: 900px) {
-      .abt, .ct, .gbk { grid-template-columns: 1fr !important; }
+    @media (max-width: 960px) {
+      .abt, .ct-top, .gbk { grid-template-columns: 1fr !important; }
+      .btns-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
       .sw2 { display: block; }
       .lead {
         background: color-mix(in srgb, var(--bg) 78%, transparent);
@@ -1608,6 +1609,10 @@
       .nav a, .nav button { padding: 9px 10px; scroll-snap-align: center; }
       .nav .tgl { padding: 8px 10px; gap: 0; box-shadow: -10px 0 8px -4px var(--paper); }
       .nav .tgl .tl { display: none; }
+    }
+    @media (max-width: 600px) {
+      .btns-row { grid-template-columns: 1fr; gap: 12px; }
+      .btns-row .btn { font-size: 16px; padding: 13px 18px; }
     }
     @media (max-width: 560px) {
       .ftw { flex-direction: column; align-items: flex-start; }
@@ -1901,26 +1906,32 @@
           <h2 class="h2">Contact me!</h2>
         </div>
         <div class="ct">
-          <div class="ct-info" data-rv>
-            <h3 class="big">
-              <span class="c-red">Projects /</span>
-              <span class="c-yellow">Meetups /</span>
-              <span class="c-blue">Collabs</span>
-            </h3>
-            <p>I'm a 2nd-year Bachelor of Science in Computer Science student at PUP Manila, based in Navotas, Philippines. For me, learning is more than just a part of college. It is something I genuinely enjoy and choose to pursue every day.</p>
-            <p>I love attending tech conferences, meetups, and events where I can connect with people, exchange ideas, discover new perspectives, and be inspired by others in the field. Every conversation and experience reminds me why I chose this path and motivates me to keep growing with purpose and passion.</p>
-            <p>I'm always open to learning, creating, connecting, and taking on new opportunities. If you're looking for someone curious, creative, and passionate about technology, <a href="https://calendly.com/helenaherrero515/30min" target="_blank" rel="noopener noreferrer">feel free to book a meeting with me</a>.</p>
-            <div class="tags">
-              <span><i></i>Available for projects / meetups / collabs</span>
-              <span>Based in Navotas, PH</span>
+          <div class="ct-top" data-rv>
+            <div class="ct-big-wrap">
+              <h3 class="big">
+                <span class="c-red">Projects /</span>
+                <span class="c-yellow">Meetups /</span>
+                <span class="c-blue">Collabs</span>
+              </h3>
+            </div>
+            <div class="ct-bio-wrap">
+              <p>I'm a 2nd-year Bachelor of Science in Computer Science student at PUP Manila, based in Navotas, Philippines. For me, learning is more than just a part of college. It is something I genuinely enjoy and choose to pursue every day.</p>
+              <p>I love attending tech conferences, meetups, and events where I can connect with people, exchange ideas, discover new perspectives, and be inspired by others in the field. Every conversation and experience reminds me why I chose this path and motivates me to keep growing with purpose and passion.</p>
+              <p>I'm always open to learning, creating, connecting, and taking on new opportunities. If you're looking for someone curious, creative, and passionate about technology, <a href="https://calendly.com/helenaherrero515/30min" target="_blank" rel="noopener noreferrer">feel free to book a meeting with me</a>.</p>
+              <div class="tags">
+                <span><i></i>Available for projects / meetups / collabs</span>
+                <span>Based in Navotas, PH</span>
+              </div>
             </div>
           </div>
           <div class="btns" data-rv>
             <div class="mono">Press a brick</div>
-            <a class="btn bt c-green" href="https://github.com/helenaherrero515" target="_blank" rel="noopener noreferrer">GitHub <span>↗</span></a>
-            <a class="btn bt c-blue" href="https://www.linkedin.com/in/helenaherrero515/" target="_blank" rel="noopener noreferrer">LinkedIn <span>↗</span></a>
-            <a class="btn bt c-yellow" href="mailto:helenaherrero515@gmail.com">Email <span>↗</span></a>
-            <a class="btn bt c-red" href="assets/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" target="_blank" rel="noopener noreferrer">Download CV <span>↓</span></a>
+            <div class="btns-row">
+              <a class="btn bt c-green" href="https://github.com/helenaherrero515" target="_blank" rel="noopener noreferrer">GitHub <span>↗</span></a>
+              <a class="btn bt c-blue" href="https://www.linkedin.com/in/helenaherrero515/" target="_blank" rel="noopener noreferrer">LinkedIn <span>↗</span></a>
+              <a class="btn bt c-yellow" href="mailto:helenaherrero515@gmail.com">Email <span>↗</span></a>
+              <a class="btn bt c-red" href="assets/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" target="_blank" rel="noopener noreferrer">Download CV <span>↓</span></a>
+            </div>
           </div>
         </div>
 
