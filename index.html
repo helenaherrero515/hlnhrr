@@ -3,9 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Helena Herrero — Portfolio</title>
+  <title>HLN</title>
   <meta name="description" content="Portfolio of Helena R. Herrero — UI/UX Designer, Frontend Developer & Creative Technologist. CS Student at PUP Manila.">
   <meta name="claude:viewport-fit-sides" content="cover">
+  <meta name="application-name" content="HLN">
+  <link rel="icon" href="public/icons/hln.svg" type="image/svg+xml">
+  <link rel="icon" href="public/icons/hln-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="public/icons/hln-180.png" sizes="180x180">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;800&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
@@ -649,25 +653,207 @@
     .tools { display: flex; flex-wrap: wrap; gap: 10px; }
     .tools span { padding: 6px 14px; border-radius: 4px; background: var(--panel); border: 2px solid var(--line); font: 500 12px var(--fm); letter-spacing: .06em; text-transform: uppercase; border-left: 7px solid var(--c); }
 
-    /* Experience */
-    .exg { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 40px 28px; align-items: start; }
-    .exg > * { min-width: 0; }
-    @media (min-width: 1000px) {
-      .exg { grid-template-columns: repeat(12, 1fr); align-items: stretch; }
-      .exb:nth-child(1) { grid-column: 1 / 8; grid-row: 1 / 3; }
-      .exb:nth-child(2) { grid-column: 8 / 13; grid-row: 1; }
-      .exb:nth-child(5) { grid-column: 8 / 13; grid-row: 2; }
-      .exb:nth-child(3) { grid-column: 1 / 7; grid-row: 3; }
-      .exb:nth-child(4) { grid-column: 7 / 13; grid-row: 3; }
-    }
-    .exb { --bl: 22px; border-radius: 6px; background: var(--panel); border: 3px solid var(--ink); box-shadow: 0 7px 0 #0003; }
-    .exb .hd { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 20px; background: var(--c); color: var(--on); font: 700 clamp(24px, 2.6vw, 34px)/1 var(--fd); box-shadow: inset 0 -5px 0 #0000002e; }
-    .exb .hd .mono { font-size: 11px; }
-    .exb .rw { padding: 12px 20px; border-top: 2px dashed var(--line); }
-    .exb .rw:first-of-type { border-top: 0; }
-    .exb .rw b { display: block; font: 800 15px/1.3 var(--fb); overflow-wrap: anywhere; }
-    .exb .rw span { display: block; color: var(--mut); font-size: 13px; }
-    .exb .rw a { color: var(--blue); font-weight: 700; text-decoration: underline; font-size: 12px; margin-top: 2px; display: inline-block; }
+    /* Experience: The Climb */
+.climb {
+  position: relative;
+  z-index: 2;
+  background-color: var(--bg);
+  background-image: radial-gradient(circle, var(--grid) 2px, transparent 2.6px);
+  background-size: 28px 28px;
+}
+.cl-track { position: relative; height: 620vh; height: 620svh; }
+.cl-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+#clGl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+.cl-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: calc(76px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: clamp(16px, 3vw, 48px);
+  row-gap: clamp(6px, 1.6vh, 18px);
+}
+.cl-head { grid-column: 1 / -1; display: flex; align-items: center; gap: clamp(10px, 2vw, 22px); min-width: 0; }
+.cl-ui .lab { margin-bottom: 0; }
+.cl-head .h2 { font-size: clamp(34px, min(10.5vh, 7.4vw), 100px); }
+.cl-pill {
+  order: 2;
+  white-space: nowrap;
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  padding: 6px 14px;
+  background: var(--paper);
+  box-shadow: 0 3px 0 #0003;
+}
+
+/* open "window" over the full-bleed canvas: no frame, just a layout slot */
+.cl-view { position: relative; min-width: 0; min-height: 0; }
+.cl-hud { position: absolute; left: 0; bottom: 6px; display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; pointer-events: auto; }
+.cl-label {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  padding: 4px 12px;
+  box-shadow: 0 3px 0 #0003;
+}
+/* level tracker: a little staircase of bricks */
+.cl-steps { display: flex; align-items: flex-end; gap: 6px; }
+.cl-steps button {
+  --bl: 7px;
+  width: 40px;
+  height: calc(26px + var(--k) * 9px);
+  padding: 0 0 4px;
+  display: flex; align-items: flex-end; justify-content: center;
+  border: 3px solid var(--ink);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 700 13px var(--fd);
+  cursor: pointer;
+  box-shadow: 0 4px 0 #0003;
+  transition: translate .2s, background .2s;
+}
+.cl-steps button::before { opacity: .3; transition: opacity .2s; }
+.cl-steps button.on { background: var(--c); color: var(--on); }
+.cl-steps button.on::before { opacity: 1; }
+.cl-steps button[aria-current="step"] { translate: 0 -6px; }
+
+/* "You" cursor that follows the minifig */
+.cl-you { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; will-change: transform; opacity: 0; transition: opacity .3s; }
+.cl-you svg { width: 26px; height: 26px; display: block; filter: drop-shadow(0 2px 0 #0003); }
+.cl-you span {
+  position: absolute; left: 18px; top: 20px;
+  background: var(--green); color: var(--on-green);
+  border: 2px solid var(--ink); border-radius: 20px;
+  padding: 0 10px; font: 700 12px/1.5 var(--fm);
+  box-shadow: 0 3px 0 #0003;
+}
+
+/* right: levels, auto-fitted so every entry is visible (JS sets --s / --w) */
+.cl-panel { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.cl-group {
+  position: absolute;
+  left: 0; top: 10px;
+  width: var(--w, 100%);
+  padding-right: 4px;
+  transform-origin: 0 0;
+  transform: translateY(22px) scale(var(--s, 1));
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s, transform .45s cubic-bezier(.2, .8, .2, 1), visibility 0s .35s;
+}
+.cl-group.on { opacity: 1; visibility: visible; transform: scale(var(--s, 1)); transition-delay: 0s; }
+.cl-ghost {
+  position: absolute; right: 0; top: -.08em;
+  font: 700 clamp(110px, 30vh, 250px)/1 var(--fd);
+  color: var(--c); opacity: .13;
+  pointer-events: none; user-select: none; letter-spacing: -.02em;
+}
+.cl-gh { position: relative; display: flex; align-items: center; gap: 14px; margin-bottom: clamp(10px, 2vh, 20px); }
+.cl-n { border: 2px solid var(--c); border-radius: 20px; padding: 2px 10px; background: var(--paper); color: var(--ink); }
+.cl-gt {
+  margin: 0;
+  display: inline-block;
+  padding: 2px 16px 6px;
+  border-radius: 6px;
+  background: var(--c);
+  color: var(--on);
+  font: 700 clamp(24px, 5.2vh, 50px)/1.1 var(--fd);
+  box-shadow: inset 0 -5px 0 #0000002e, 0 4px 0 #0002;
+  rotate: -1.5deg;
+}
+.cl-cnt { margin-left: auto; color: var(--mut); }
+.cl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: clamp(10px, 1.7vh, 15px); }
+/* running-bond: cards alternate sideways like a brick wall */
+.cl-card:nth-child(odd) { margin-right: clamp(10px, 2.6vw, 34px); }
+.cl-card:nth-child(even) { margin-left: clamp(10px, 2.6vw, 34px); }
+.cl-card {
+  --bl: 16px;
+  position: relative;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-left: 10px solid var(--c);
+  border-radius: 8px;
+  padding: clamp(7px, 1.3vh, 13px) 48px clamp(8px, 1.4vh, 14px) 16px;
+  box-shadow: inset 0 -4px 0 #0000001f, 0 4px 0 #0002;
+  opacity: 0;
+  transform: translateX(22px);
+}
+.cl-card::after {
+  content: attr(data-n);
+  position: absolute; right: 12px; top: 7px;
+  font: 700 clamp(14px, 2.4vh, 22px)/1 var(--fd);
+  color: var(--line);
+}
+.cl-group.on .cl-card {
+  opacity: 1;
+  transform: none;
+  transition: opacity .4s ease, transform .45s cubic-bezier(.2, .8, .2, 1);
+  transition-delay: calc(var(--k) * 55ms + 80ms);
+}
+.cl-card b { display: block; font: 800 clamp(12.5px, 2.1vh, 18px)/1.22 var(--fb); overflow-wrap: anywhere; }
+.cl-card span {
+  display: block; margin-top: 3px;
+  font: 500 clamp(10px, 1.45vh, 12.5px)/1.35 var(--fm);
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--mut); overflow-wrap: anywhere;
+}
+
+/* portrait phones / small tablets: scene on top, list below */
+@media (max-width: 820px) and (max-aspect-ratio: 1/1) {
+  .cl-ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(120px, 32%) minmax(0, 1fr); row-gap: 8px; }
+  .cl-panel {
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    border-radius: 10px; padding: 0 4px;
+  }
+  .cl-card { padding: 6px 40px 7px 12px; border-left-width: 8px; }
+  .cl-card b { font-size: clamp(11.5px, 1.7vh, 14px); }
+  .cl-card span { font-size: clamp(9.5px, 1.3vh, 11px); }
+  .cl-card::after { font-size: 14px; right: 10px; top: 6px; }
+  .cl-list { gap: 9px; }
+  .cl-gt { font-size: clamp(22px, 4vh, 34px); }
+  .cl-ghost { font-size: clamp(90px, 18vh, 150px); }
+}
+/* portrait phones: roomier scene, compact HUD, tighter cards */
+@media (max-width: 820px) and (max-aspect-ratio: 1/1) {
+  .cl-track { height: 520vh; height: 520svh; }
+  .cl-ui { padding-top: calc(70px + env(safe-area-inset-top, 0px)); grid-template-rows: auto minmax(150px, 30%) minmax(0, 1fr); row-gap: 6px; }
+  .cl-head { gap: 10px; }
+  .cl-hud { bottom: 0; gap: 8px; flex-wrap: nowrap; }
+  .cl-steps { gap: 4px; }
+  .cl-steps button { width: 34px; height: calc(22px + var(--k) * 6px); --bl: 5px; border-width: 2px; font-size: 12px; box-shadow: 0 3px 0 #0003; }
+  .cl-label { font-size: 10px; padding: 3px 9px; white-space: nowrap; }
+  .cl-lname { display: none; }
+  .cl-gh { gap: 10px; margin-bottom: 8px; }
+  .cl-gt { font-size: clamp(20px, 3.6vh, 30px); padding: 2px 12px 5px; }
+  .cl-ghost { font-size: clamp(70px, 12vh, 120px); }
+  .cl-list { gap: 8px; }
+  .cl-card:nth-child(odd) { margin-right: 6px; }
+  .cl-card:nth-child(even) { margin-left: 6px; }
+  .cl-card { padding: 6px 34px 7px 11px; border-width: 2px; border-left-width: 7px; }
+  .cl-card b { font-size: 13px; line-height: 1.2; }
+  .cl-card span { font-size: 10px; letter-spacing: .04em; margin-top: 2px; }
+  .cl-card::after { font-size: 12px; right: 9px; top: 6px; }
+}
+@media (max-width: 700px) { .cl-pill { display: none; } .cl-head .h2 { font-size: clamp(34px, min(8vh, 11vw), 56px); } }
+@media (max-height: 560px) { .cl-ui { padding-top: calc(66px + env(safe-area-inset-top, 0px)); } .cl-pill { display: none; } }
+
+/* no WebGL / reduced motion: plain stacked list */
+.cl-static .cl-track { height: auto; }
+.cl-static .cl-stage { position: relative; height: auto; overflow: visible; }
+.cl-static #clGl, .cl-static .cl-you, .cl-static .cl-view, .cl-static .cl-pill { display: none; }
+.cl-static .cl-ui { position: relative; inset: auto; pointer-events: auto; grid-template-columns: 1fr; grid-template-rows: auto; padding-bottom: 70px; }
+.cl-static .cl-panel { overflow: visible; background: none; }
+.cl-static .cl-group { position: relative; top: 0; width: 100%; opacity: 1; visibility: visible; transform: none; margin-bottom: 40px; }
+.cl-static .cl-card { opacity: 1; transform: none; }
+
 
     /* Creative Works */
     .wk { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 26px; }
@@ -1820,14 +2006,30 @@
       </div>
     </section>
 
-    <!-- Experience: Bento Grid -->
-    <section class="solid" id="exp">
-      <div class="wrap">
-        <div class="lab c-yellow">
-          <span class="tag">Experience</span>
-          <h2 class="h2">Experiences</h2>
+    <!-- Experience: The Climb -->
+    <section class="climb" id="exp" aria-label="Experience · The Climb">
+      <div class="cl-track" id="clTrack">
+        <div class="cl-stage" id="clStage">
+          <canvas id="clGl" aria-hidden="true"></canvas>
+          <div class="cl-you" id="clYou" aria-hidden="true">
+            <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M3 2 L3 21 L8 16 L12 25 L15.5 23.5 L11.5 15 L18.5 15 Z" fill="var(--green)" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span>You</span>
+          </div>
+          <div class="cl-ui">
+            <div class="lab cl-head c-yellow">
+              <span class="tag">Experience</span>
+              <h2 class="h2">The Climb</h2>
+              <span class="cl-pill mono">Scroll to ascend</span>
+            </div>
+            <div class="cl-view" id="clView">
+              <div class="cl-hud">
+                <div class="cl-steps" id="clSteps"></div>
+                <span class="cl-label mono" id="clLabel">Level 1</span>
+              </div>
+            </div>
+            <div class="cl-panel" id="clPanel" aria-live="polite"></div>
+          </div>
         </div>
-        <div class="exg" id="ex"></div>
       </div>
     </section>
 
@@ -2412,19 +2614,6 @@
     $('#tools').innerHTML = CONTENT.tools.map((t, i) =>
       `<span style="--c:${['var(--red)', 'var(--yellow)', 'var(--blue)', 'var(--green)'][i % 4]}">${t}</span>`
     ).join('');
-
-    /* Experience Bento Grid */
-    $('#ex').innerHTML = CONTENT.experience.map(e => `
-      <div class="exb bt ${e[2]}" data-rv>
-        <div class="hd"><span>${e[0]}</span><span class="mono">${e[1]}</span></div>
-        ${e[3].map(r => `
-          <div class="rw">
-            <b>${r[0]}</b>
-            <span>${r[1]}</span>
-          </div>
-        `).join('')}
-      </div>
-    `).join('');
 
     /* Works Cards with Real Media */
     $('#wk').innerHTML = CONTENT.works.map(w => `
@@ -3917,6 +4106,291 @@
         btn.disabled = false;
       });
     })();
+
+    /* ===== THE CLIMB — Experience: full-bleed LEGO build you climb while scrolling ===== */
+(() => {
+  const sec = $('#exp');
+  if (!sec) return;
+  const track = $('#clTrack'), stage = $('#clStage'), panel = $('#clPanel'), view = $('#clView'), cv = $('#clGl');
+  const label = $('#clLabel'), stepsEl = $('#clSteps'), you = $('#clYou');
+  const LV = CONTENT.experience, N = LV.length;
+  const COLS = ['red', 'blue', 'yellow', 'green', 'grey'];
+  const pad2 = n => String(n).padStart(2, '0');
+
+  /* ---- right side: one group per level ---- */
+  panel.innerHTML = LV.map((g, i) => `
+    <div class="cl-group ${g[2]}" aria-hidden="${i ? 'true' : 'false'}">
+      <div class="cl-ghost" aria-hidden="true">${pad2(i + 1)}</div>
+      <div class="cl-gh"><span class="cl-n mono">${pad2(i + 1)}</span><h3 class="cl-gt">${g[0]}</h3><span class="cl-cnt mono">${pad2(g[3].length)} entries</span></div>
+      <ul class="cl-list">${g[3].map((r, k) => `<li class="cl-card bt" data-n="${pad2(k + 1)}" style="--k:${k}"><b>${r[0]}</b><span>${r[1]}</span></li>`).join('')}</ul>
+    </div>`).join('');
+  const groups = $$('#clPanel .cl-group');
+  stepsEl.innerHTML = LV.map((g, i) => `<button type="button" class="bt ${g[2]}" style="--k:${i}" aria-label="Go to level ${i + 1}: ${g[0]}">${i + 1}</button>`).join('');
+  const stepBtns = $$('#clSteps button');
+
+  /* ---- fit every list inside the visible panel, any screen size ---- */
+  const fit = () => {
+    if (sec.classList.contains('cl-static')) return;
+    const H = panel.clientHeight - 12;
+    if (H < 40) return;
+    groups.forEach(g => {
+      let s = 1;
+      for (let n = 0; n < 4; n++) {
+        g.style.setProperty('--w', (100 / s) + '%');
+        const ns = Math.min(1, H / g.offsetHeight);
+        if (Math.abs(ns - s) < .01) break;
+        s = ns;
+      }
+      g.style.setProperty('--w', (100 / s) + '%');
+      s = Math.min(s, H / g.offsetHeight);   // widening only shrinks height, so this always fits
+      s = Math.max(.38, Math.min(1, s));
+      g.style.setProperty('--w', (100 / s) + '%');
+      g.style.setProperty('--s', s.toFixed(3));
+    });
+  };
+
+  let active = -1;
+  const setActive = i => {
+    if (i === active) return;
+    active = i;
+    groups.forEach((g, k) => { g.classList.toggle('on', k === i); g.setAttribute('aria-hidden', String(k !== i)); });
+    stepBtns.forEach((b, k) => { b.classList.toggle('on', k <= i); b.setAttribute('aria-current', k === i ? 'step' : 'false'); });
+    label.innerHTML = `Level ${i + 1}/${N}<span class="cl-lname"> · ${LV[i][0]}</span>`;
+  };
+
+  /* ---- static fallback ---- */
+  let ok = !reduce && !!BX;
+  let rd = null;
+  if (ok) {
+    try { rd = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch (e) { ok = false; }
+  }
+  if (!ok) {
+    sec.classList.add('cl-static');
+    groups.forEach(g => g.setAttribute('aria-hidden', 'false'));
+    return;
+  }
+
+  setActive(0);
+  fit();
+  addEventListener('resize', fit);
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(panel);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+
+  /* ---- Three.js: the whole stage is the canvas ---- */
+  rd.setClearColor(0x000000, 0);
+  const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, -100, 100);
+  cam.position.set(14, 13, 14);
+  cam.lookAt(0, 1.5, 0);
+  const scene = new THREE.Scene();
+  const amb = new THREE.AmbientLight(0xffffff, .95);
+  const dl = new THREE.DirectionalLight(0xffffff, .92); dl.position.set(8, 14, 10);
+  const fl = new THREE.DirectionalLight(0xffffff, .48); fl.position.set(-8, 8, -8);
+  const tl = new THREE.DirectionalLight(0xffffff, .3);  tl.position.set(0, 16, 0);
+  scene.add(amb, dl, fl, tl);
+  BX.th.push(d => { amb.intensity = d ? .92 : .95; dl.intensity = d ? 1 : .92; });
+
+  const world = new THREE.Group();
+  scene.add(world);
+
+  const SX = 3.25, SZ = 6.5, HS = 2, TH = 2.4;                // per level: sideways, depth, rise; slab thickness
+  const P = i => new THREE.Vector3(i * SX, i * HS, -i * SZ);   // platform base-center
+  const topY = i => i * HS + TH;
+  const stand = i => i === N - 1 ? new THREE.Vector3(.5, 0, 1.1) : new THREE.Vector3();  // last level: stand in front of the house
+  const pathAngle = Math.atan2(SX, -SZ);
+
+  /* every brick is its own part that flies in and snaps down, like the hero build */
+  let sd = 11;
+  const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const parts = [];
+  const add = (m, x, y, z, i, d, ry) => {
+    world.add(m);
+    parts.push({ m, x, y, z, ry: ry || 0, i, d, dx: (rnd() - .5) * 18, dz: (rnd() - .5) * 18, h: 9 + rnd() * 9, sp: (rnd() - .5) * 5 });
+  };
+
+  const tree = (p, i, d) => {
+    const x = p.x - 1, z = p.z + 1, y = p.y + TH;
+    add(BX.brick(1, 1, 1, 'brown'), x, y, z, i, d);
+    add(BX.brick(1, 1, 1, 'brown'), x, y + 1.2, z, i, d + .08);
+    add(BX.brick(2, 2, 1, 'green'), x, y + 2.4, z, i, d + .16);
+    add(BX.brick(1, 1, 1, 'green'), x, y + 3.6, z, i, d + .24);
+  };
+  const crate = (p, i, d) => {
+    const x = p.x - 1, z = p.z + 1, y = p.y + TH;
+    add(BX.brick(2, 2, 1, 'brown'), x, y, z, i, d);
+    add(BX.brick(1, 1, 1, 'yellow'), x - .5, y + 1.2, z - .5, i, d + .1);
+    add(BX.brick(1, 1, 1, 'red'), x + .5, y + 1.2, z + .5, i, d + .18);
+  };
+  const trophy = (p, i, d) => {
+    const x = p.x - 1, z = p.z + 1, y = p.y + TH;
+    add(BX.brick(2, 2, 1, 'grey'), x, y, z, i, d);
+    add(BX.brick(1, 1, 1, 'yellow'), x, y + 1.2, z, i, d + .1);
+    add(BX.brick(2, 2, 1, 'yellow'), x, y + 2.4, z, i, d + .2);
+    add(BX.brick(1, 1, 1, 'red'), x, y + 3.6, z, i, d + .3);
+  };
+  const house = (p, i) => {
+    const y = p.y + TH;
+    add(BX.brick(4, 2, 1, 'white'), p.x, y, p.z - 1, i, .3);
+    add(BX.brick(4, 2, 1, 'yellow'), p.x, y + 1.2, p.z - 1, i, .4);
+    add(BX.brick(4, 2, 1, 'red'), p.x, y + 2.4, p.z - 1, i, .55);
+    add(BX.brick(2, 2, 1, 'red'), p.x, y + 3.6, p.z - 1, i, .62);
+    add(BX.brick(1, 1, 1.5, 'grey'), p.x + 1.5, y + 3.6, p.z - 1.5, i, .7);
+    add(BX.brick(1, 1, 1, 'blue'), p.x - .9, y, p.z + .5, i, .5);
+  };
+
+  for (let i = 0; i < N; i++) {
+    const p = P(i), top = COLS[i], base = i === N - 1 ? 'white' : 'grey';
+    [-1, 1].forEach((z, k) => add(BX.brick(4, 2, 1, base), p.x, p.y, p.z + z, i, k * .05));
+    [-1, 1].forEach((x, k) => add(BX.brick(2, 4, 1, top), p.x + x, p.y + 1.2, p.z, i, .12 + k * .05));
+    if (i === 0 || i === 2) tree(p, i, .3);
+    else if (i === 1) crate(p, i, .3);
+    else if (i === 3) trophy(p, i, .3);
+    else house(p, i);
+  }
+  /* stepping plates between levels */
+  for (let i = 0; i < N - 1; i++) {
+    for (let k = 1; k <= 2; k++) {
+      const f = k === 1 ? .36 : .64, a = P(i), b = P(i + 1);
+      add(BX.brick(2, 2, .67, COLS[i + 1]), lerp(a.x, b.x, f), topY(i) + k * HS / 3 - .8, lerp(a.z, b.z, f), i + 1, -.15 + k * .1);
+    }
+  }
+
+  /* the minifig */
+  const fig = BX.figure();
+  const fgrp = new THREE.Group();
+  fgrp.add(fig.g);
+  world.add(fgrp);
+
+  /* floating loose bricks and plates (all LEGO, no other shapes) */
+  const fA = ['yellow', 'red', 'green', 'blue', 'red'];
+  const fB = ['red', 'yellow', 'blue', 'yellow', 'green'];
+  const fC = ['green', 'blue', 'red', 'white', 'yellow'];
+  const decor = [];
+  LV.forEach((g, i) => {
+    const p = P(i);
+    const a = BX.brick(2, 2, 1, fA[i]), b = BX.brick(1, 1, 1, fB[i]), c = BX.brick(2, 4, .33, fC[i]);
+    world.add(a, b, c);
+    decor.push(
+      { m: a, b: new THREE.Vector3(p.x - 3.5, p.y + 7, p.z + 2),   pi: i, ph: i * 1.3,     sp: .5,  sc: 1 },
+      { m: b, b: new THREE.Vector3(p.x + 4.5, p.y + 6.5, p.z - 3), pi: i, ph: i * 1.3 + 2, sp: .8,  sc: 1.1 },
+      { m: c, b: new THREE.Vector3(p.x - 3, p.y - 3.5, p.z + 6),   pi: i, ph: i * 1.3 + 4, sp: -.6, sc: .9 }
+    );
+  });
+
+  /* ---- sizing: canvas = whole stage; the figure is pinned to the open slot on the left ---- */
+  let SW = 1, SH = 1;
+  const size = () => {
+    const W = stage.clientWidth, H = stage.clientHeight;
+    if (!W || !H) return;
+    SW = W; SH = H;
+    rd.setPixelRatio(Math.min(devicePixelRatio || 1, small() ? 1.5 : 2));
+    rd.setSize(W, H, false);
+    const sr = stage.getBoundingClientRect(), vr = view.getBoundingClientRect();
+    const pt = matchMedia('(max-width: 820px) and (max-aspect-ratio: 1/1)').matches;
+    const ppu = clamp(Math.min(vr.width / 15, vr.height / 8.5), 14, 40);                 // pixels per world unit
+    const v = H / ppu, a = W / H;
+    const fx = (vr.left - sr.left + vr.width * (pt ? .34 : .36)) / W;
+    const fy = (vr.top - sr.top + vr.height * (pt ? .58 : .62)) / H;
+    cam.left = -v * a * fx; cam.right = v * a * (1 - fx);
+    cam.top = v * fy; cam.bottom = -v * (1 - fy);
+    cam.updateProjectionMatrix();
+    cam.updateMatrixWorld(true);
+  };
+  size();
+  if (window.ResizeObserver) { new ResizeObserver(size).observe(stage); new ResizeObserver(size).observe(view); }
+  addEventListener('resize', size);
+
+  /* ---- scroll ---- */
+  const progress = () => {
+    const r = track.getBoundingClientRect();
+    return clamp(-r.top / Math.max(1, r.height - stage.clientHeight));
+  };
+  stepBtns.forEach((b, k) => b.addEventListener('click', () => {
+    const r = track.getBoundingClientRect();
+    const y = scrollY + r.top + ((k + .25) / N) * (r.height - stage.clientHeight);
+    if (typeof lenis !== 'undefined' && lenis) lenis.scrollTo(y, { duration: 1.4 });
+    else scrollTo({ top: y, behavior: 'smooth' });
+  }));
+
+  /* ---- animation ---- */
+  const clock = new THREE.Clock();
+  let pv = 0, face = pathAngle;
+  const wp = new THREE.Vector3();
+  const tmp = new THREE.Vector3();
+
+  function frame(snap) {
+    const t = clock.getElapsedTime();
+    pv += (progress() - pv) * (snap ? 1 : .12);
+    const s = clamp(pv, 0, .9999) * N;
+    const i = Math.min(N - 1, Math.floor(s)), f = s - i;
+    const mv = i < N - 1 ? ss(clamp((f - .66) / .34)) : 0;     // walk to the next level in the last third of each segment
+    const tt = i + mv;
+    setActive(i);
+
+    /* build progress: level 1 assembles right as the section opens, the rest as you approach */
+    const build = (pi, d) => pi === 0 ? clamp((s - d * .6) / .5) : clamp((tt - (pi - 1.15) - d) / .85);
+    parts.forEach(o => {
+      const q = build(o.i, o.d), e = 1 - Math.pow(1 - q, 3);
+      o.m.visible = q > .001;
+      o.m.position.set(o.x + o.dx * (1 - e), o.y + o.h * (1 - e), o.z + o.dz * (1 - e));
+      o.m.rotation.set(0, o.ry + o.sp * (1 - e), 0);
+      o.m.scale.setScalar(Math.max(.001, lerp(.55, 1, eob(q))));
+    });
+
+    /* minifig: drops in, hops up the stairs, waves on arrival */
+    const j = Math.min(N - 1, i + 1);
+    const A = P(i).add(stand(i)), B = P(j).add(stand(j));
+    const walking = Math.sin(mv * Math.PI);
+    const fx = lerp(A.x, B.x, mv), fz = lerp(A.z, B.z, mv);
+    const fyBase = lerp(topY(i), topY(j), mv) + .2;
+    const drop = Math.pow(1 - clamp((s - .22) / .3), 3) * 10;
+    const fy = fyBase + walking * .9 + Math.abs(Math.sin(mv * Math.PI * 4)) * .3 * walking + drop;
+    fgrp.visible = s > .2;
+    fgrp.position.set(fx, fy, fz);
+    face += (((i === N - 1) ? Math.PI / 4 : pathAngle) - face) * .1;
+    fgrp.rotation.y = face;
+    const wv = ss(clamp((.6 - f) / .2)) * (1 - mv);
+    fig.ra.rotation.z = wv * (2.3 + Math.sin(t * 7) * .4) + Math.sin(t * 12) * .6 * walking;
+    fig.la.rotation.z = -Math.sin(t * 12) * .6 * walking - .12;
+
+    decor.forEach(d => {
+      const a = d.pi === 0 ? clamp((s - .1) / .4) : clamp((tt - (d.pi - 1)) / .9);
+      d.m.visible = a > .01;
+      d.m.scale.setScalar(Math.max(.001, eob(a) * d.sc));
+      d.m.position.set(d.b.x, d.b.y + Math.sin(t * .9 + d.ph) * .5, d.b.z);
+      d.m.rotation.set(Math.sin(t * .5 + d.ph) * .4 + d.ph * .1, t * d.sp, d.ph);
+    });
+
+    /* camera follows the figure, which stays pinned to the open slot */
+    wp.x += (-fx - wp.x) * (snap ? 1 : .1);
+    wp.y += (-fyBase - wp.y) * (snap ? 1 : .1);
+    wp.z += (-fz - wp.z) * (snap ? 1 : .1);
+    world.position.copy(wp);
+    world.updateMatrixWorld(true);
+
+    /* "You" tag rides the minifig's head */
+    fgrp.getWorldPosition(tmp);
+    tmp.y += 3.3;
+    tmp.project(cam);
+    you.style.transform = `translate3d(${((tmp.x + 1) / 2 * SW).toFixed(1)}px,${((1 - tmp.y) / 2 * SH).toFixed(1)}px,0)`;
+    you.style.opacity = fgrp.visible ? '1' : '0';
+
+    rd.render(scene, cam);
+  }
+
+  let vis = true;
+  new IntersectionObserver(es => { vis = es[0].isIntersecting; }, { rootMargin: '200px' }).observe(track);
+
+  { const p0 = P(0); wp.set(-p0.x, -(topY(0) + .2), -p0.z); }
+  frame(true);
+  (function loop() {
+    if (vis && !document.hidden) frame(false);
+    requestAnimationFrame(loop);
+  })();
+
+  /* keep this scene's own render, and repaint on theme toggle */
+  const prevRedraw = window.SCN && window.SCN.redraw;
+  if (window.SCN) window.SCN.redraw = () => { if (prevRedraw) prevRedraw(); if (vis) frame(true); };
+})();
 
     /* ===== Scroll sequence & GSAP motion layer ===== */
     const mf = $('#mfi'), words = $$('#mt .w'), stage = $('#stage'), orb = $('#orb'), cl = $('#cl'), stpEl = $('#stp');

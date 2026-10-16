@@ -1,167 +1,193 @@
 <p align="center">
-  <img width="180" src="./assets/hln-logo.png" alt="hln logo" />
+  <img src="public/icons/hln.svg" alt="HLN yellow brick logo" width="160">
 </p>
 
-<h1 align="center">Helena Herrero · Brick Portfolio</h1>
+<h1 align="center">HLN</h1>
 
-<p align="center"><strong>A LEGO-themed, single-page developer portfolio with a 3D brick scene, a scroll-driven build, a brick playground, and a BMO-style guestbook.</strong></p>
+<p align="center"><b>Curious first. Build, break, fix, repeat.</b><br>
+Helena Herrero's interactive portfolio: projects, experiments, and creative work,<br>
+built around a love of learning and a world of colorful bricks.</p>
 
 <p align="center">
-  <strong>Navigation</strong><br />
-  <a href="#what-this-is">What this is</a> ·
-  <a href="#current-state">Current state</a> ·
-  <a href="#run-it-locally">Run it locally</a> ·
-  <a href="#whats-included">What's included</a> ·
-  <a href="#why-bricks">Why bricks</a> ·
-  <a href="#in-the-browser-versus-internet-required">In the browser versus internet required</a> ·
-  <a href="#tech-stack">Tech stack</a> ·
-  <a href="#known-limitations">Known limitations</a> ·
+  <img alt="Next.js 15" src="https://img.shields.io/badge/Next.js-15-111111?style=flat&logo=nextdotjs&logoColor=white">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-149ECA?style=flat&labelColor=20232A&logo=react&logoColor=white">
+  <img alt="TypeScript 5" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&labelColor=1E3A5F&logo=typescript&logoColor=white">
+  <img alt="Three.js: interactive 3D" src="https://img.shields.io/badge/Three.js-interactive%203D-FFD900?style=flat&labelColor=171900&logo=threedotjs&logoColor=white"><br>
+  <img alt="Motion: GSAP and Lenis" src="https://img.shields.io/badge/Motion-GSAP%20%2B%20Lenis-88CE02?style=flat&labelColor=243018">
+  <img alt="Hosting: Cloudflare Pages and Workers" src="https://img.shields.io/badge/Cloudflare-Pages%20%2B%20Workers-F38020?style=flat&labelColor=402A19&logo=cloudflare&logoColor=white">
+  <img alt="Guestbook: shared SQLite storage" src="https://img.shields.io/badge/Guestbook-shared%20SQLite-38C4AD?style=flat&labelColor=16483F">
+</p>
+
+<p align="center">
+  <a href="https://hlnhrr.pages.dev">Visit HLN</a> ·
+  <a href="#what-you-can-explore">Explore</a> ·
+  <a href="#quick-start">Quick start</a> ·
   <a href="#deployment">Deployment</a> ·
-  <a href="#development-checks">Development checks</a>
+  <a href="docs/README.md">Docs</a>
 </p>
 
-<p align="center">
-  <img alt="Live site" src="https://img.shields.io/badge/live-hlnhrr.pages.dev-E3000B?style=flat-square" />
-  <img alt="No build step" src="https://img.shields.io/badge/build_step-none-5BB838?style=flat-square" />
-  <img alt="Three.js r128" src="https://img.shields.io/badge/Three.js-r128-2AA7F2?style=flat-square" />
-  <img alt="GSAP 3.12.5" src="https://img.shields.io/badge/GSAP-3.12.5-FFB400?style=flat-square" />
-  <img alt="Hosted on Cloudflare Pages" src="https://img.shields.io/badge/hosted_on-Cloudflare_Pages-334155?style=flat-square" />
-</p>
+## About
 
-<p align="center">
-  <img width="100%" src="./docs/img/portfolio-demo.gif" alt="Portfolio demo" />
-</p>
+HLN is the personal portfolio of **Helena Herrero**, a BS Computer Science student at **PUP Manila (2025–2029)**. A start in high-school robotics grew into an interest in data science, AI and machine learning, cybersecurity, cloud computing, and design.
 
-## What this is
+The brick theme makes the portfolio something to explore, not just read. Projects become building blocks, a 3D scene assembles as you scroll, and visitors can build something of their own before leaving a note.
 
-This is the portfolio of Helena Herrero, a BS Computer Science student at PUP Manila (2025–2029) who got into tech through robotics research in high school and now focuses on data science, AI, and machine learning. The site is built around one idea: curious first, then build it, break it, fix it, and build it better.
+## What you can explore
 
-The whole site is a single HTML file. Loose 3D bricks fly in and assemble as you scroll, the name is built out of bricks, and every card, button, and tag borrows the same stud-and-shadow look. Visitors can also build their own LEGO model in the playground and download it as an Instagram-story PNG.
+- **The build:** a brick-letter hero and a scroll-driven Three.js scene.
+- **Projects:** GuidHer, Tinig, Lingap, Gising, PurifAI, and Convex, with project details and links.
+- **Experience:** organization roles, internships, volunteering, hackathons, and education.
+- **Creative work:** publication materials, event merchandise, and design galleries.
+- **The playground:** choose brick colors and sizes, place and rotate pieces, undo changes, and export a personalized 1080 × 1920 PNG.
+- **The guestbook:** leave a note through a BMO-inspired console. Confirmed notes are shared across devices and refresh every five seconds while the page is visible.
+- **Personal touches:** light and dark themes, reduced-motion support, and responsive layouts.
 
-Live site: **[hlnhrr.pages.dev](https://hlnhrr.pages.dev)**
+## Quick start
 
-## Current state
-
-> [!IMPORTANT]
-> The deployed app is a Next.js static export served by a Cloudflare Worker. The guestbook API uses a persistent SQLite-backed Durable Object shared by all visitors.
-
-- Sections: Home, About, Work, Skills, Experience, Designs, Play, Git, and Contact.
-- Light and dark mode, following the system setting until the visitor picks one.
-- Mobile-first layout, with a scrolling nav and touch-friendly playground controls.
-- Respects `prefers-reduced-motion`.
-- The guestbook stores confirmed notes centrally and refreshes visible pages every five seconds, plus on focus and reconnect.
-
-## Run it locally
-
-Prerequisites: Node.js 22+, npm, and a modern browser with WebGL enabled.
+Use **Node.js 22+**, npm, and a modern browser. WebGL is needed for the 3D scene and playground.
 
 ```bash
+git clone https://github.com/helenaherrero515/hlnhrr.git
+cd hlnhrr
 npm ci
+npm run dev
+```
+
+Open **http://localhost:3000** for frontend development. The Next.js development server alone does **not** run the Cloudflare guestbook API.
+
+### Run the full site with the guestbook
+
+```bash
 npx wrangler dev
 ```
 
-Wrangler builds the Next.js export and serves both the site and `/api/guestbook`. Local notes persist in `.wrangler/state` and are separate from production. `npm run dev` and static file servers alone do not provide the guestbook API.
+Wrangler builds the static export and serves the frontend together with `/api/guestbook`. Open the local URL it prints. Local guestbook data persists in `.wrangler/state` and is separate from production.
 
-### Deploy the shared guestbook
+### Checks
+
+```bash
+npm run validate
+```
+
+This runs ESLint, TypeScript checks, and a production build. The GitHub Actions workflow also checks a Cloudflare Workers deployment dry-run.
+
+Before publishing, exercise the playground, PNG export, theme toggle, mobile layout, and cross-device guestbook updates. Do not use real visitor notes as test data.
+
+## How the guestbook works
+
+1. A visitor submits a name and note to the same-origin `/api/guestbook` endpoint.
+2. On Pages, a Function forwards the request through the `GUESTBOOK_SERVICE` service binding to the `hlnhrr` Worker.
+3. The Worker stores the note in one shared, SQLite-backed Durable Object.
+4. The UI reports success only after the server confirms saving. Failed requests keep the draft.
+5. Visible pages refresh every five seconds, and refresh again on focus or reconnect.
+
+Both Pages and Workers URLs use the same records. The API displays the latest **50 notes**, ordered by submission. Notes saved only in an older browser-local guestbook are not automatically uploaded; those must be resubmitted.
+
+## Tech stack
+
+| Area | Tools |
+| :-- | :-- |
+| Application | Next.js 15 App Router, React 19, TypeScript |
+| Styling | Custom CSS, brick-themed design tokens, Tailwind CSS 4 |
+| 3D and export | Three.js, WebGL, Canvas 2D |
+| Motion | GSAP, ScrollTrigger, Lenis, Framer Motion |
+| Guestbook | Cloudflare Worker, Durable Objects, SQLite |
+| Hosting | Cloudflare Pages and Workers static assets |
+| Tooling | npm, ESLint, TypeScript, Wrangler, GitHub Actions |
+
+The deployed app is built from `app/` and `components/`. The root `index.html` is a separate standalone version, not the source of the Next.js export.
+
+## Scripts
+
+| Command | What it does |
+| :-- | :-- |
+| `npm run dev` | Start Next.js frontend development |
+| `npm run build` | Generate the production static export in `out/` |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Check TypeScript without emitting files |
+| `npm run validate` | Run lint, typecheck, and build |
+| `npx wrangler dev` | Build and run the site with its local guestbook API |
+| `npx wrangler deploy` | Build and deploy the Worker, assets, and pending Durable Object migrations |
+
+Use Wrangler to serve the complete static-export application; `next start` is not the production server for this deployment mode.
+
+## Deployment
+
+### 1. Deploy the shared Worker
 
 ```bash
 npx wrangler login
 npx wrangler deploy
 ```
 
-`wrangler.json` binds `GUESTBOOK` and creates its SQLite-backed Durable Object through migration `v1`; no KV namespace or database ID is required. Deploy the Worker, not just the `out` directory. Use its Workers URL or attach your portfolio's custom domain to that Worker. An existing `pages.dev` deployment is separate and will not automatically switch to this Worker.
+`wrangler.json` configures the `hlnhrr` Worker, its static assets, and the `GUESTBOOK` Durable Object binding. The `v1` migration creates the SQLite-backed class. No separate KV namespace or database ID is required.
 
-All devices must visit the same deployed Worker/domain to share notes. The API keeps submitted notes centrally and returns the latest 50 in submission order. Success appears only after the API confirms saving; failed requests leave the draft intact. Old `hln_brick_notes` browser-local entries are not uploaded automatically and must be resubmitted if they were never saved centrally.
+**New Durable Object migrations require `wrangler deploy`.** Apply them before using `wrangler versions upload` for preview versions; an upload alone cannot apply migrations.
 
-## What's included
+### 2. Connect Cloudflare Pages
 
-- **Brick hero:** the name "HELENA HERRERO" is built out of CSS bricks. Loose 3D bricks start off-screen and fly in as you scroll.
-- **Scroll-driven build:** a Three.js scene assembles a LEGO build as the page scrolls, with Lenis smooth scrolling and GSAP ScrollTrigger.
-- **About, Skills, and Technical Skills:** a brick-wall skills section and seven grouped cards (languages, frontend, data and ML, visualization and BI, blockchain, design and tools, others).
-- **Projects:** GuidHer, Tinig, Lingap, Gising, PurifAI, and Convex.
-- **Experience:** organizations, internships, volunteering, hackathons, and academics.
-- **Designs:** a gallery for publication materials, swag designs, and presentation decks.
-- **Playground:** a 3D brick builder where visitors pick colors and sizes, place, turn, and undo bricks, and save their work as a 1080×1920 PNG made for Instagram stories. The PNG shows their name ("name's work"), "YOUR TURN TO BUILD WITH ME", and the site link.
-- **BMO guestbook:** a note form styled after BMO from Adventure Time, with a shared log that refreshes automatically across devices.
-- **Ticker:** a scrolling strip of focus areas (Machine Learning, Artificial Intelligence, Automation, Software Development, Cloud Computing, AI Workflows, UI/UX, Product Designer).
+For **hlnhrr.pages.dev**, configure the Pages project as follows:
 
-## Why bricks
+| Setting | Value |
+| :-- | :-- |
+| Production branch | `main` |
+| Build command | `npm run build` |
+| Build output directory | `out` |
+| Root directory | Repository root |
+| Service binding, production and preview | `GUESTBOOK_SERVICE` → `hlnhrr` production Worker |
 
-A portfolio is mostly a list of things someone built. The LEGO theme makes that literal: every project is a brick, and the page itself gets built as you scroll. The playground lets visitors build something of their own before they leave, so the site is something you play with and not only read.
+The service binding is managed in Pages settings. `wrangler.json` configures the separate Worker and is intentionally ignored by Pages. Keep `functions/api/guestbook.js` in the repository: it connects Pages to the shared database through that Worker.
 
-The design is a theme, not a gimmick that blocks content. All text is real HTML, the site works without the 3D scene (the builder shows a message if WebGL is off), and animation is reduced for visitors who ask for less motion.
+For a manual production deployment, run from the repository root:
 
-## In the browser versus internet required
+```bash
+npm run build
+npx wrangler pages deploy out --project-name hlnhrr --branch main
+```
 
-### Runs in the browser today
+**Keep `main` in sync before the next automatic deployment.** A feature-branch merge or manual upload does not update the production branch's source. Deploying an older `main` can replace newer frontend or guestbook fixes.
 
-| Capability | Current behavior |
-| --- | --- |
-| Page content and layout | Static HTML, CSS, and JavaScript in a single file. |
-| Theme (light or dark) | Saved in the browser's `localStorage` under `hln_brick_theme`. |
-| Guestbook notes | Saved centrally in Cloudflare Durable Object SQLite; the latest 50 confirmed notes are displayed. |
-| Playground builds | Built and held in memory in the visitor's browser. |
-| PNG export | Drawn with the Canvas 2D API and downloaded locally; nothing is uploaded. |
+## Project layout
 
-### Requires internet
+```text
+app/                 Next.js routes, root metadata, and global styles
+components/lego/     Portfolio, 3D scenes, playground, and guestbook UI
+constants/           Site identity, SEO, navigation, and shared configuration
+data/                Portfolio content
+styles/              Brick theme and reusable design tokens
+public/              Images, downloadable assets, and HLN icons
+functions/api/       Pages proxy for the shared guestbook
+worker/              Persistent guestbook Worker and Durable Object
+hooks/ · lib/        Shared React hooks and application helpers
+utils/ · types/      Utilities and TypeScript models
+docs/                Design, content, and implementation references
+index.html           Standalone HTML version
+wrangler.json        Worker deployment and database binding configuration
+```
 
-| Activity | Current requirement |
-| --- | --- |
-| Loading Three.js, GSAP, ScrollTrigger, and Lenis | Loaded from cdnjs and jsDelivr when the page opens. |
-| Loading fonts | Pixelify Sans, DM Mono, Nunito come from Google Fonts. |
-| Hosting and deployment | Cloudflare Workers and GitHub need a network connection. |
+## FAQ
 
-## Tech stack
+**What is HLN?**  
+Helena Herrero's personal portfolio: a collection of technical projects, creative work, and experiments presented through an interactive brick-inspired interface.
 
-| Layer | Choice |
-| --- | --- |
-| Markup and styling | HTML5 and CSS3 (custom properties, grid, flexbox, `color-mix`) |
-| Scripting | Vanilla JavaScript (ES2020), no framework |
-| 3D | Three.js r128 (cdnjs) |
-| Animation | GSAP 3.12.5 and ScrollTrigger (cdnjs) |
-| Smooth scrolling | Lenis 1.1.20 (jsDelivr) |
-| Fonts | Pixelify Sans, DM Mono, Nunito (Google Fonts) |
-| Image export | Canvas 2D API |
-| Storage | `localStorage` for theme; Durable Object SQLite for guestbook notes |
-| Hosting | Cloudflare Workers with static assets |
+**Are guestbook notes private?**  
+No. Submitted names and messages appear in the public guestbook. Do not include sensitive personal information.
 
-Prerequisites for development:
+**Where is my playground build saved?**  
+The build lives in browser memory. Use the PNG export to keep an image; it is generated and downloaded locally rather than uploaded.
 
-- A code editor such as VS Code.
-- A modern browser with WebGL (Chrome, Edge, Firefox, or Safari).
-- Git and a GitHub account.
-- Node.js 22+ and npm.
-- An image tool such as Squoosh to compress images to WebP.
+**Does the site work offline?**  
+It is not an offline app. Shared guestbook reads and writes need a network connection, and some fonts and external resources also depend on internet access.
 
-## Known limitations
+**Do I need WebGL?**  
+The 3D features do. The portfolio's text and project content remain ordinary HTML, but the builder and its export need a working graphics context.
 
-- Shared guestbook reads and writes require the deployed Worker API. Offline or unavailable service errors are shown instead of pretending a note was saved. Previously browser-only notes cannot be recovered from other devices automatically.
-- The 3D scene and the playground need WebGL. Without it, the builder shows a message and the PNG export is unavailable.
-- The page depends on CDN-hosted libraries and fonts, so it does not work fully offline.
-- The PNG export waits for the fonts to load, so test it online.
-- Pinned library versions are older releases (Three.js r128); upgrading them may need small code changes.
+## Author
 
-## Deployment
-
-The site is deployed on Cloudflare Pages at [hlnhrr.pages.dev](https://hlnhrr.pages.dev).
-
-1. Push the repository to GitHub.
-2. In Cloudflare Pages, connect the repository.
-3. Leave the build command empty and set the output directory to the repository root.
-4. Every push to the main branch redeploys the site.
-
-## Development checks
-
-There are no automated tests. Before publishing, check these by hand:
-
-- The page loads with no console errors.
-- No horizontal scroll at 360px, 768px, and 1280px widths.
-- The light and dark toggle works and is remembered after a reload.
-- The playground places, turns, undoes, and clears bricks.
-- "Save my work" downloads a PNG that shows the build, the name, and the site link.
-- The guestbook confirms a saved note, shows it in a second browser within five seconds without reloading, and retains the draft if saving fails.
-- Every link points to a real address (no placeholder `#` links).
+| GitHub | Name | Focus |
+| :-- | :-- | :-- |
+| [@helenaherrero515](https://github.com/helenaherrero515) | Helena Herrero | Computer science, data and AI, frontend development, and creative design |
 
 ---
 
-© 2026 hln. All rights reserved.
+© 2026 Helena Herrero. All rights reserved. This personal portfolio is not affiliated with or endorsed by the LEGO Group.
