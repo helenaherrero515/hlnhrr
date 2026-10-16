@@ -6,11 +6,11 @@
    Palette is taken from the LEGO posters: red, yellow, blue, green on white (light) or a dark baseplate (dark). */
 :root{
 --bg:#ffffff;--bg2:#f3f4f6;--panel:#f4f5f7;--paper:#ffffff;--line:#dcdfe5;--ink:#14171c;--mut:#566070;--grid:#eceef2;
---red:#eb0a14;--yellow:#ffd500;--blue:#0066dc;--green:#00a838;--grey:#b4bac5;
---on-red:#ffffff;--on-yellow:#1b1400;--on-blue:#ffffff;--on-green:#ffffff;--on-grey:#14171c;
+--red:#ff3340;--yellow:#ffc800;--blue:#22aeff;--green:#48c92a;--grey:#b9bec7;
+--on-red:#ffffff;--on-yellow:#1b1400;--on-blue:#04101c;--on-green:#0a2204;--on-grey:#14171c;
 --fd:"Pixelify Sans",ui-monospace,Menlo,monospace;--fb:"Nunito","Segoe UI",system-ui,sans-serif;--fm:"DM Mono",ui-monospace,Menlo,Consolas,monospace}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0e13;--bg2:#121720;--panel:#151a23;--paper:#161b24;--line:#262d3a;--ink:#f1f3f7;--mut:#a0a9b8;--grid:#141a24;--red:#ff1f2d;--yellow:#ffd700;--blue:#147eff;--green:#00c744;--grey:#9299a7;--on-blue:#ffffff;--on-green:#041808;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0b0e13;--bg2:#121720;--panel:#151a23;--paper:#161b24;--line:#262d3a;--ink:#f1f3f7;--mut:#a0a9b8;--grid:#141a24;--red:#ff1f2d;--yellow:#ffd700;--blue:#147eff;--green:#00c744;--grey:#9299a7;--on-blue:#ffffff;--on-green:#041808;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0e13;--bg2:#121720;--panel:#151a23;--paper:#161b24;--line:#262d3a;--ink:#f1f3f7;--mut:#a0a9b8;--grid:#141a24;--red:#ff4d40;--yellow:#ffd520;--blue:#38bdf8;--green:#4ade80;--grey:#8d95a3;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b0e13;--bg2:#121720;--panel:#151a23;--paper:#161b24;--line:#262d3a;--ink:#f1f3f7;--mut:#a0a9b8;--grid:#141a24;--red:#ff4d40;--yellow:#ffd520;--blue:#38bdf8;--green:#4ade80;--grey:#8d95a3;color-scheme:dark}
 *{box-sizing:border-box}
 html{overflow-x:clip;background:var(--bg)}
 html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis-stopped{overflow:hidden}
