@@ -6,7 +6,7 @@ import "@/styles/lego.css";
 export const metadata: Metadata = {
   ...siteMetadata,
   title: "Helena Herrero Brick Portfolio",
-  description: "BS Computer Science · PUP Manila · Navotas, PH. Obsessed with growth, robotics, data science, AI/ML, and building what I'm curious about.",
+  description: "Obsessed with growth, robotics, data science, AI/ML, and building what I'm curious about.",
 };
 
 export const viewport: Viewport = {
