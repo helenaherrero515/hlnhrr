@@ -805,45 +805,77 @@
   color: var(--mut); overflow-wrap: anywhere;
 }
 
-/* portrait phones / small tablets: scene on top, list below */
-@media (max-width: 820px) and (max-aspect-ratio: 1/1) {
-  .cl-ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(120px, 32%) minmax(0, 1fr); row-gap: 8px; }
-  .cl-panel {
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-    border-radius: 10px; padding: 0 4px;
-  }
-  .cl-card { padding: 6px 40px 7px 12px; border-left-width: 8px; }
-  .cl-card b { font-size: clamp(11.5px, 1.7vh, 14px); }
-  .cl-card span { font-size: clamp(9.5px, 1.3vh, 11px); }
-  .cl-card::after { font-size: 14px; right: 10px; top: 6px; }
-  .cl-list { gap: 9px; }
-  .cl-gt { font-size: clamp(22px, 4vh, 34px); }
-  .cl-ghost { font-size: clamp(90px, 18vh, 150px); }
-}
-/* portrait phones: roomier scene, compact HUD, tighter cards */
+/* portrait phones / small tablets: scene on top, compact HUD, scrollable card panel */
 @media (max-width: 820px) and (max-aspect-ratio: 1/1) {
   .cl-track { height: 520vh; height: 520svh; }
-  .cl-ui { padding-top: calc(70px + env(safe-area-inset-top, 0px)); grid-template-rows: auto minmax(150px, 30%) minmax(0, 1fr); row-gap: 6px; }
-  .cl-head { gap: 10px; }
+  .cl-ui {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(130px, 28%) minmax(0, 1fr);
+    row-gap: 8px;
+    padding-top: calc(64px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  .cl-head {
+    gap: 10px;
+    margin-bottom: 2px;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 2px 8px;
+  }
+  .cl-head .h2 { font-size: clamp(22px, 4.2vw, 32px); }
   .cl-hud { bottom: 0; gap: 8px; flex-wrap: nowrap; }
   .cl-steps { gap: 4px; }
   .cl-steps button { width: 34px; height: calc(22px + var(--k) * 6px); --bl: 5px; border-width: 2px; font-size: 12px; box-shadow: 0 3px 0 #0003; }
   .cl-label { font-size: 10px; padding: 3px 9px; white-space: nowrap; }
   .cl-lname { display: none; }
+  .cl-panel {
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 6px 6px 12px 6px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    pointer-events: auto;
+    scrollbar-width: thin;
+  }
+  .cl-group {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transform: none !important;
+    display: none;
+    padding-right: 0;
+  }
+  .cl-group.on {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: none !important;
+    animation: clFadeIn .3s ease-out;
+  }
   .cl-gh { gap: 10px; margin-bottom: 8px; }
-  .cl-gt { font-size: clamp(20px, 3.6vh, 30px); padding: 2px 12px 5px; }
+  .cl-gt { font-size: clamp(18px, 3.2vh, 26px); padding: 2px 10px 4px; }
+  .cl-n { font-size: 11px; padding: 1px 8px; }
+  .cl-cnt { font-size: 11px; }
   .cl-ghost { font-size: clamp(70px, 12vh, 120px); }
-  .cl-list { gap: 8px; }
-  .cl-card:nth-child(odd) { margin-right: 6px; }
-  .cl-card:nth-child(even) { margin-left: 6px; }
-  .cl-card { padding: 6px 34px 7px 11px; border-width: 2px; border-left-width: 7px; }
-  .cl-card b { font-size: 13px; line-height: 1.2; }
-  .cl-card span { font-size: 10px; letter-spacing: .04em; margin-top: 2px; }
-  .cl-card::after { font-size: 12px; right: 9px; top: 6px; }
+  .cl-list { gap: 6px; }
+  .cl-card:nth-child(odd) { margin-right: 0; }
+  .cl-card:nth-child(even) { margin-left: 0; }
+  .cl-card { padding: 6px 32px 6px 10px; border-width: 2px; border-left-width: 6px; box-shadow: 0 2px 0 #0002; }
+  .cl-card b { font-size: 12px; line-height: 1.25; }
+  .cl-card span { font-size: 9.5px; letter-spacing: .04em; margin-top: 1px; }
+  .cl-card::after { font-size: 11px; right: 8px; top: 5px; }
 }
-@media (max-width: 700px) { .cl-pill { display: none; } .cl-head .h2 { font-size: clamp(34px, min(8vh, 11vw), 56px); } }
-@media (max-height: 560px) { .cl-ui { padding-top: calc(66px + env(safe-area-inset-top, 0px)); } .cl-pill { display: none; } }
+@keyframes clFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 700px) { .cl-pill { display: none; } }
+@media (max-height: 560px) { .cl-ui { padding-top: calc(60px + env(safe-area-inset-top, 0px)); } .cl-pill { display: none; } }
 
 /* no WebGL / reduced motion: plain stacked list */
 .cl-static .cl-track { height: auto; }
@@ -1871,7 +1903,7 @@
           <div class="plate-float-brick brick-1" aria-hidden="true"></div>
           <div class="base">
             <div class="mat">
-              <img src="assets/images/profile/helena-portrait.webp" alt="Portrait of Helena Herrero" width="290" height="313" loading="eager">
+              <img src="assets/images/profile/helena-portrait.webp" alt="Portrait of Helena Herrero" width="290" height="313" loading="eager" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='images/profile/helena-portrait.webp';}else if(this.dataset.fb==='1'){this.dataset.fb='2';this.src='assets/images/profile/helena-portrait.png';}">
               <span class="plate-badge">CREATOR · HLN</span>
               <div class="mat-corner tl" aria-hidden="true"></div>
               <div class="mat-corner tr" aria-hidden="true"></div>
@@ -4131,6 +4163,8 @@
   /* ---- fit every list inside the visible panel, any screen size ---- */
   const fit = () => {
     if (sec.classList.contains('cl-static')) return;
+    const pt = matchMedia('(max-width: 820px) and (max-aspect-ratio: 1/1)').matches;
+    if (pt) return;
     const H = panel.clientHeight - 12;
     if (H < 40) return;
     groups.forEach(g => {
@@ -4270,9 +4304,9 @@
     const a = BX.brick(2, 2, 1, fA[i]), b = BX.brick(1, 1, 1, fB[i]), c = BX.brick(2, 4, .33, fC[i]);
     world.add(a, b, c);
     decor.push(
-      { m: a, b: new THREE.Vector3(p.x - 3.5, p.y + 7, p.z + 2),   pi: i, ph: i * 1.3,     sp: .5,  sc: 1 },
-      { m: b, b: new THREE.Vector3(p.x + 4.5, p.y + 6.5, p.z - 3), pi: i, ph: i * 1.3 + 2, sp: .8,  sc: 1.1 },
-      { m: c, b: new THREE.Vector3(p.x - 3, p.y - 3.5, p.z + 6),   pi: i, ph: i * 1.3 + 4, sp: -.6, sc: .9 }
+      { m: a, b: new THREE.Vector3(p.x - 3.2, p.y + 3.8, p.z + 1.8),   pi: i, ph: i * 1.3,     sp: .5,  sc: .85 },
+      { m: b, b: new THREE.Vector3(p.x + 3.8, p.y + 3.6, p.z - 2.4), pi: i, ph: i * 1.3 + 2, sp: .8,  sc: .9 },
+      { m: c, b: new THREE.Vector3(p.x - 2.8, p.y - 3.0, p.z + 5.0),   pi: i, ph: i * 1.3 + 4, sp: -.6, sc: .85 }
     );
   });
 
@@ -4286,10 +4320,12 @@
     rd.setSize(W, H, false);
     const sr = stage.getBoundingClientRect(), vr = view.getBoundingClientRect();
     const pt = matchMedia('(max-width: 820px) and (max-aspect-ratio: 1/1)').matches;
-    const ppu = clamp(Math.min(vr.width / 15, vr.height / 8.5), 14, 40);                 // pixels per world unit
+    const ppu = pt
+      ? clamp(Math.min(vr.width / 16, vr.height / 9.5), 13, 26)
+      : clamp(Math.min(vr.width / 15, vr.height / 8.5), 14, 40);
     const v = H / ppu, a = W / H;
-    const fx = (vr.left - sr.left + vr.width * (pt ? .34 : .36)) / W;
-    const fy = (vr.top - sr.top + vr.height * (pt ? .58 : .62)) / H;
+    const fx = (vr.left - sr.left + vr.width * (pt ? .35 : .36)) / W;
+    const fy = (vr.top - sr.top + vr.height * (pt ? .48 : .62)) / H;
     cam.left = -v * a * fx; cam.right = v * a * (1 - fx);
     cam.top = v * fy; cam.bottom = -v * (1 - fy);
     cam.updateProjectionMatrix();
@@ -4361,10 +4397,11 @@
     });
 
     /* camera follows the figure, which stays pinned to the open slot */
+    const pt = matchMedia('(max-width: 820px) and (max-aspect-ratio: 1/1)').matches;
+    const camYOffset = pt ? 3.0 : 0;
     wp.x += (-fx - wp.x) * (snap ? 1 : .1);
-    wp.y += (-fyBase - wp.y) * (snap ? 1 : .1);
+    wp.y += (-(fyBase + camYOffset) - wp.y) * (snap ? 1 : .1);
     wp.z += (-fz - wp.z) * (snap ? 1 : .1);
-    world.position.copy(wp);
     world.updateMatrixWorld(true);
 
     /* "You" tag rides the minifig's head */
