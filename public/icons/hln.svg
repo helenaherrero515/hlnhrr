@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">HLN yellow brick logo</title>
+  <path fill="#e6bc00" d="M48 62V48h8v-8h32v8h8v14zm112 0V48h8v-8h32v8h8v14z"/>
+  <path fill="#ffe227" d="M56 48v-8h32v8zm112 0v-8h32v8z"/>
+  <rect x="8" y="60" width="240" height="152" rx="16" fill="#cbb000"/>
+  <rect x="8" y="56" width="240" height="140" rx="16" fill="#ffd900"/>
+  <path d="M24 60h208a12 12 0 0 1 12 12H12a12 12 0 0 1 12-12" fill="#ffe653"/>
+  <path fill="#171900" d="M60 100h10v30h10v-10h20v10h10v40h-10v-30H80v10H70v20H60zm64 0h10v60h10v10h-20zm32 20h30v10h10v40h-10v-30h-20v30h-10z"/>
+</svg>

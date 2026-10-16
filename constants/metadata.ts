@@ -11,9 +11,12 @@ export const siteMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
   icons: {
-    icon: [{ url: "/images/profile/helena-portrait.png", type: "image/png" }],
-    shortcut: [{ url: "/images/profile/helena-portrait.png", type: "image/png" }],
-    apple: [{ url: "/images/profile/helena-portrait.png", type: "image/png" }],
+    icon: [
+      { url: "/icons/hln.svg", type: "image/svg+xml", sizes: "any" },
+      { url: "/icons/hln-32.png", type: "image/png", sizes: "32x32" },
+    ],
+    shortcut: [{ url: "/icons/hln-32.png", type: "image/png" }],
+    apple: [{ url: "/icons/hln-180.png", type: "image/png", sizes: "180x180" }],
   },
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
