@@ -23,10 +23,10 @@
       --ink: #14171c;
       --mut: #566070;
       --grid: #eceef2;
-      --red: #e3000b;
-      --yellow: #ffb400;
-      --blue: #2aa7f2;
-      --green: #5bb838;
+      --red: #ff3340;
+      --yellow: #ffc800;
+      --blue: #22aeff;
+      --green: #48c92a;
       --grey: #b9bec7;
       --on-red: #ffffff;
       --on-yellow: #1b1400;
@@ -47,7 +47,10 @@
         --ink: #f1f3f7;
         --mut: #a0a9b8;
         --grid: #141a24;
-        --red: #ff3d33;
+        --red: #ff4d40;
+        --yellow: #ffd520;
+        --blue: #38bdf8;
+        --green: #4ade80;
         --grey: #8d95a3;
         color-scheme: dark;
       }
@@ -61,7 +64,10 @@
       --ink: #f1f3f7;
       --mut: #a0a9b8;
       --grid: #141a24;
-      --red: #ff3d33;
+      --red: #ff4d40;
+      --yellow: #ffd520;
+      --blue: #38bdf8;
+      --green: #4ade80;
       --grey: #8d95a3;
       color-scheme: dark;
     }
@@ -2890,8 +2896,8 @@
     const BX = (() => {
       if (!window.THREE) return null;
       const PAL = {
-        red: 0xe3000b, yellow: 0xffb400, blue: 0x2aa7f2, green: 0x5bb838,
-        white: 0xf4f5f7, grey: 0xb9bec7, brown: 0x8a5a34, bgreen: 0x4ea53a, black: 0x15181d
+        red: 0xff3340, yellow: 0xffd000, blue: 0x24b2ff, green: 0x48d330,
+        white: 0xffffff, grey: 0xd2d7e0, brown: 0xaa7042, bgreen: 0x54cc38, black: 0x1e232a
       };
       const PM = {};
       for (const k in PAL) PM[k] = new THREE.MeshLambertMaterial({ color: PAL[k] });
@@ -2991,10 +2997,13 @@
       function theme(d) {
         edgeM.color.set(d ? 0xffffff : 0x000000);
         edgeM.opacity = d ? .22 : .28;
-        PM.white.color.set(d ? 0xdfe3e9 : 0xf4f5f7);
-        PM.red.color.set(d ? 0xff3d33 : 0xe3000b);
-        PM.grey.color.set(d ? 0x8d95a3 : 0xb9bec7);
-        PM.bgreen.color.set(d ? 0x3d8a30 : 0x4ea53a);
+        PM.white.color.set(d ? 0xeef1f6 : 0xffffff);
+        PM.red.color.set(d ? 0xff4d40 : 0xff3340);
+        PM.yellow.color.set(d ? 0xffd520 : 0xffd000);
+        PM.blue.color.set(d ? 0x38bdf8 : 0x24b2ff);
+        PM.green.color.set(d ? 0x4ade80 : 0x48d330);
+        PM.grey.color.set(d ? 0x9ca3af : 0xd2d7e0);
+        PM.bgreen.color.set(d ? 0x45b330 : 0x54cc38);
         th.forEach(f => f(d));
       }
 
@@ -3039,13 +3048,16 @@
       cam.lookAt(0, 2, 0);
       const scene = new THREE.Scene();
 
-      const amb = new THREE.AmbientLight(0xffffff, .78);
-      const dir = new THREE.DirectionalLight(0xffffff, .85);
-      dir.position.set(6, 12, 8);
-      scene.add(amb, dir);
+      const amb = new THREE.AmbientLight(0xffffff, 1.05);
+      const hemi = new THREE.HemisphereLight(0xffffff, 0xc8d8e8, 0.6);
+      const dir = new THREE.DirectionalLight(0xffffff, 0.95);
+      dir.position.set(8, 14, 10);
+      const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+      fill.position.set(-8, 8, -8);
+      scene.add(amb, hemi, dir, fill);
       BX.th.push(d => {
-        amb.intensity = d ? .6 : .78;
-        dir.intensity = d ? 1 : .85;
+        amb.intensity = d ? .95 : 1.05;
+        dir.intensity = d ? 1.05 : .95;
       });
 
       let sd = 7;
@@ -3274,13 +3286,16 @@
       cam.position.set(14, 13, 14);
       cam.lookAt(0, 1.5, 0);
 
-      const amb = new THREE.AmbientLight(0xffffff, .8);
-      const dir = new THREE.DirectionalLight(0xffffff, .85);
-      dir.position.set(6, 12, 8);
-      scene.add(amb, dir);
+      const amb = new THREE.AmbientLight(0xffffff, 1.05);
+      const hemi = new THREE.HemisphereLight(0xffffff, 0xc8d8e8, 0.6);
+      const dir = new THREE.DirectionalLight(0xffffff, 0.95);
+      dir.position.set(8, 14, 10);
+      const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+      fill.position.set(-8, 8, -8);
+      scene.add(amb, hemi, dir, fill);
       BX.th.push(d => {
-        amb.intensity = d ? .6 : .8;
-        dir.intensity = d ? 1 : .85;
+        amb.intensity = d ? .95 : 1.05;
+        dir.intensity = d ? 1.05 : .95;
       });
 
       const world = new THREE.Group();
