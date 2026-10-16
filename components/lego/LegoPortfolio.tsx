@@ -253,17 +253,18 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     camera.lookAt(0, 2, 0);
 
     const scene = new THREE.Scene();
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.05);
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc8d8e8, 0.6);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.95);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.92);
     directionalLight.position.set(8, 14, 10);
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.45);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.48);
     fillLight.position.set(-8, 8, -8);
-    scene.add(ambientLight, hemiLight, directionalLight, fillLight);
+    const topLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    topLight.position.set(0, 16, 0);
+    scene.add(ambientLight, directionalLight, fillLight, topLight);
 
     BX.themeCallbacks.push((d) => {
-      ambientLight.intensity = d ? 0.95 : 1.05;
-      directionalLight.intensity = d ? 1.05 : 0.95;
+      ambientLight.intensity = d ? 0.92 : 0.95;
+      directionalLight.intensity = d ? 1.0 : 0.92;
     });
 
     let seed = 7;
@@ -924,17 +925,18 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     cam.position.set(14, 13, 14);
     cam.lookAt(0, 1.5, 0);
 
-    const amb = new THREE.AmbientLight(0xffffff, 1.05);
-    const hemi = new THREE.HemisphereLight(0xffffff, 0xc8d8e8, 0.6);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.95);
+    const amb = new THREE.AmbientLight(0xffffff, 0.95);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.92);
     dir.position.set(8, 14, 10);
-    const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.48);
     fill.position.set(-8, 8, -8);
-    scene.add(amb, hemi, dir, fill);
+    const top = new THREE.DirectionalLight(0xffffff, 0.3);
+    top.position.set(0, 16, 0);
+    scene.add(amb, dir, fill, top);
 
     BX.themeCallbacks.push((d) => {
-      amb.intensity = d ? 0.95 : 1.05;
-      dir.intensity = d ? 1.05 : 0.95;
+      amb.intensity = d ? 0.92 : 0.95;
+      dir.intensity = d ? 1.0 : 0.92;
     });
 
     const world = new THREE.Group();
