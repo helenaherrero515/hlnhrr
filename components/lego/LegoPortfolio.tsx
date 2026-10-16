@@ -86,6 +86,8 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   const [guestStatus, setGuestStatus] = useState<string>("hi! write me a note");
   const [guestNotes, setGuestNotes] = useState<GuestbookEntry[]>([]);
   const [isBmoHappy, setIsBmoHappy] = useState<boolean>(false);
+  const guestSending = useRef(false);
+  const guestRevision = useRef(0);
 
   // Stats counters state
   const [statTotals, setStatTotals] = useState({ contributions: 0, streak: 0, activeDays: 0 });
@@ -161,63 +163,75 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     syncTheme(initialDark);
   }, [syncTheme]);
 
-  // Load guestbook notes
+  // The server is authoritative; browser-local notes are not shared records.
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("hln_brick_notes");
-      if (saved) {
-        setGuestNotes(JSON.parse(saved));
-      }
-    } catch {}
-
+    let active = true;
+    let loading = false;
     const fetchLiveNotes = async () => {
+      if (loading || guestSending.current) return;
+      loading = true;
+      const revision = guestRevision.current;
       try {
-        const res = await fetch("/api/guestbook");
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length) {
-            const sorted = data.slice().sort((a: GuestbookEntry, b: GuestbookEntry) => (a.t || 0) - (b.t || 0));
-            setGuestNotes(sorted);
-            try {
-              localStorage.setItem("hln_brick_notes", JSON.stringify(sorted));
-            } catch {}
-          }
+        const res = await fetch("/api/guestbook", { cache: "no-store" });
+        if (!res.ok) throw new Error("Guestbook unavailable");
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("Invalid guestbook response");
+        if (active && revision === guestRevision.current) {
+          setGuestNotes(data);
+          setGuestStatus((status) => status === "cannot load shared notes. reconnect to refresh." ? "hi! write me a note" : status);
         }
-      } catch {}
+      } catch {
+        if (active && revision === guestRevision.current) setGuestStatus("cannot load shared notes. reconnect to refresh.");
+      } finally {
+        loading = false;
+      }
     };
-    fetchLiveNotes();
+    const refresh = () => { if (!document.hidden) void fetchLiveNotes(); };
+    void fetchLiveNotes();
+    const timer = window.setInterval(refresh, 5000);
+    window.addEventListener("focus", refresh);
+    window.addEventListener("online", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("online", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, []);
 
-  // Handle guestbook submission
   const handleGuestbookSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (guestSending.current) return;
     const m = guestMessage.trim().slice(0, 160);
     const n = guestName.trim().slice(0, 24);
     if (!m) {
       setGuestStatus("type a note first.");
       return;
     }
-    const newEntry: GuestbookEntry = { n: n || "anonymous", m, t: Date.now() };
-    const updated = [...guestNotes, newEntry].slice(-50);
-    setGuestNotes(updated);
+    guestSending.current = true;
+    guestRevision.current++;
+    setGuestStatus("sending...");
     try {
-      localStorage.setItem("hln_brick_notes", JSON.stringify(updated));
-    } catch {}
-    setGuestMessage("");
-    setGuestStatus("thank you for your note! 🧱");
-    setIsBmoHappy(true);
-    setTimeout(() => {
-      setIsBmoHappy(false);
-      setGuestStatus("hi! write me a note");
-    }, 2600);
-
-    try {
-      await fetch("/api/guestbook", {
+      const res = await fetch("/api/guestbook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newEntry),
+        body: JSON.stringify({ n: n || "anonymous", m }),
       });
-    } catch {}
+      if (!res.ok) throw new Error("Note not saved");
+      const data = await res.json();
+      if (!data.success || !Array.isArray(data.notes)) throw new Error("Invalid guestbook response");
+      setGuestNotes(data.notes);
+      setGuestMessage((current) => current.trim().slice(0, 160) === m ? "" : current);
+      setGuestStatus("thank you for your note!");
+      setIsBmoHappy(true);
+      setTimeout(() => setIsBmoHappy(false), 2600);
+    } catch {
+      setGuestStatus("could not confirm saving. your note is still here.");
+    } finally {
+      guestSending.current = false;
+    }
   };
 
   // Main Three.js Scene + Lenis + ScrollTrigger Sequence

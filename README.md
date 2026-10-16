@@ -43,27 +43,35 @@ Live site: **[hlnhrr.pages.dev](https://hlnhrr.pages.dev)**
 ## Current state
 
 > [!IMPORTANT]
-> This is a static site with no backend, no build step, and no package manager. Everything runs in the visitor's browser.
+> The deployed app is a Next.js static export served by a Cloudflare Worker. The guestbook API uses a persistent SQLite-backed Durable Object shared by all visitors.
 
 - Sections: Home, About, Work, Skills, Experience, Designs, Play, Git, and Contact.
 - Light and dark mode, following the system setting until the visitor picks one.
 - Mobile-first layout, with a scrolling nav and touch-friendly playground controls.
 - Respects `prefers-reduced-motion`.
-- The guestbook is stored on the visitor's own device only (see [Known limitations](#known-limitations)).
+- The guestbook stores confirmed notes centrally and refreshes visible pages every five seconds, plus on focus and reconnect.
 
 ## Run it locally
 
-Prerequisites: a modern browser with WebGL enabled and an internet connection (the libraries and fonts load from CDNs). Node.js is optional and only needed if you want a local server.
-
-Open `index.html` directly in your browser, or serve the folder:
+Prerequisites: Node.js 22+, npm, and a modern browser with WebGL enabled.
 
 ```bash
-npx serve .
+npm ci
+npx wrangler dev
 ```
 
-Then open the address it prints (usually `http://localhost:3000`).
+Wrangler builds the Next.js export and serves both the site and `/api/guestbook`. Local notes persist in `.wrangler/state` and are separate from production. `npm run dev` and static file servers alone do not provide the guestbook API.
 
-There is nothing to install and nothing to compile. Edit the file, refresh the page.
+### Deploy the shared guestbook
+
+```bash
+npx wrangler login
+npx wrangler deploy
+```
+
+`wrangler.json` binds `GUESTBOOK` and creates its SQLite-backed Durable Object through migration `v1`; no KV namespace or database ID is required. Deploy the Worker, not just the `out` directory. Use its Workers URL or attach your portfolio's custom domain to that Worker. An existing `pages.dev` deployment is separate and will not automatically switch to this Worker.
+
+All devices must visit the same deployed Worker/domain to share notes. The API keeps submitted notes centrally and returns the latest 50 in submission order. Success appears only after the API confirms saving; failed requests leave the draft intact. Old `hln_brick_notes` browser-local entries are not uploaded automatically and must be resubmitted if they were never saved centrally.
 
 ## What's included
 
@@ -74,7 +82,7 @@ There is nothing to install and nothing to compile. Edit the file, refresh the p
 - **Experience:** organizations, internships, volunteering, hackathons, and academics.
 - **Designs:** a gallery for publication materials, swag designs, and presentation decks.
 - **Playground:** a 3D brick builder where visitors pick colors and sizes, place, turn, and undo bricks, and save their work as a 1080×1920 PNG made for Instagram stories. The PNG shows their name ("name's work"), "YOUR TURN TO BUILD WITH ME", and the site link.
-- **BMO guestbook:** a note form styled after BMO from Adventure Time, with a log of notes saved on the visitor's device.
+- **BMO guestbook:** a note form styled after BMO from Adventure Time, with a shared log that refreshes automatically across devices.
 - **Ticker:** a scrolling strip of focus areas (Machine Learning, Artificial Intelligence, Automation, Software Development, Cloud Computing, AI Workflows, UI/UX, Product Designer).
 
 ## Why bricks
@@ -91,7 +99,7 @@ The design is a theme, not a gimmick that blocks content. All text is real HTML,
 | --- | --- |
 | Page content and layout | Static HTML, CSS, and JavaScript in a single file. |
 | Theme (light or dark) | Saved in the browser's `localStorage` under `hln_brick_theme`. |
-| Guestbook notes | Saved in the browser's `localStorage` under `hln_brick_notes`; never sent anywhere. |
+| Guestbook notes | Saved centrally in Cloudflare Durable Object SQLite; the latest 50 confirmed notes are displayed. |
 | Playground builds | Built and held in memory in the visitor's browser. |
 | PNG export | Drawn with the Canvas 2D API and downloaded locally; nothing is uploaded. |
 
@@ -101,7 +109,7 @@ The design is a theme, not a gimmick that blocks content. All text is real HTML,
 | --- | --- |
 | Loading Three.js, GSAP, ScrollTrigger, and Lenis | Loaded from cdnjs and jsDelivr when the page opens. |
 | Loading fonts | Pixelify Sans, DM Mono, Nunito come from Google Fonts. |
-| Hosting and deployment | Cloudflare Pages and GitHub need a network connection. |
+| Hosting and deployment | Cloudflare Workers and GitHub need a network connection. |
 
 ## Tech stack
 
@@ -114,20 +122,20 @@ The design is a theme, not a gimmick that blocks content. All text is real HTML,
 | Smooth scrolling | Lenis 1.1.20 (jsDelivr) |
 | Fonts | Pixelify Sans, DM Mono, Nunito (Google Fonts) |
 | Image export | Canvas 2D API |
-| Storage | `localStorage` |
-| Hosting | Cloudflare Pages |
+| Storage | `localStorage` for theme; Durable Object SQLite for guestbook notes |
+| Hosting | Cloudflare Workers with static assets |
 
 Prerequisites for development:
 
 - A code editor such as VS Code.
 - A modern browser with WebGL (Chrome, Edge, Firefox, or Safari).
 - Git and a GitHub account.
-- Node.js (optional), for `npx serve`.
+- Node.js 22+ and npm.
 - An image tool such as Squoosh to compress images to WebP.
 
 ## Known limitations
 
-- The guestbook saves notes only on the visitor's own device, so notes are not shared between visitors and I cannot read them. A shared guestbook would need a backend (for example Cloudflare Workers with KV or D1).
+- Shared guestbook reads and writes require the deployed Worker API. Offline or unavailable service errors are shown instead of pretending a note was saved. Previously browser-only notes cannot be recovered from other devices automatically.
 - The 3D scene and the playground need WebGL. Without it, the builder shows a message and the PNG export is unavailable.
 - The page depends on CDN-hosted libraries and fonts, so it does not work fully offline.
 - The PNG export waits for the fonts to load, so test it online.
@@ -151,7 +159,7 @@ There are no automated tests. Before publishing, check these by hand:
 - The light and dark toggle works and is remembered after a reload.
 - The playground places, turns, undoes, and clears bricks.
 - "Save my work" downloads a PNG that shows the build, the name, and the site link.
-- The guestbook saves and shows a note after sending.
+- The guestbook confirms a saved note, shows it in a second browser within five seconds without reloading, and retains the draft if saving fails.
 - Every link points to a real address (no placeholder `#` links).
 
 ---

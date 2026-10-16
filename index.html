@@ -2543,10 +2543,9 @@
       const gn = $('#gn'), gm = $('#gm'), st = $('#gst'), serialLogs = $('#serialLogs');
 
       let notes = [];
-      try {
-        const saved = localStorage.getItem('hln_brick_notes');
-        if (saved) notes = JSON.parse(saved);
-      } catch (e) {}
+      let sending = false;
+      let loading = false;
+      let revision = 0;
 
       const formatTime = (ts) => {
         const d = new Date(ts);
@@ -2590,50 +2589,61 @@
 
       renderSerialLogs();
 
-      // Fetch live notes if available
-      (async () => {
+      const fetchLiveNotes = async () => {
+        if (loading || sending) return;
+        loading = true;
+        const started = revision;
         try {
-          const res = await fetch('/api/guestbook');
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data) && data.length) {
-              notes = data.slice().sort((a, b) => (a.t || 0) - (b.t || 0));
-              try { localStorage.setItem('hln_brick_notes', JSON.stringify(notes)); } catch (e) {}
-              renderSerialLogs();
-            }
-          }
-        } catch (e) {}
-      })();
+          const res = await fetch('/api/guestbook', { cache: 'no-store' });
+          if (!res.ok) throw new Error('Guestbook unavailable');
+          const data = await res.json();
+          if (!Array.isArray(data)) throw new Error('Invalid guestbook response');
+          if (started !== revision) return;
+          notes = data;
+          renderSerialLogs();
+          if (st.textContent === 'cannot load shared notes. reconnect to refresh.') st.textContent = 'hi! write me a note';
+        } catch {
+          if (started === revision) st.textContent = 'cannot load shared notes. reconnect to refresh.';
+        } finally {
+          loading = false;
+        }
+      };
+      const refresh = () => { if (!document.hidden) void fetchLiveNotes(); };
+      void fetchLiveNotes();
+      setInterval(refresh, 5000);
+      window.addEventListener('focus', refresh);
+      window.addEventListener('online', refresh);
+      document.addEventListener('visibilitychange', refresh);
 
       $('#nf').addEventListener('submit', async e => {
         e.preventDefault();
+        if (sending) return;
         const m = gm.value.trim().slice(0, 160), n = gn.value.trim().slice(0, 24);
         if (!m) { st.textContent = 'type a note first.'; return; }
-        const newNote = { n: n || 'anonymous', m, t: Date.now() };
-        notes.push(newNote);
-        if (notes.length > 50) notes = notes.slice(-50);
+        sending = true;
+        revision++;
+        st.textContent = 'sending...';
         try {
-          localStorage.setItem('hln_brick_notes', JSON.stringify(notes));
-        } catch (e) {}
-
-        renderSerialLogs();
-        gm.value = '';
-        st.textContent = 'thank you for your note! 🧱';
-
-        try {
-          await fetch('/api/guestbook', {
+          const res = await fetch('/api/guestbook', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newNote)
+            body: JSON.stringify({ n: n || 'anonymous', m })
           });
-        } catch(err) {}
-
-        const f = $('#nf');
-        f.classList.add('happy');
-        setTimeout(() => {
-          f.classList.remove('happy');
-          st.textContent = 'hi! write me a note';
-        }, 2600);
+          if (!res.ok) throw new Error('Note not saved');
+          const data = await res.json();
+          if (!data.success || !Array.isArray(data.notes)) throw new Error('Invalid guestbook response');
+          notes = data.notes;
+          renderSerialLogs();
+          if (gm.value.trim().slice(0, 160) === m) gm.value = '';
+          st.textContent = 'thank you for your note!';
+          const f = $('#nf');
+          f.classList.add('happy');
+          setTimeout(() => f.classList.remove('happy'), 2600);
+        } catch {
+          st.textContent = 'could not confirm saving. your note is still here.';
+        } finally {
+          sending = false;
+        }
       });
     })();
 
@@ -3058,9 +3068,9 @@
       dir.position.set(8, 14, 10);
       const fill = new THREE.DirectionalLight(0xffffff, 0.48);
       fill.position.set(-8, 8, -8);
-      const top = new THREE.DirectionalLight(0xffffff, 0.3);
-      top.position.set(0, 16, 0);
-      scene.add(amb, dir, fill, top);
+      const topLight = new THREE.DirectionalLight(0xffffff, 0.3);
+      topLight.position.set(0, 16, 0);
+      scene.add(amb, dir, fill, topLight);
       BX.th.push(d => {
         amb.intensity = d ? .92 : .95;
         dir.intensity = d ? 1.0 : .92;
