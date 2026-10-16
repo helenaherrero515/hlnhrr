@@ -253,14 +253,17 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     camera.lookAt(0, 2, 0);
 
     const scene = new THREE.Scene();
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.78);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.85);
-    directionalLight.position.set(6, 12, 8);
-    scene.add(ambientLight, directionalLight);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.05);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc8d8e8, 0.6);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.95);
+    directionalLight.position.set(8, 14, 10);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.45);
+    fillLight.position.set(-8, 8, -8);
+    scene.add(ambientLight, hemiLight, directionalLight, fillLight);
 
     BX.themeCallbacks.push((d) => {
-      ambientLight.intensity = d ? 0.6 : 0.78;
-      directionalLight.intensity = d ? 1 : 0.85;
+      ambientLight.intensity = d ? 0.95 : 1.05;
+      directionalLight.intensity = d ? 1.05 : 0.95;
     });
 
     let seed = 7;
@@ -921,14 +924,17 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     cam.position.set(14, 13, 14);
     cam.lookAt(0, 1.5, 0);
 
-    const amb = new THREE.AmbientLight(0xffffff, 0.8);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.85);
-    dir.position.set(6, 12, 8);
-    scene.add(amb, dir);
+    const amb = new THREE.AmbientLight(0xffffff, 1.05);
+    const hemi = new THREE.HemisphereLight(0xffffff, 0xc8d8e8, 0.6);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.95);
+    dir.position.set(8, 14, 10);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+    fill.position.set(-8, 8, -8);
+    scene.add(amb, hemi, dir, fill);
 
     BX.themeCallbacks.push((d) => {
-      amb.intensity = d ? 0.6 : 0.8;
-      dir.intensity = d ? 1 : 0.85;
+      amb.intensity = d ? 0.95 : 1.05;
+      dir.intensity = d ? 1.05 : 0.95;
     });
 
     const world = new THREE.Group();
@@ -2442,46 +2448,53 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
             </div>
 
             <div className="ct">
-              <div className="ct-info" data-rv>
-                <h3 className="big">
-                  <span className="c-red">Projects /</span>
-                  <span className="c-yellow">Meetups /</span>
-                  <span className="c-blue">Collabs</span>
-                </h3>
-                <p>
-                  I&apos;m a 2nd-year Bachelor of Science in Computer Science student at PUP Manila, based in Navotas, Philippines. For me, learning is more than just a part of college. It is something I genuinely enjoy and choose to pursue every day.
-                </p>
-                <p>
-                  I love attending tech conferences, meetups, and events where I can connect with people, exchange ideas, discover new perspectives, and be inspired by others in the field. Every conversation and experience reminds me why I chose this path and motivates me to keep growing with purpose and passion.
-                </p>
-                <p>
-                  I&apos;m always open to learning, creating, connecting, and taking on new opportunities. If you&apos;re looking for someone curious, creative, and passionate about technology,{" "}
-                  <a href="https://calendly.com/helenaherrero515/30min" target="_blank" rel="noopener noreferrer">
-                    feel free to book a meeting with me
-                  </a>.
-                </p>
-                <div className="tags">
-                  <span>
-                    <i />Available for projects / meetups / collabs
-                  </span>
-                  <span>Based in Navotas, PH</span>
+              <div className="ct-top" data-rv>
+                <div className="ct-big-wrap">
+                  <h3 className="big">
+                    <span className="c-red">Projects /</span>
+                    <span className="c-yellow">Meetups /</span>
+                    <span className="c-blue">Collabs</span>
+                  </h3>
+                </div>
+
+                <div className="ct-bio-wrap">
+                  <p>
+                    I&apos;m a 2nd-year Bachelor of Science in Computer Science student at PUP Manila, based in Navotas, Philippines. For me, learning is more than just a part of college. It is something I genuinely enjoy and choose to pursue every day.
+                  </p>
+                  <p>
+                    I love attending tech conferences, meetups, and events where I can connect with people, exchange ideas, discover new perspectives, and be inspired by others in the field. Every conversation and experience reminds me why I chose this path and motivates me to keep growing with purpose and passion.
+                  </p>
+                  <p>
+                    I&apos;m always open to learning, creating, connecting, and taking on new opportunities. If you&apos;re looking for someone curious, creative, and passionate about technology,{" "}
+                    <a href="https://calendly.com/helenaherrero515/30min" target="_blank" rel="noopener noreferrer">
+                      feel free to book a meeting with me
+                    </a>.
+                  </p>
+                  <div className="tags">
+                    <span>
+                      <i />Available for projects / meetups / collabs
+                    </span>
+                    <span>Based in Navotas, PH</span>
+                  </div>
                 </div>
               </div>
 
               <div className="btns" data-rv>
                 <div className="mono">Press a brick</div>
-                <a className="btn bt c-green" href="https://github.com/helenaherrero515" target="_blank" rel="noopener noreferrer">
-                  GitHub <span>↗</span>
-                </a>
-                <a className="btn bt c-blue" href="https://www.linkedin.com/in/helenaherrero515/" target="_blank" rel="noopener noreferrer">
-                  LinkedIn <span>↗</span>
-                </a>
-                <a className="btn bt c-yellow" href="mailto:helenaherrero515@gmail.com">
-                  Email <span>↗</span>
-                </a>
-                <a className="btn bt c-red" href="/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" target="_blank" rel="noopener noreferrer">
-                  Download CV <span>↓</span>
-                </a>
+                <div className="btns-row">
+                  <a className="btn bt c-green" href="https://github.com/helenaherrero515" target="_blank" rel="noopener noreferrer">
+                    GitHub <span>↗</span>
+                  </a>
+                  <a className="btn bt c-blue" href="https://www.linkedin.com/in/helenaherrero515/" target="_blank" rel="noopener noreferrer">
+                    LinkedIn <span>↗</span>
+                  </a>
+                  <a className="btn bt c-yellow" href="mailto:helenaherrero515@gmail.com">
+                    Email <span>↗</span>
+                  </a>
+                  <a className="btn bt c-red" href="/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" target="_blank" rel="noopener noreferrer">
+                    Download CV <span>↓</span>
+                  </a>
+                </div>
               </div>
             </div>
 

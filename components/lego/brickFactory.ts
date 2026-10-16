@@ -12,15 +12,15 @@ export type BrickColorKey =
   | "black";
 
 export const LEGO_PALETTE: Record<BrickColorKey, number> = {
-  red: 0xe3000b,
-  yellow: 0xffb400,
-  blue: 0x2aa7f2,
-  green: 0x5bb838,
-  white: 0xf4f5f7,
-  grey: 0xb9bec7,
-  brown: 0x8a5a34,
-  bgreen: 0x4ea53a,
-  black: 0x15181d,
+  red: 0xff3340,
+  yellow: 0xffd000,
+  blue: 0x24b2ff,
+  green: 0x48d330,
+  white: 0xffffff,
+  grey: 0xd2d7e0,
+  brown: 0xaa7042,
+  bgreen: 0x54cc38,
+  black: 0x1e232a,
 };
 
 export class BrickFactory {
@@ -206,10 +206,13 @@ export class BrickFactory {
   theme(isDark: boolean): void {
     this.edgeMaterial.color.set(isDark ? 0xffffff : 0x000000);
     this.edgeMaterial.opacity = isDark ? 0.22 : 0.28;
-    this.materials.white.color.set(isDark ? 0xdfe3e9 : 0xf4f5f7);
-    this.materials.red.color.set(isDark ? 0xff3d33 : 0xe3000b);
-    this.materials.grey.color.set(isDark ? 0x8d95a3 : 0xb9bec7);
-    this.materials.bgreen.color.set(isDark ? 0x3d8a30 : 0x4ea53a);
+    this.materials.white.color.set(isDark ? 0xeef1f6 : 0xffffff);
+    this.materials.red.color.set(isDark ? 0xff4d40 : 0xff3340);
+    this.materials.yellow.color.set(isDark ? 0xffd520 : 0xffd000);
+    this.materials.blue.color.set(isDark ? 0x38bdf8 : 0x24b2ff);
+    this.materials.green.color.set(isDark ? 0x4ade80 : 0x48d330);
+    this.materials.grey.color.set(isDark ? 0x9ca3af : 0xd2d7e0);
+    this.materials.bgreen.color.set(isDark ? 0x45b330 : 0x54cc38);
     this.themeCallbacks.forEach((cb) => cb(isDark));
   }
 }
