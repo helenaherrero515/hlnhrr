@@ -2507,7 +2507,13 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   <a className="btn bt c-yellow" href="mailto:helenaherrero515@gmail.com">
                     Email <span>↗</span>
                   </a>
-                  <a className="btn bt c-red" href="/images/works/ppt-decks/Copy of GUIDHER PITCH DECK.pdf" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className="btn bt c-red"
+                    href="/assets/cv/CV_HERRERO,%20HELENA%20R.%20.pdf"
+                    download="CV_HERRERO, HELENA R. .pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Download CV <span>↓</span>
                   </a>
                 </div>
