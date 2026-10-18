@@ -1,20 +1,25 @@
 import type { ExperienceCategory, ProjectItem } from "./types";
 
 export const LEGO_MANIFESTO: [string, number, string?][] = [
-  ["Curious", 1, "c-yellow"],
-  ["first.", 0],
-  ["Then", 0],
-  ["I", 0],
-  ["build", 1, "c-blue"],
-  ["it,", 0],
-  ["break", 1, "c-red"],
-  ["it,", 0],
-  ["fix", 1, "c-green"],
-  ["it,", 0],
+  ["With", 0],
+  ["a", 0],
+  ["brick", 1, "c-yellow"],
+  ["in", 0],
+  ["hand", 0],
   ["and", 0],
-  ["build", 0],
-  ["it", 0],
-  ["better.", 0],
+  ["wonder", 1, "c-blue"],
+  ["in", 0],
+  ["mind,", 0],
+  ["I", 0],
+  ["build", 1, "c-red"],
+  ["beyond", 0],
+  ["what", 0],
+  ["the", 0],
+  ["pieces", 1, "c-green"],
+  ["were", 0],
+  ["meant", 0],
+  ["to", 0],
+  ["be.", 0],
 ];
 
 export const LEGO_TICKER: string[] = [
