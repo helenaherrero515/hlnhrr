@@ -1814,47 +1814,38 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   // Share directly to Instagram Story Handler
   const handleShareToIg = async () => {
     setIsSharingIg(true);
-    setPgSaveMsg("Preparing your build for Instagram…");
+    setPgSaveMsg("Preparing your build for Instagram Story…");
 
     try {
       const result = await generateStoryBlob();
       if (!result) return;
 
       const { blob, slug } = result;
-      const file = new File([blob], slug, { type: "image/png" });
 
-      // First check native Web Share API with files (iOS Safari, Android Chrome)
-      if (typeof navigator !== "undefined" && navigator.canShare && navigator.canShare({ files: [file] })) {
+      // 1. Download and save image to photos/gallery
+      downloadBlob(blob, slug);
+
+      // 2. Copy image to clipboard for automatic "Paste Sticker" popup in Instagram Story
+      if (typeof navigator !== "undefined" && navigator.clipboard && window.ClipboardItem) {
         try {
-          await navigator.share({
-            files: [file],
-            title: `${pgName.trim() || "My"} LEGO Build`,
-            text: `Check out my LEGO build! Built on hlnhrr.pages.dev`,
-          });
-          downloadBlob(blob, slug);
-          setPgSaveMsg("Shared! Pick Instagram Stories to post (and saved a copy to your device).");
-          return;
-        } catch (err: unknown) {
-          if (err instanceof Error && err.name === "AbortError") {
-            setPgSaveMsg("Share cancelled. You can still save the PNG directly.");
-            return;
-          }
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        } catch {
+          // Clipboard write permission may not be available; continue gracefully
         }
       }
 
-      // Fallback: download PNG and launch Instagram Story camera / web
-      downloadBlob(blob, slug);
+      // 3. Automatically go directly to Instagram Story camera
       const isMobile =
         typeof navigator !== "undefined" &&
         /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
       if (isMobile) {
-        setPgSaveMsg("Saved PNG to gallery! Opening Instagram Story camera…");
+        setPgSaveMsg("Saved to photos & copied! Opening Instagram Story…");
         setTimeout(() => {
-          window.location.href = "instagram://camera";
-        }, 400);
+          window.location.href = "instagram://story-camera";
+        }, 250);
       } else {
-        setPgSaveMsg("Saved PNG to downloads! Opening Instagram in a new tab…");
+        setPgSaveMsg("Saved Story PNG to downloads! Opening Instagram…");
         window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
       }
     } catch {

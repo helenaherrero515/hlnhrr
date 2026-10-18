@@ -4617,40 +4617,33 @@
           }
           btn.disabled = true;
           shareBtn.disabled = true;
-          msg.textContent = 'Preparing your build for Instagram…';
+          msg.textContent = 'Preparing your build for Instagram Story…';
 
           try {
             const c = await make(nm.value);
             const blob = await new Promise(r => c.toBlob(r, 'image/png'));
-            if (!blob) throw 0;
+            if (!blob) throw new Error('Failed to generate image');
             const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
-            const file = new File([blob], slug, { type: 'image/png' });
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            // 1. Download/save image to gallery/photos
+            download(blob, slug);
+
+            // 2. Copy image to clipboard so Instagram Story auto-prompts "Paste Sticker"
+            if (navigator.clipboard && window.ClipboardItem) {
               try {
-                await navigator.share({
-                  files: [file],
-                  title: `${nm.value.trim() || 'My'} LEGO Build`,
-                  text: 'Check out my LEGO build! Built on hlnhrr.pages.dev'
-                });
-                download(blob, slug);
-                msg.textContent = 'Shared! Pick Instagram Stories to post (and saved a copy to your device).';
-                return;
-              } catch (err) {
-                if (err && err.name === 'AbortError') {
-                  msg.textContent = 'Share cancelled. You can still save the PNG directly.';
-                  return;
-                }
-              }
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+              } catch (_) {}
             }
 
-            download(blob, slug);
+            // 3. Automatically go directly to Instagram Story camera
             const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
             if (isMobile) {
-              msg.textContent = 'Saved PNG to gallery! Opening Instagram Story camera…';
-              setTimeout(() => { window.location.href = 'instagram://camera'; }, 400);
+              msg.textContent = 'Saved to photos & copied! Opening Instagram Story…';
+              setTimeout(() => {
+                window.location.href = 'instagram://story-camera';
+              }, 250);
             } else {
-              msg.textContent = 'Saved PNG to downloads! Opening Instagram in a new tab…';
+              msg.textContent = 'Saved Story PNG to downloads! Opening Instagram…';
               window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
             }
           } catch (e) {
