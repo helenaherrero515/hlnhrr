@@ -4535,9 +4535,66 @@
           trigger: '#build',
           start: 'top top',
           end: 'bottom bottom',
-          onUpdate: s => seq(s.progress)
+          onUpdate: s => {
+            seq(s.progress);
+            const c = $('#gl');
+            if (c && s.progress > 0) {
+              c.style.opacity = '1';
+              c.style.visibility = 'visible';
+            }
+          },
+          onEnter: () => {
+            const c = $('#gl');
+            if (c) {
+              c.style.opacity = '1';
+              c.style.visibility = 'visible';
+            }
+            S.active = true;
+          },
+          onEnterBack: () => {
+            const c = $('#gl');
+            if (c) {
+              c.style.opacity = '1';
+              c.style.visibility = 'visible';
+            }
+            S.active = true;
+          }
         });
         seq(0);
+
+        // Manage 3D canvas active lifecycle across entire #build section
+        ScrollTrigger.create({
+          trigger: '#build',
+          start: 'top bottom',
+          end: 'bottom top',
+          onEnter: () => {
+            S.active = true;
+          },
+          onEnterBack: () => {
+            S.active = true;
+            const c = $('#gl');
+            if (c) {
+              c.style.opacity = '1';
+              c.style.visibility = 'visible';
+            }
+          },
+          onLeave: () => {
+            S.active = false;
+            const c = $('#gl');
+            if (c) {
+              c.style.opacity = '0';
+              c.style.visibility = 'hidden';
+            }
+          },
+          onLeaveBack: () => {
+            S.active = false;
+            const c = $('#gl');
+            if (c) {
+              c.style.opacity = '0';
+              c.style.visibility = 'hidden';
+            }
+          }
+        });
 
         // Keep 3D lego scene outside screen display until scrolling down towards #build
         ScrollTrigger.create({
@@ -4623,11 +4680,17 @@
     }
 
     new IntersectionObserver(es => {
-      S.active = es[0].isIntersecting;
+      const isIntersecting = es[0].isIntersecting;
+      S.active = isIntersecting;
       const c = $('#gl');
       if (c) {
-        if (S.active) {
+        if (isIntersecting) {
           c.style.visibility = 'visible';
+          const topEl = $('#top');
+          const heroBottom = topEl ? topEl.getBoundingClientRect().bottom : 0;
+          if (heroBottom <= 0) {
+            c.style.opacity = '1';
+          }
         } else {
           c.style.visibility = 'hidden';
           c.style.opacity = '0';
