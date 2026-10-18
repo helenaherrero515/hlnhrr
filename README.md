@@ -4,7 +4,7 @@
 
 <h1 align="center">HLN</h1>
 
-<p align="center"><b>Curious first. Build, break, fix, repeat.</b><br>
+<p align="center"><b>An endless appetite for the unknown.</b><br>
 Helena Herrero's interactive portfolio: projects, experiments, and creative work,<br>
 built around a love of learning and a world of colorful bricks.</p>
 
