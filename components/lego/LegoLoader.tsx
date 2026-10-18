@@ -379,6 +379,9 @@ export function LegoLoader({ onComplete, once = false }: LegoLoaderProps): React
       root.dataset.loading = "false";
       unlockScroll();
       try {
+        window.focus();
+      } catch {}
+      try {
         sessionStorage.setItem(KEY, "1");
       } catch {
         // Ignore
@@ -390,6 +393,9 @@ export function LegoLoader({ onComplete, once = false }: LegoLoaderProps): React
     function finish() {
       isFinished = true;
       unlockScroll();
+      try {
+        window.focus();
+      } catch {}
       setFinished(true);
     }
 

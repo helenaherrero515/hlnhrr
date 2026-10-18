@@ -667,27 +667,55 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
 
     // Lenis Smooth Scroll Setup
     let lenis: Lenis | null = null;
-    try {
-      lenis = new Lenis({
-        duration: 1.1,
-        smoothWheel: true,
-      });
-      gsap.registerPlugin(ScrollTrigger);
-      lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add((time) => lenis?.raf(time * 1000));
-      gsap.ticker.lagSmoothing(0);
-      if (document.documentElement.dataset.loading === "true") {
-        lenis.stop();
-        window.addEventListener(
-          "loader:done",
-          () => {
-            lenis?.start();
-            ScrollTrigger.refresh();
-          },
-          { once: true }
-        );
+    const startLenis = () => {
+      if (!lenis && !isReduced) {
+        try {
+          lenis = new Lenis({
+            duration: 1.1,
+            smoothWheel: true,
+            autoResize: true,
+          });
+          gsap.registerPlugin(ScrollTrigger);
+          lenis.on("scroll", ScrollTrigger.update);
+          gsap.ticker.add((time) => lenis?.raf(time * 1000));
+          gsap.ticker.lagSmoothing(500, 33);
+        } catch {
+          lenis = null;
+        }
       }
-    } catch {}
+      if (lenis) {
+        lenis.start();
+        lenis.resize();
+      }
+      document.documentElement.classList.remove("lenis-stopped");
+      ScrollTrigger.refresh();
+      try {
+        window.focus();
+      } catch {}
+      requestAnimationFrame(() => {
+        lenis?.resize();
+        ScrollTrigger.refresh();
+      });
+      setTimeout(() => {
+        lenis?.resize();
+        ScrollTrigger.refresh();
+      }, 150);
+    };
+
+    if (document.documentElement.dataset.loading === "true") {
+      window.addEventListener("loader:done", startLenis, { once: true });
+      const checkDone = setInterval(() => {
+        if (
+          document.documentElement.dataset.loading !== "true" ||
+          !document.getElementById("loader")
+        ) {
+          clearInterval(checkDone);
+          startLenis();
+        }
+      }, 100);
+    } else {
+      startLenis();
+    }
 
     if (!isReduced) {
       ScrollTrigger.create({
@@ -1814,13 +1842,14 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   // Share directly to Instagram Story Handler
   const handleShareToIg = async () => {
     setIsSharingIg(true);
-    setPgSaveMsg("Preparing your build for Instagram Story…");
+    setPgSaveMsg("Preparing your build for Instagram…");
 
     try {
       const result = await generateStoryBlob();
       if (!result) return;
 
       const { blob, slug } = result;
+      const file = new File([blob], slug, { type: "image/png" });
 
       // 1. Download and save image to photos/gallery
       downloadBlob(blob, slug);
@@ -1834,18 +1863,39 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
         }
       }
 
-      // 3. Automatically go directly to Instagram Story camera
+      // 3. Web Share API with image file
+      // Sharing ONLY the file (without conflicting text/url) allows iOS and Android to pass the image directly into Instagram Stories
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        try {
+          await navigator.share({
+            files: [file],
+          });
+          setPgSaveMsg("Shared to Instagram! Your build is ready in Stories.");
+          return;
+        } catch (err: unknown) {
+          if (err instanceof Error && err.name === "AbortError") {
+            setPgSaveMsg("Share cancelled. Your build was saved to your photos!");
+            return;
+          }
+        }
+      }
+
+      // 4. Fallback if Web Share is unavailable
       const isMobile =
         typeof navigator !== "undefined" &&
         /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
       if (isMobile) {
-        setPgSaveMsg("Saved to photos & copied! Opening Instagram Story…");
+        setPgSaveMsg("Saved to photos! Opening Instagram — tap Story to add your build.");
         setTimeout(() => {
-          window.location.href = "instagram://story-camera";
-        }, 250);
+          window.location.href = "instagram://camera";
+        }, 400);
       } else {
-        setPgSaveMsg("Saved Story PNG to downloads! Opening Instagram…");
+        setPgSaveMsg("Saved Story PNG to downloads! Send to your phone to post to Instagram Story.");
         window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
       }
     } catch {

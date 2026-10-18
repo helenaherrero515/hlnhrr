@@ -2173,12 +2173,14 @@
       }
       root.dataset.loading = 'false';
       unlockScroll();
+      try { window.focus(); } catch (_) {}
       window.dispatchEvent(new Event('loader:done'));
     }
     function finish() {
       finished = true;
       unlockScroll();
       if (loader) loader.remove();
+      try { window.focus(); } catch (_) {}
     }
 
     function wallBrick(b, y) {
@@ -4617,33 +4619,51 @@
           }
           btn.disabled = true;
           shareBtn.disabled = true;
-          msg.textContent = 'Preparing your build for Instagram Story…';
+          msg.textContent = 'Preparing your build for Instagram…';
 
           try {
             const c = await make(nm.value);
             const blob = await new Promise(r => c.toBlob(r, 'image/png'));
             if (!blob) throw new Error('Failed to generate image');
             const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
+            const file = new File([blob], slug, { type: 'image/png' });
 
-            // 1. Download/save image to gallery/photos
+            // 1. Download/save image to gallery/photos so it's always available
             download(blob, slug);
 
-            // 2. Copy image to clipboard so Instagram Story auto-prompts "Paste Sticker"
+            // 2. Copy image to clipboard for Instagram Story "Paste Sticker"
             if (navigator.clipboard && window.ClipboardItem) {
               try {
                 await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
               } catch (_) {}
             }
 
-            // 3. Automatically go directly to Instagram Story camera
+            // 3. Web Share API with image file
+            // Sharing ONLY the file (no conflicting text/url) allows iOS and Android to pass the image directly into Instagram Stories
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              try {
+                await navigator.share({
+                  files: [file]
+                });
+                msg.textContent = 'Shared to Instagram! Your build is ready in Stories.';
+                return;
+              } catch (err) {
+                if (err && err.name === 'AbortError') {
+                  msg.textContent = 'Share cancelled. Your build was saved to your photos!';
+                  return;
+                }
+              }
+            }
+
+            // 4. Fallback if Web Share is unavailable
             const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
             if (isMobile) {
-              msg.textContent = 'Saved to photos & copied! Opening Instagram Story…';
+              msg.textContent = 'Saved to photos! Opening Instagram — tap Story to add your build.';
               setTimeout(() => {
-                window.location.href = 'instagram://story-camera';
-              }, 250);
+                window.location.href = 'instagram://camera';
+              }, 400);
             } else {
-              msg.textContent = 'Saved Story PNG to downloads! Opening Instagram…';
+              msg.textContent = 'Saved Story PNG to downloads! Send to your phone to post to Instagram Story.';
               window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
             }
           } catch (e) {
@@ -5034,37 +5054,57 @@
 
     /* ===== Lenis + GSAP ===== */
     let lenis = null;
-    if (!reduce) {
-      try {
-        if (window.Lenis) {
-          lenis = new Lenis({ duration: 1.1, smoothWheel: true });
-          if (hasG) lenis.on('scroll', ScrollTrigger.update);
-          if (root.dataset.loading === 'true') {
-            lenis.stop();
-            const startLenis = () => {
-              lenis.start();
-              document.documentElement.classList.remove('lenis-stopped');
-              if (hasG) ScrollTrigger.refresh();
-            };
-            window.addEventListener('loader:done', startLenis, { once: true });
-            const checkDone = setInterval(() => {
-              if (root.dataset.loading !== 'true' || !document.getElementById('loader')) {
-                clearInterval(checkDone);
-                startLenis();
-              }
-            }, 100);
-          }
-        }
-      } catch (e) { lenis = null; }
-    }
-
     if (hasG) {
       gsap.registerPlugin(ScrollTrigger);
-      if (lenis) {
-        gsap.ticker.add(t => lenis.raf(t * 1000));
-        gsap.ticker.lagSmoothing(500, 33);
+    }
+
+    const startLenis = () => {
+      if (!lenis && !reduce && window.Lenis) {
+        try {
+          lenis = new Lenis({
+            duration: 1.1,
+            smoothWheel: true,
+            autoResize: true
+          });
+          if (hasG) {
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(t => lenis.raf(t * 1000));
+            gsap.ticker.lagSmoothing(500, 33);
+          }
+        } catch (e) {
+          lenis = null;
+        }
       }
-      if (!reduce) {
+      if (lenis) {
+        lenis.start();
+        lenis.resize();
+      }
+      document.documentElement.classList.remove('lenis-stopped');
+      if (hasG) ScrollTrigger.refresh();
+      try { window.focus(); } catch (_) {}
+      requestAnimationFrame(() => {
+        if (lenis) lenis.resize();
+        if (hasG) ScrollTrigger.refresh();
+      });
+      setTimeout(() => {
+        if (lenis) lenis.resize();
+        if (hasG) ScrollTrigger.refresh();
+      }, 150);
+    };
+
+    if (root.dataset.loading !== 'true') {
+      startLenis();
+    } else {
+      window.addEventListener('loader:done', startLenis, { once: true });
+      const checkDone = setInterval(() => {
+        if (root.dataset.loading !== 'true' || !document.getElementById('loader')) {
+          clearInterval(checkDone);
+          startLenis();
+        }
+      }, 100);
+    }
+
+    if (!reduce) {
         ScrollTrigger.create({
           trigger: '#build',
           start: 'top top',

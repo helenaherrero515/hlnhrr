@@ -259,6 +259,7 @@
     }
     root.dataset.loading = 'false';
     unlockScroll();
+    try { window.focus(); } catch (_) {}
     try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
     window.dispatchEvent(new Event('loader:done'));
     if (CONFIG.redirectTo) setTimeout(() => { location.href = CONFIG.redirectTo; }, 700);
@@ -267,6 +268,7 @@
     finished = true;
     unlockScroll();
     if (loader) loader.remove();
+    try { window.focus(); } catch (_) {}
     replayWrap.classList.add('show');
   }
 
