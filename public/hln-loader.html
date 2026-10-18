@@ -91,11 +91,19 @@
   try { const t = localStorage.getItem('hln-theme'); if (t) root.dataset.theme = t; } catch (e) {}
 
   const loading = () => root.dataset.loading === 'true';
-  addEventListener('wheel', e => { if (loading()) e.preventDefault(); }, { passive: false });
-  addEventListener('touchmove', e => { if (loading()) e.preventDefault(); }, { passive: false });
-  addEventListener('keydown', e => {
+  const lockScroll = e => { if (loading()) e.preventDefault(); };
+  const lockKey = e => {
     if (loading() && [' ', 'ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'End', 'Home'].includes(e.key)) e.preventDefault();
-  });
+  };
+  addEventListener('wheel', lockScroll, { passive: false });
+  addEventListener('touchmove', lockScroll, { passive: false });
+  addEventListener('keydown', lockKey, { passive: false });
+
+  function unlockScroll() {
+    removeEventListener('wheel', lockScroll);
+    removeEventListener('touchmove', lockScroll);
+    removeEventListener('keydown', lockKey);
+  }
 
   const loader = document.getElementById('loader');
   const replayWrap = document.getElementById('replay-wrap');
@@ -244,14 +252,21 @@
 
   function reveal() {
     stage.style.visibility = 'hidden';
+    if (loader) {
+      loader.style.pointerEvents = 'none';
+      loader.style.touchAction = 'auto';
+      loader.style.backgroundColor = 'transparent';
+    }
     root.dataset.loading = 'false';
+    unlockScroll();
     try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
     window.dispatchEvent(new Event('loader:done'));
     if (CONFIG.redirectTo) setTimeout(() => { location.href = CONFIG.redirectTo; }, 700);
   }
   function finish() {
     finished = true;
-    loader.remove();
+    unlockScroll();
+    if (loader) loader.remove();
     replayWrap.classList.add('show');
   }
 

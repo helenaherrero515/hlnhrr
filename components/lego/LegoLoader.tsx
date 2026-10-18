@@ -57,6 +57,12 @@ export function LegoLoader({ onComplete, once = false }: LegoLoaderProps): React
     window.addEventListener("touchmove", handleScrollLock, { passive: false });
     window.addEventListener("keydown", handleKeyDown, { passive: false });
 
+    const unlockScroll = () => {
+      window.removeEventListener("wheel", handleScrollLock);
+      window.removeEventListener("touchmove", handleScrollLock);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+
     // HLN brick letters definition
     const LETTERS = [
       { color: COLORS.yellow, rows: ["X...X", "X...X", "X...X", "XXXXX", "X...X", "X...X", "X...X"] }, // H
@@ -364,7 +370,14 @@ export function LegoLoader({ onComplete, once = false }: LegoLoaderProps): React
     function reveal() {
       const stage = document.getElementById("loader-stage");
       if (stage) stage.style.visibility = "hidden";
+      const loaderEl = document.getElementById("loader");
+      if (loaderEl) {
+        loaderEl.style.pointerEvents = "none";
+        loaderEl.style.touchAction = "auto";
+        loaderEl.style.backgroundColor = "transparent";
+      }
       root.dataset.loading = "false";
+      unlockScroll();
       try {
         sessionStorage.setItem(KEY, "1");
       } catch {
@@ -376,6 +389,7 @@ export function LegoLoader({ onComplete, once = false }: LegoLoaderProps): React
 
     function finish() {
       isFinished = true;
+      unlockScroll();
       setFinished(true);
     }
 

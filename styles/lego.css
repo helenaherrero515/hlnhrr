@@ -646,6 +646,12 @@ html[data-loading="true"] body {
   background-color: var(--bg);
 }
 
+html:not([data-loading="true"]) #loader {
+  pointer-events: none !important;
+  touch-action: auto !important;
+  background: transparent !important;
+}
+
 #loader-stage {
   position: absolute;
   inset: 0;
