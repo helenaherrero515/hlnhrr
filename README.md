@@ -26,28 +26,11 @@ built around a love of learning and a world of colorful bricks.</p>
   <a href="docs/README.md">Docs</a>
 </p>
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <br>
-        🟨 🟧 🟩 🟦 🟥 🟦 🟩 🟧 🟨
-        <h2>📖 READ!</h2>
-        <b>on Medium now</b><br>
-        <sub>A story about bricks, becoming, and not knowing what comes next.</sub>
-        <br><br>
-        <a href="https://medium.com/@helenaherrero515/even-the-bricks-didnt-know-what-they-would-become-3b1eba78e7c6">
-          <img alt="Read on Medium" src="https://img.shields.io/badge/Read%20on%20Medium-Even%20the%20Bricks%20Didn't%20Know-FFD900?style=for-the-badge&labelColor=171900&logo=medium&logoColor=FFD900">
-        </a>
-        <br><br>
-        <a href="https://medium.com/@helenaherrero515/even-the-bricks-didnt-know-what-they-would-become-3b1eba78e7c6">medium.com/@helenaherrero515/even-the-bricks-didnt-know-what-they-would-become</a>
-        <br><br>
-        🟨 🟧 🟩 🟦 🟥 🟦 🟩 🟧 🟨
-        <br><br>
-      </td>
-    </tr>
-  </table>
-</div>
+<p align="center">
+  <a href="https://medium.com/@helenaherrero515/even-the-bricks-didnt-know-what-they-would-become-3b1eba78e7c6">
+    <img alt="Read on Medium: Even the Bricks Didn't Know What They Would Become" src="https://img.shields.io/badge/READ%20ON%20MEDIUM-EVEN%20THE%20BRICKS%20DIDN%27T%20KNOW%20WHAT%20THEY%20WOULD%20BECOME-FFD900?style=for-the-badge&labelColor=171900&logo=medium&logoColor=FFD900">
+  </a>
+</p>
 
 ## About
 
