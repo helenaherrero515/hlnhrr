@@ -1872,21 +1872,22 @@
       z-index: 99999;
       touch-action: none;
       overscroll-behavior: none;
+      background-color: var(--bg);
     }
-    #stage {
+    #loader-stage {
       position: absolute;
       inset: 0;
       overflow: hidden;
       background-color: var(--bg);
     }
-    #cv {
+    #loader-cv {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       display: block;
     }
-    .hud {
+    #loader .hud {
       position: absolute;
       left: 0;
       right: 0;
@@ -1897,8 +1898,9 @@
       gap: 24px;
       padding: 0 24px 28px;
       pointer-events: none;
+      z-index: 5;
     }
-    .percent {
+    #loader .percent {
       display: flex;
       align-items: baseline;
       gap: 8px;
@@ -1906,37 +1908,37 @@
       font-size: clamp(48px, 9vw, 112px);
       font-family: var(--fd);
     }
-    .percent small {
+    #loader .percent small {
       font-size: 0.35em;
       color: var(--mut);
     }
-    #status {
+    #loader-status {
       margin-top: 12px;
       font-size: 12px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       font-family: var(--fm);
     }
-    .segs {
+    #loader .segs {
       display: flex;
       gap: 8px;
       padding-bottom: 8px;
     }
-    .seg {
+    #loader .seg {
       width: 14px;
       height: 14px;
       border-radius: 999px;
       background: color-mix(in srgb, var(--mut) 30%, transparent);
       transition: background-color 0.25s, transform 0.25s;
     }
-    .seg.on {
+    #loader .seg.on {
       background: var(--red);
       transform: translateY(-2px);
     }
-    .segs.full .seg.on {
+    #loader .segs.full .seg.on {
       background: var(--green);
     }
-    #wall {
+    #loader-wall {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -1945,12 +1947,12 @@
       pointer-events: none;
       z-index: 10;
     }
-    .dots {
+    #loader .dots {
       background-image: radial-gradient(circle, var(--grid) 2px, transparent 2.6px);
       background-size: 28px 28px;
     }
     @media (min-width: 768px) {
-      .hud {
+      #loader .hud {
         padding: 0 48px 28px;
       }
     }
