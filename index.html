@@ -1874,6 +1874,11 @@
       overscroll-behavior: none;
       background-color: var(--bg);
     }
+    html:not([data-loading="true"]) #loader {
+      pointer-events: none !important;
+      touch-action: auto !important;
+      background: transparent !important;
+    }
     #loader-stage {
       position: absolute;
       inset: 0;
@@ -1984,13 +1989,20 @@
     const COLORS = { yellow: '#ffd500', red: '#eb0a14', blue: '#0066dc', green: '#00a838' };
 
     const lockScroll = e => { if (root.dataset.loading === 'true') e.preventDefault(); };
-    window.addEventListener('wheel', lockScroll, { passive: false });
-    window.addEventListener('touchmove', lockScroll, { passive: false });
-    window.addEventListener('keydown', e => {
+    const lockKey = e => {
       if (root.dataset.loading === 'true' && [' ', 'ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'End', 'Home'].includes(e.key)) {
         e.preventDefault();
       }
-    });
+    };
+    window.addEventListener('wheel', lockScroll, { passive: false });
+    window.addEventListener('touchmove', lockScroll, { passive: false });
+    window.addEventListener('keydown', lockKey, { passive: false });
+
+    function unlockScroll() {
+      window.removeEventListener('wheel', lockScroll);
+      window.removeEventListener('touchmove', lockScroll);
+      window.removeEventListener('keydown', lockKey);
+    }
 
     const loader = document.getElementById('loader');
     if (!loader) return;
@@ -2154,12 +2166,19 @@
 
     function reveal() {
       if (stage) stage.style.visibility = 'hidden';
+      if (loader) {
+        loader.style.pointerEvents = 'none';
+        loader.style.touchAction = 'auto';
+        loader.style.backgroundColor = 'transparent';
+      }
       root.dataset.loading = 'false';
+      unlockScroll();
       window.dispatchEvent(new Event('loader:done'));
     }
     function finish() {
       finished = true;
-      loader.remove();
+      unlockScroll();
+      if (loader) loader.remove();
     }
 
     function wallBrick(b, y) {
@@ -2217,7 +2236,12 @@
       buildWall(); wallPhase = 'in'; wallT = 0;
     }
 
-    window.addEventListener('keydown', e => { if (e.key === 'Escape' && !covering) t = Math.max(t, T.cover); });
+    const skipLoader = () => { if (!covering) t = Math.max(t, T.cover); };
+    window.addEventListener('keydown', e => { if (e.key === 'Escape') skipLoader(); });
+    if (loader) {
+      loader.addEventListener('click', skipLoader);
+      loader.addEventListener('touchstart', skipLoader, { passive: true });
+    }
 
     function frame(now) {
       if (finished) return;
@@ -4593,40 +4617,33 @@
           }
           btn.disabled = true;
           shareBtn.disabled = true;
-          msg.textContent = 'Preparing your build for Instagram…';
+          msg.textContent = 'Preparing your build for Instagram Story…';
 
           try {
             const c = await make(nm.value);
             const blob = await new Promise(r => c.toBlob(r, 'image/png'));
-            if (!blob) throw 0;
+            if (!blob) throw new Error('Failed to generate image');
             const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
-            const file = new File([blob], slug, { type: 'image/png' });
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            // 1. Download/save image to gallery/photos
+            download(blob, slug);
+
+            // 2. Copy image to clipboard so Instagram Story auto-prompts "Paste Sticker"
+            if (navigator.clipboard && window.ClipboardItem) {
               try {
-                await navigator.share({
-                  files: [file],
-                  title: `${nm.value.trim() || 'My'} LEGO Build`,
-                  text: 'Check out my LEGO build! Built on hlnhrr.pages.dev'
-                });
-                download(blob, slug);
-                msg.textContent = 'Shared! Pick Instagram Stories to post (and saved a copy to your device).';
-                return;
-              } catch (err) {
-                if (err && err.name === 'AbortError') {
-                  msg.textContent = 'Share cancelled. You can still save the PNG directly.';
-                  return;
-                }
-              }
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+              } catch (_) {}
             }
 
-            download(blob, slug);
+            // 3. Automatically go directly to Instagram Story camera
             const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
             if (isMobile) {
-              msg.textContent = 'Saved PNG to gallery! Opening Instagram Story camera…';
-              setTimeout(() => { window.location.href = 'instagram://camera'; }, 400);
+              msg.textContent = 'Saved to photos & copied! Opening Instagram Story…';
+              setTimeout(() => {
+                window.location.href = 'instagram://story-camera';
+              }, 250);
             } else {
-              msg.textContent = 'Saved PNG to downloads! Opening Instagram in a new tab…';
+              msg.textContent = 'Saved Story PNG to downloads! Opening Instagram…';
               window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
             }
           } catch (e) {
@@ -5024,10 +5041,18 @@
           if (hasG) lenis.on('scroll', ScrollTrigger.update);
           if (root.dataset.loading === 'true') {
             lenis.stop();
-            window.addEventListener('loader:done', () => {
+            const startLenis = () => {
               lenis.start();
+              document.documentElement.classList.remove('lenis-stopped');
               if (hasG) ScrollTrigger.refresh();
-            }, { once: true });
+            };
+            window.addEventListener('loader:done', startLenis, { once: true });
+            const checkDone = setInterval(() => {
+              if (root.dataset.loading !== 'true' || !document.getElementById('loader')) {
+                clearInterval(checkDone);
+                startLenis();
+              }
+            }, 100);
           }
         }
       } catch (e) { lenis = null; }
@@ -5037,7 +5062,7 @@
       gsap.registerPlugin(ScrollTrigger);
       if (lenis) {
         gsap.ticker.add(t => lenis.raf(t * 1000));
-        gsap.ticker.lagSmoothing(0);
+        gsap.ticker.lagSmoothing(500, 33);
       }
       if (!reduce) {
         ScrollTrigger.create({
