@@ -678,9 +678,66 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
         trigger: "#build",
         start: "top top",
         end: "bottom bottom",
-        onUpdate: (self) => updateSequence(self.progress),
+        onUpdate: (self) => {
+          updateSequence(self.progress);
+          const c = glCanvasRef.current;
+          if (c && self.progress > 0) {
+            c.style.opacity = "1";
+            c.style.visibility = "visible";
+          }
+        },
+        onEnter: () => {
+          const c = glCanvasRef.current;
+          if (c) {
+            c.style.opacity = "1";
+            c.style.visibility = "visible";
+          }
+          S.active = true;
+        },
+        onEnterBack: () => {
+          const c = glCanvasRef.current;
+          if (c) {
+            c.style.opacity = "1";
+            c.style.visibility = "visible";
+          }
+          S.active = true;
+        },
       });
       updateSequence(0);
+
+      // Manage 3D canvas active lifecycle across entire #build section
+      ScrollTrigger.create({
+        trigger: "#build",
+        start: "top bottom",
+        end: "bottom top",
+        onEnter: () => {
+          S.active = true;
+        },
+        onEnterBack: () => {
+          S.active = true;
+          const c = glCanvasRef.current;
+          if (c) {
+            c.style.opacity = "1";
+            c.style.visibility = "visible";
+          }
+        },
+        onLeave: () => {
+          S.active = false;
+          const c = glCanvasRef.current;
+          if (c) {
+            c.style.opacity = "0";
+            c.style.visibility = "hidden";
+          }
+        },
+        onLeaveBack: () => {
+          S.active = false;
+          const c = glCanvasRef.current;
+          if (c) {
+            c.style.opacity = "0";
+            c.style.visibility = "hidden";
+          }
+        },
+      });
 
       // Keep 3D lego scene outside screen display until scrolling down towards #build
       ScrollTrigger.create({
