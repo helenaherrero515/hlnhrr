@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-loading="true">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="public/icons/hln-180.png" sizes="180x180">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Nunito:wght@400;600;800&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=JetBrains+Mono:wght@400;700&family=Nunito:wght@400;600;800&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       color-scheme: light;
@@ -1857,9 +1857,437 @@
       .mt .w { opacity: 1 !important; transform: none !important; color: var(--ink) !important; }
       .mt .w.hi { background: var(--c) !important; color: var(--on) !important; }
     }
+
+    /* ============================================================
+       HLN Brick Loader Animation
+       ============================================================ */
+    html[data-loading="true"],
+    html[data-loading="true"] body {
+      overflow: hidden !important;
+      height: 100% !important;
+    }
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+    #stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background-color: var(--bg);
+    }
+    #cv {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .hud {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 0 24px 28px;
+      pointer-events: none;
+    }
+    .percent {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      line-height: 1;
+      font-size: clamp(48px, 9vw, 112px);
+      font-family: var(--fd);
+    }
+    .percent small {
+      font-size: 0.35em;
+      color: var(--mut);
+    }
+    #status {
+      margin-top: 12px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: var(--fm);
+    }
+    .segs {
+      display: flex;
+      gap: 8px;
+      padding-bottom: 8px;
+    }
+    .seg {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--mut) 30%, transparent);
+      transition: background-color 0.25s, transform 0.25s;
+    }
+    .seg.on {
+      background: var(--red);
+      transform: translateY(-2px);
+    }
+    .segs.full .seg.on {
+      background: var(--green);
+    }
+    #wall {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .dots {
+      background-image: radial-gradient(circle, var(--grid) 2px, transparent 2.6px);
+      background-size: 28px 28px;
+    }
+    @media (min-width: 768px) {
+      .hud {
+        padding: 0 48px 28px;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- ================= HLN BRICK LOADER ================= -->
+  <div id="loader" role="status" aria-live="polite" aria-label="Loading HLN portfolio">
+    <div id="loader-stage" class="dots">
+      <canvas id="loader-cv" aria-hidden="true"></canvas>
+
+      <div class="hud">
+        <div>
+          <div class="percent pixel"><span id="loader-num" aria-hidden="true">000</span><small aria-hidden="true">%</small></div>
+          <p id="loader-status" class="mono">Step 1 · Snap the pieces together</p>
+        </div>
+        <div id="loader-segs" class="segs" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <canvas id="loader-wall" aria-hidden="true"></canvas>
+  </div>
+
+  <script>
+  (() => {
+    const root = document.documentElement;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const COLORS = { yellow: '#ffd500', red: '#eb0a14', blue: '#0066dc', green: '#00a838' };
+
+    const lockScroll = e => { if (root.dataset.loading === 'true') e.preventDefault(); };
+    window.addEventListener('wheel', lockScroll, { passive: false });
+    window.addEventListener('touchmove', lockScroll, { passive: false });
+    window.addEventListener('keydown', e => {
+      if (root.dataset.loading === 'true' && [' ', 'ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'End', 'Home'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    const loader = document.getElementById('loader');
+    if (!loader) return;
+
+    const LETTERS = [
+      { color: COLORS.yellow, rows: ['X...X','X...X','X...X','XXXXX','X...X','X...X','X...X'] },
+      { color: COLORS.red,    rows: ['X....','X....','X....','X....','X....','X....','XXXXX'] },
+      { color: COLORS.blue,   rows: ['X...X','XX..X','X.X.X','X.X.X','X..XX','X..XX','X...X'] }
+    ];
+    const COLS = 17, CX = 8, ROWS = 7;
+    const FALL_SPAN = 0.18, LAND_AT = 0.7;
+
+    function mulberry32(a) {
+      return () => {
+        a |= 0; a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    const rand = mulberry32(2026);
+
+    const raw = [];
+    LETTERS.forEach((L, li) => L.rows.forEach((row, r) => [...row].forEach((ch, c) => {
+      if (ch === 'X') raw.push({ x: li * 6 + c, y: ROWS - 1 - r, color: L.color, j: rand() });
+    })));
+    raw.sort((a, b) => a.y - b.y || a.j - b.j);
+    const specs = raw.map((b, i) => ({
+      x: b.x, y: b.y, color: b.color,
+      start: (i / raw.length) * 0.82,
+      fromY: 13 + rand() * 5,
+      dx: (rand() - .5) * 2.4,
+      rz: (rand() - .5) * 1.6,
+      landed: false
+    }));
+    const zOrder = specs.map((_, i) => i).sort((a, b) => specs[a].y - specs[b].y || specs[a].x - specs[b].x);
+
+    const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+    const mix = (h, t, k) => { const c = hex(h); return `rgb(${c.map(v => Math.round(v + (t - v) * k)).join(',')})`; };
+    const SHADES = {};
+    Object.values(COLORS).forEach(c => SHADES[c] = { front: c, top: mix(c, 255, .28), side: mix(c, 0, .26), edge: mix(c, 0, .38) });
+
+    const stage = document.getElementById('loader-stage');
+    const cv = document.getElementById('loader-cv');
+    const ctx = cv ? cv.getContext('2d') : null;
+    let W = 0, H = 0, u = 40, dpr = 1;
+    const wcv = document.getElementById('loader-wall');
+    const wctx = wcv ? wcv.getContext('2d') : null;
+    if (!ctx || !wctx) return;
+
+    let wall = [], wallPhase = null, wallT = 0, WB = { bw: 80, bh: 50, rows: 10 };
+
+    function buildWall() {
+      const bw = Math.max(56, Math.min(W / 12, 120)), bh = bw * .62;
+      const cols = Math.ceil(W / bw) + 2, rows = Math.ceil(H / bh) + 1;
+      const rnd = mulberry32(7), cs = Object.values(COLORS);
+      WB = { bw, bh, rows };
+      wall = [];
+      for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++)
+          wall.push({ r, x: (c - 1) * bw - (r % 2 ? bw / 2 : 0), color: cs[(rnd() * 4) | 0], d: rnd() * .05 });
+    }
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      wcv.width = cv.width; wcv.height = cv.height; wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (wallPhase) buildWall();
+      u = Math.min(W * .9 / 20.8, H * .45 / 9, 66);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const pointer = { x: 0, y: 0, sx: 0, sy: 0 };
+    window.addEventListener('pointermove', e => { pointer.x = e.clientX / innerWidth * 2 - 1; pointer.y = e.clientY / innerHeight * 2 - 1; });
+
+    const clamp01 = v => Math.min(1, Math.max(0, v));
+    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+    const easeOutBack = x => { const c1 = 1.2, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+    const easeInCubic = x => x * x * x;
+
+    function rr(x, y, w, h, r) {
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+    }
+
+    function stud(cx, cy, s) {
+      const rx = u * .27, ry = u * .115, h = u * .15;
+      ctx.fillStyle = s.side;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillRect(cx - rx, cy - h, rx * 2, h);
+      ctx.fillStyle = s.top;
+      ctx.beginPath(); ctx.ellipse(cx, cy - h, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+    }
+
+    function brick(color, vx, vy) {
+      const s = SHADES[color], h = u / 2;
+      ctx.fillStyle = s.top;
+      ctx.beginPath(); ctx.moveTo(-h, -h); ctx.lineTo(h, -h); ctx.lineTo(h + vx, -h + vy); ctx.lineTo(-h + vx, -h + vy); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = s.side;
+      ctx.beginPath(); ctx.moveTo(h, -h); ctx.lineTo(h + vx, -h + vy); ctx.lineTo(h + vx, h + vy); ctx.lineTo(h, h); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = s.front; rr(-h, -h, u, u, u * .06); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.fillRect(-h + 1, -h + 1, u - 2, u * .1);
+      ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.fillRect(-h + 1, h - u * .13, u - 2, u * .13 - 1);
+      ctx.strokeStyle = s.edge; ctx.globalAlpha = .35; ctx.lineWidth = 1;
+      rr(-h + .5, -h + .5, u - 1, u - 1, u * .06); ctx.stroke(); ctx.globalAlpha = 1;
+      stud(vx / 2, -h + vy / 2 + u * .02, s);
+    }
+
+    const parts = [];
+    function burst(x, y, color, n, power, up) {
+      for (let i = 0; i < n && parts.length < 160; i++) {
+        const a = Math.random() * Math.PI * 2, sp = power * (.4 + Math.random() * .8);
+        parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (up ? power * 1.1 : power * .35), life: 0, max: .5 + Math.random() * .6, s: u * (.08 + Math.random() * .1), c: color });
+      }
+    }
+    function stepParts(dt) {
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i]; p.life += dt;
+        if (p.life >= p.max) { parts.splice(i, 1); continue; }
+        p.vy += u * 14 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        ctx.globalAlpha = 1 - p.life / p.max; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.s, p.s);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    const numEl = document.getElementById('loader-num'), statusEl = document.getElementById('loader-status');
+    const segsEl = document.getElementById('loader-segs');
+    const SEGMENTS = 10;
+    for (let i = 0; i < SEGMENTS; i++) { const s = document.createElement('i'); s.className = 'seg'; segsEl.appendChild(s); }
+    const segs = [...segsEl.children];
+    const STEPS = [[0,'Step 1 · Snap the pieces together'],[30,'Step 2 · Stack it up'],[60,'Step 3 · Press every stud down'],[90,'Step 4 · Almost there']];
+    let lastPct = -1;
+    function hud(p) {
+      const pct = Math.round(p * 100);
+      if (pct === lastPct) return; lastPct = pct;
+      if (numEl) numEl.textContent = String(pct).padStart(3, '0');
+      const lit = Math.round(p * SEGMENTS);
+      segs.forEach((el, i) => el.classList.toggle('on', i < lit));
+      if (pct < 100 && statusEl) {
+        const msg = [...STEPS].reverse().find(s => pct >= s[0])[1];
+        if (statusEl.textContent !== msg) statusEl.textContent = msg;
+      }
+    }
+
+    const T = { buildStart: .45, buildDur: 3.4, complete: 3.85, waveStart: 3.8, waveDur: 1.1, cover: 5.35 };
+    let t = reduce ? T.cover - .8 : 0;
+    let completed = false, covering = false, finished = false, last = performance.now();
+
+    function complete() {
+      completed = true;
+      hud(1); segsEl.classList.add('full');
+      if (statusEl) statusEl.textContent = 'HLN · Helena Herrero · Ready';
+      if (!reduce) {
+        const cols = Object.values(COLORS);
+        for (let i = 0; i < 56; i++) burst(W / 2 + (Math.random() - .5) * u * 14, H * .42, cols[i % 4], 1, u * 7, true);
+      }
+    }
+
+    function reveal() {
+      if (stage) stage.style.visibility = 'hidden';
+      root.dataset.loading = 'false';
+      window.dispatchEvent(new Event('loader:done'));
+    }
+    function finish() {
+      finished = true;
+      loader.remove();
+    }
+
+    function wallBrick(b, y) {
+      const { bw, bh } = WB, s = SHADES[b.color], x = b.x;
+      [.27, .73].forEach(k => {
+        const cx = x + bw * k, rx = bw * .11, ry = bh * .1, h = bh * .1;
+        wctx.fillStyle = s.side;
+        wctx.beginPath(); wctx.ellipse(cx, y, rx, ry, 0, 0, Math.PI * 2); wctx.fill();
+        wctx.fillRect(cx - rx, y - h, rx * 2, h);
+        wctx.fillStyle = s.top;
+        wctx.beginPath(); wctx.ellipse(cx, y - h, rx, ry, 0, 0, Math.PI * 2); wctx.fill();
+      });
+      wctx.fillStyle = s.front;
+      wctx.beginPath(); if (wctx.roundRect) wctx.roundRect(x, y, bw, bh, bh * .08); else wctx.rect(x, y, bw, bh); wctx.fill();
+      wctx.fillStyle = 'rgba(255,255,255,.22)'; wctx.fillRect(x + 1, y + 1, bw - 2, bh * .12);
+      wctx.fillStyle = 'rgba(0,0,0,.18)'; wctx.fillRect(x + 1, y + bh - bh * .14, bw - 2, bh * .14 - 1);
+      wctx.fillStyle = 'rgba(0,0,0,.12)'; wctx.fillRect(x + bw - bw * .04, y + 1, bw * .04 - 1, bh - 2);
+      wctx.strokeStyle = s.edge; wctx.globalAlpha = .35; wctx.lineWidth = 1;
+      wctx.strokeRect(x + .5, y + .5, bw - 1, bh - 1); wctx.globalAlpha = 1;
+    }
+
+    function drawWall(dt) {
+      if (!wallPhase) return;
+      wallT += dt;
+      const inPhase = wallPhase === 'in';
+      const p = clamp01(wallT / (inPhase ? 1.3 : 1.2));
+      wctx.clearRect(0, 0, W, H);
+      for (const b of wall) {
+        const finalY = H - (b.r + 1) * WB.bh;
+        let y;
+        if (inPhase) {
+          const k = clamp01((p - (b.r / WB.rows) * .56 - b.d) / .38);
+          if (k <= 0) continue;
+          const startY = H + WB.bh;
+          y = startY + (finalY - startY) * easeOutBack(k);
+        } else {
+          const k = clamp01((p - (b.r / WB.rows) * .45 - b.d) / .5);
+          if (k >= 1) continue;
+          y = finalY - easeInCubic(k) * (finalY + WB.bh * 3);
+        }
+        wallBrick(b, y);
+      }
+      if (p >= 1) {
+        if (inPhase) { reveal(); wallPhase = 'out'; wallT = 0; }
+        else { wallPhase = null; wctx.clearRect(0, 0, W, H); finish(); }
+      }
+    }
+
+    function startCurtain() {
+      covering = true;
+      if (reduce) {
+        reveal(); finish();
+        return;
+      }
+      buildWall(); wallPhase = 'in'; wallT = 0;
+    }
+
+    window.addEventListener('keydown', e => { if (e.key === 'Escape' && !covering) t = Math.max(t, T.cover); });
+
+    function frame(now) {
+      if (finished) return;
+      const dt = Math.min((now - last) / 1000, .05); last = now; t += dt;
+
+      const intro = easeOutCubic(clamp01(t / .7));
+      const build = (() => { const x = clamp01((t - T.buildStart) / T.buildDur); return x * x; })();
+      const wave = clamp01((t - T.waveStart) / T.waveDur);
+      if (!completed) hud(build);
+      if (!completed && t >= T.complete) complete();
+      if (!covering && t >= T.cover) startCurtain();
+
+      pointer.sx += (pointer.x - pointer.sx) * (1 - Math.exp(-dt * 4));
+      pointer.sy += (pointer.y - pointer.sy) * (1 - Math.exp(-dt * 4));
+      const vx = u * (.30 + pointer.sx * .10), vy = -u * (.24 - pointer.sy * .06);
+      const Xc = W / 2 - 1.5 * vx, Yp = H * .5 + 3.4 * u;
+      const ph = u * .5, PW = 19 * u;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const po = 9 * u * (1 - intro);
+      if (intro > .001) {
+        const g = SHADES[COLORS.green], px = Xc - PW / 2, py = Yp + po;
+        ctx.fillStyle = g.top;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + PW, py); ctx.lineTo(px + PW + 3 * vx, py + 3 * vy); ctx.lineTo(px + 3 * vx, py + 3 * vy); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = g.side;
+        ctx.beginPath(); ctx.moveTo(px + PW, py); ctx.lineTo(px + PW + 3 * vx, py + 3 * vy); ctx.lineTo(px + PW + 3 * vx, py + 3 * vy + ph); ctx.lineTo(px + PW, py + ph); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = g.front; rr(px, py, PW, ph, u * .08); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.2)'; ctx.fillRect(px + 1, py + 1, PW - 2, u * .08);
+        ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fillRect(px + 1, py + ph - u * .1, PW - 2, u * .1 - 1);
+        for (let x = -9; x <= 9; x++) stud(Xc + x * u + vx * 2.5, py + vy * 2.5, g);
+      }
+
+      const poses = new Array(specs.length);
+      for (let i = 0; i < specs.length; i++) {
+        const sp = specs[i];
+        const k0 = clamp01((build - sp.start) / FALL_SPAN);
+        if (k0 <= 0) continue;
+        const fall = Math.min(k0 / LAND_AT, 1);
+        let yOff = 0, sy = 1;
+        if (k0 < LAND_AT) yOff = sp.fromY * (1 - fall * fall);
+        else {
+          const k = (k0 - LAND_AT) / (1 - LAND_AT);
+          yOff = .28 * Math.sin(k * Math.PI) * (1 - k);
+          sy = 1 - .14 * Math.sin(Math.min(k * 2.5, 1) * Math.PI);
+        }
+        const w = clamp01(wave * 1.8 - (sp.x / (COLS - 1)) * .8);
+        const hop = w > 0 && w < 1 ? Math.sin(w * Math.PI) * .5 : 0;
+        const fx = Xc + (sp.x - CX) * u + vx + sp.dx * (1 - fall) * u;
+        const fy = Yp + vy - (sp.y + .5) * u - (yOff + hop) * u + (1 - sy) * u * .5;
+        poses[i] = { fx, fy, rot: sp.rz * (1 - fall), sx: 1 + (1 - sy) * .5, sy, landed: fall >= 1 };
+        if (fall >= 1 && !sp.landed) { sp.landed = true; if (dt < .04) burst(fx, fy + u / 2, sp.color, 5, u * 2.4, false); }
+      }
+      const draw = i => {
+        const p = poses[i]; if (!p) return;
+        ctx.save(); ctx.translate(p.fx, p.fy); ctx.rotate(p.rot); ctx.scale(p.sx, p.sy);
+        brick(specs[i].color, vx, vy);
+        ctx.restore();
+      };
+      zOrder.forEach(i => { if (poses[i] && poses[i].landed) draw(i); });
+
+      if (intro > .001) { const g = SHADES[COLORS.green]; for (let x = -9; x <= 9; x++) stud(Xc + x * u + vx * .5, Yp + po + vy * .5, g); }
+
+      zOrder.forEach(i => { if (poses[i] && !poses[i].landed) draw(i); });
+      stepParts(dt);
+      drawWall(dt);
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+  </script>
 
   <!-- Fixed Three.js scene: loose bricks snapping into a build -->
   <canvas id="gl" aria-hidden="true"></canvas>
@@ -2122,8 +2550,11 @@
           <div class="pgsave">
             <div class="pgshow">Show it off!</div>
             <label class="mono" for="pgName">Your name<input id="pgName" maxlength="20" placeholder="e.g. helena" autocomplete="off"></label>
-            <button class="btn bt c-red" id="pSave" type="button"><span>Save my work ↓</span><small>share it on ig!</small></button>
-            <div id="pgSaveMsg" aria-live="polite">Type your name, then save your build as a PNG, ready to post on your Instagram story.</div>
+            <div class="pgsave-btns">
+              <button class="btn bt c-blue" id="pSave" type="button"><span>SAVE AS PNG ↓</span></button>
+              <button class="btn bt c-red" id="pShareIg" type="button"><span>SHARE IT TO IG ↗</span></button>
+            </div>
+            <div id="pgSaveMsg" aria-live="polite">Type your name, then save your build as a PNG or share it directly to your Instagram story.</div>
           </div>
           <p class="pgnote mono">Click to place · Arrow keys move · Enter places · R turns · Z undoes</p>
         </div>
@@ -3966,7 +4397,7 @@
 
     /* ===== Instagram Story PNG Export Handler ===== */
     (() => {
-      const btn = $('#pSave'), nm = $('#pgName'), msg = $('#pgSaveMsg');
+      const btn = $('#pSave'), shareBtn = $('#pShareIg'), nm = $('#pgName'), msg = $('#pgSaveMsg');
       if (!btn || !nm) return;
 
       const INK = '#14171c', RED = '#e3000b', YEL = '#ffb400', BLU = '#2aa7f2', GRN = '#5bb838', SITE = 'hlnhrr.pages.dev';
@@ -4117,33 +4548,93 @@
         return c;
       }
 
+      function download(blob, slug) {
+        const u = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = u;
+        a.download = slug;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => window.URL.revokeObjectURL(u), 4000);
+      }
+
       btn.addEventListener('click', async () => {
         if (!window.__pgSnap) {
           msg.textContent = 'The builder needs WebGL to save your build. Please turn it on in your browser.';
           return;
         }
         btn.disabled = true;
-        msg.textContent = 'Building your story…';
+        if (shareBtn) shareBtn.disabled = true;
+        msg.textContent = 'Building your PNG…';
 
         try {
           const c = await make(nm.value);
           const blob = await new Promise(r => c.toBlob(r, 'image/png'));
           if (!blob) throw 0;
           const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
-          const u = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = u;
-          a.download = slug;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => window.URL.revokeObjectURL(u), 4000);
-          msg.textContent = 'Saved! Open it from your gallery and add it to your Instagram story.';
+          download(blob, slug);
+          msg.textContent = 'Saved PNG! Check your downloads for your LEGO build.';
         } catch (e) {
           msg.textContent = 'Could not save the image. Please try again.';
+        } finally {
+          btn.disabled = false;
+          if (shareBtn) shareBtn.disabled = false;
         }
-        btn.disabled = false;
       });
+
+      if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+          if (!window.__pgSnap) {
+            msg.textContent = 'The builder needs WebGL to save your build. Please turn it on in your browser.';
+            return;
+          }
+          btn.disabled = true;
+          shareBtn.disabled = true;
+          msg.textContent = 'Preparing your build for Instagram…';
+
+          try {
+            const c = await make(nm.value);
+            const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+            if (!blob) throw 0;
+            const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
+            const file = new File([blob], slug, { type: 'image/png' });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              try {
+                await navigator.share({
+                  files: [file],
+                  title: `${nm.value.trim() || 'My'} LEGO Build`,
+                  text: 'Check out my LEGO build! Built on hlnhrr.pages.dev'
+                });
+                download(blob, slug);
+                msg.textContent = 'Shared! Pick Instagram Stories to post (and saved a copy to your device).';
+                return;
+              } catch (err) {
+                if (err && err.name === 'AbortError') {
+                  msg.textContent = 'Share cancelled. You can still save the PNG directly.';
+                  return;
+                }
+              }
+            }
+
+            download(blob, slug);
+            const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+            if (isMobile) {
+              msg.textContent = 'Saved PNG to gallery! Opening Instagram Story camera…';
+              setTimeout(() => { window.location.href = 'instagram://camera'; }, 400);
+            } else {
+              msg.textContent = 'Saved PNG to downloads! Opening Instagram in a new tab…';
+              window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
+            }
+          } catch (e) {
+            msg.textContent = 'Could not prepare the Instagram story. Please try again.';
+          } finally {
+            btn.disabled = false;
+            shareBtn.disabled = false;
+          }
+        });
+      }
     })();
 
     /* ===== THE CLIMB — Experience: full-bleed LEGO build you climb while scrolling ===== */
@@ -4462,13 +4953,18 @@
 
     function seq(P) {
       S.asm = ss(clamp(P / .34));
-      const p1 = clamp(P / .3);
-      words.forEach((w, i) => w.classList.toggle('on', i / words.length < p1 + .001));
 
+      const intro = clamp(P / .035);
       const out = clamp((P - .36) / .12);
-      mf.style.opacity = String(1 - out);
-      mf.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,0,0)`;
+      mf.style.opacity = String(intro * (1 - out));
+      mf.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,${((1 - intro) * 14).toFixed(1)}px,0)`;
       mf.style.pointerEvents = out > .9 ? 'none' : '';
+
+      const pWords = clamp((P - .015) / .30);
+      words.forEach((w, i) => {
+        const threshold = (i + .5) / words.length;
+        w.classList.toggle('on', pWords > 0 && pWords >= threshold);
+      });
 
       S.off = lerp(small() ? 0 : .2, 0, ss(clamp((P - .34) / .2)));
       S.rot = P * Math.PI * 1.1;
@@ -4524,6 +5020,13 @@
         if (window.Lenis) {
           lenis = new Lenis({ duration: 1.1, smoothWheel: true });
           if (hasG) lenis.on('scroll', ScrollTrigger.update);
+          if (root.dataset.loading === 'true') {
+            lenis.stop();
+            window.addEventListener('loader:done', () => {
+              lenis.start();
+              if (hasG) ScrollTrigger.refresh();
+            }, { once: true });
+          }
         }
       } catch (e) { lenis = null; }
     }

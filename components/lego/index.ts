@@ -1,4 +1,5 @@
 export { LegoPortfolio } from "./LegoPortfolio";
+export { LegoLoader } from "./LegoLoader";
 export { LegoWorksModal } from "./LegoWorksModal";
 export { LegoProjectModal } from "./LegoProjectModal";
 export * from "./types";

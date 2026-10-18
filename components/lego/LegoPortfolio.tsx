@@ -22,6 +22,7 @@ import { renderIsoBrickSvg } from "./iso";
 import { BrickFactory, BrickColorKey, LEGO_PALETTE } from "./brickFactory";
 import { LegoWorksModal } from "./LegoWorksModal";
 import { LegoProjectModal } from "./LegoProjectModal";
+import { LegoLoader } from "./LegoLoader";
 import type { GuestbookEntry, ProjectItem } from "./types";
 
 interface LegoPortfolioProps {
@@ -76,9 +77,10 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   const [pgBuildLabel, setPgBuildLabel] = useState<string>("");
   const [pgName, setPgName] = useState<string>("");
   const [pgSaveMsg, setPgSaveMsg] = useState<string>(
-    "Type your name, then save your build as a PNG, ready to post on your Instagram story."
+    "Type your name, then save your build as a PNG or share it directly to your Instagram story."
   );
-  const [isSavingStory, setIsSavingStory] = useState<boolean>(false);
+  const [isSavingPng, setIsSavingPng] = useState<boolean>(false);
+  const [isSharingIg, setIsSharingIg] = useState<boolean>(false);
 
   // Guestbook state
   const [guestName, setGuestName] = useState<string>("");
@@ -589,17 +591,20 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
 
     function updateSequence(P: number) {
       S.asm = smoothStep(clamp(P / 0.34));
-      const p1 = clamp(P / 0.3);
-      words.forEach((w, i) => {
-        w.classList.toggle("on", i / words.length < p1 + 0.001);
-      });
 
+      const intro = clamp(P / 0.035);
       const out = clamp((P - 0.36) / 0.12);
       if (mfiRef.current) {
-        mfiRef.current.style.opacity = String(1 - out);
-        mfiRef.current.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,0,0)`;
+        mfiRef.current.style.opacity = String(intro * (1 - out));
+        mfiRef.current.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,${((1 - intro) * 14).toFixed(1)}px,0)`;
         mfiRef.current.style.pointerEvents = out > 0.9 ? "none" : "";
       }
+
+      const pWords = clamp((P - 0.015) / 0.30);
+      words.forEach((w, i) => {
+        const threshold = (i + 0.5) / words.length;
+        w.classList.toggle("on", pWords > 0 && pWords >= threshold);
+      });
 
       S.off = lerp(isSmall() ? 0 : 0.2, 0, smoothStep(clamp((P - 0.34) / 0.2)));
       S.rot = P * Math.PI * 1.1;
@@ -671,6 +676,17 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       lenis.on("scroll", ScrollTrigger.update);
       gsap.ticker.add((time) => lenis?.raf(time * 1000));
       gsap.ticker.lagSmoothing(0);
+      if (document.documentElement.dataset.loading === "true") {
+        lenis.stop();
+        window.addEventListener(
+          "loader:done",
+          () => {
+            lenis?.start();
+            ScrollTrigger.refresh();
+          },
+          { once: true }
+        );
+      }
     } catch {}
 
     if (!isReduced) {
@@ -1552,14 +1568,24 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     };
   }, [pgColor, pgSize]);
 
-  // Instagram Story PNG Export Handler
-  const handleSaveStory = async () => {
+  // Helper to trigger a browser file download from a Blob
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  };
+
+  // Instagram Story PNG Generator
+  const generateStoryBlob = async (): Promise<{ blob: Blob; slug: string } | null> => {
     if (!pgRef.current.snapStory) {
       setPgSaveMsg("The builder needs WebGL to save your build. Please turn it on in your browser.");
-      return;
+      return null;
     }
-    setIsSavingStory(true);
-    setPgSaveMsg("Building your story…");
 
     try {
       try {
@@ -1760,20 +1786,81 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       const slug =
         (pgName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "my") +
         "-lego-story.png";
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = slug;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
 
-      setPgSaveMsg("Saved! Open it from your gallery and add it to your Instagram story.");
+      return { blob, slug };
+    } catch {
+      setPgSaveMsg("Could not save the image. Please try again.");
+      return null;
+    }
+  };
+
+  // Save as PNG Handler
+  const handleSaveAsPng = async () => {
+    setIsSavingPng(true);
+    setPgSaveMsg("Building your PNG…");
+
+    try {
+      const result = await generateStoryBlob();
+      if (!result) return;
+      downloadBlob(result.blob, result.slug);
+      setPgSaveMsg("Saved PNG! Check your downloads for your LEGO build.");
     } catch {
       setPgSaveMsg("Could not save the image. Please try again.");
     } finally {
-      setIsSavingStory(false);
+      setIsSavingPng(false);
+    }
+  };
+
+  // Share directly to Instagram Story Handler
+  const handleShareToIg = async () => {
+    setIsSharingIg(true);
+    setPgSaveMsg("Preparing your build for Instagram…");
+
+    try {
+      const result = await generateStoryBlob();
+      if (!result) return;
+
+      const { blob, slug } = result;
+      const file = new File([blob], slug, { type: "image/png" });
+
+      // First check native Web Share API with files (iOS Safari, Android Chrome)
+      if (typeof navigator !== "undefined" && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: `${pgName.trim() || "My"} LEGO Build`,
+            text: `Check out my LEGO build! Built on hlnhrr.pages.dev`,
+          });
+          downloadBlob(blob, slug);
+          setPgSaveMsg("Shared! Pick Instagram Stories to post (and saved a copy to your device).");
+          return;
+        } catch (err: unknown) {
+          if (err instanceof Error && err.name === "AbortError") {
+            setPgSaveMsg("Share cancelled. You can still save the PNG directly.");
+            return;
+          }
+        }
+      }
+
+      // Fallback: download PNG and launch Instagram Story camera / web
+      downloadBlob(blob, slug);
+      const isMobile =
+        typeof navigator !== "undefined" &&
+        /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        setPgSaveMsg("Saved PNG to gallery! Opening Instagram Story camera…");
+        setTimeout(() => {
+          window.location.href = "instagram://camera";
+        }, 400);
+      } else {
+        setPgSaveMsg("Saved PNG to downloads! Opening Instagram in a new tab…");
+        window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+      }
+    } catch {
+      setPgSaveMsg("Could not prepare the Instagram story. Please try again.");
+    } finally {
+      setIsSharingIg(false);
     }
   };
 
@@ -1939,6 +2026,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
 
   return (
     <>
+      <LegoLoader />
       {/* Fixed Three.js loose brick snap background scene */}
       <canvas id="gl" ref={glCanvasRef} aria-hidden="true" />
 
@@ -2463,16 +2551,26 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                     onChange={(e) => setPgName(e.target.value)}
                   />
                 </label>
-                <button
-                  className="btn bt c-red"
-                  id="pSave"
-                  type="button"
-                  disabled={isSavingStory}
-                  onClick={handleSaveStory}
-                >
-                  <span>Save my work ↓</span>
-                  <small>share it on ig!</small>
-                </button>
+                <div className="pgsave-btns">
+                  <button
+                    className="btn bt c-blue"
+                    id="pSavePng"
+                    type="button"
+                    disabled={isSavingPng || isSharingIg}
+                    onClick={handleSaveAsPng}
+                  >
+                    <span>{isSavingPng ? "SAVING PNG…" : "SAVE AS PNG ↓"}</span>
+                  </button>
+                  <button
+                    className="btn bt c-red"
+                    id="pShareIg"
+                    type="button"
+                    disabled={isSavingPng || isSharingIg}
+                    onClick={handleShareToIg}
+                  >
+                    <span>{isSharingIg ? "OPENING IG…" : "SHARE IT TO IG ↗"}</span>
+                  </button>
+                </div>
                 <div id="pgSaveMsg" aria-live="polite">
                   {pgSaveMsg}
                 </div>

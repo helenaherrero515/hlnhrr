@@ -283,9 +283,10 @@ html[data-theme="dark"] .plate .mat{background:radial-gradient(circle at 50% 32%
 .pgsave{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;padding:14px 16px;background:var(--panel);border-top:3px solid var(--ink)}
 .pgsave label{display:flex;align-items:center;gap:10px;color:var(--mut);flex:1 1 220px}
 .pgsave input{flex:1;min-width:0;font:400 16px var(--fb);color:var(--ink);background:var(--paper);border:2px solid var(--ink);border-radius:5px;padding:9px 12px}
-.pgsave .btn{--bl:10px;padding:11px 18px;font-size:14px}.pgsave .btn[disabled]{opacity:.6;cursor:wait}
+.pgsave .btn{--bl:10px;padding:11px 18px;font-size:14px;justify-content:center}.pgsave .btn[disabled]{opacity:.6;cursor:wait}
 .pgshow{flex:1 1 100%;font:700 clamp(26px,4vw,38px)/1 var(--fd);color:var(--ink)}
-.pgsave .btn{flex-direction:column;gap:3px;text-align:center}.pgsave .btn small{font:500 10px var(--fm);letter-spacing:.1em;text-transform:uppercase;opacity:.92}
+.pgsave-btns{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.pgsave-btns .btn{flex:0 0 auto;white-space:nowrap}
 #pgSaveMsg{flex:1 1 100%;color:var(--mut);font:500 12px var(--fm);min-height:0}
 
 /* ===== layout + responsive fixes ===== */
@@ -323,7 +324,8 @@ section.solid:last-of-type{padding-bottom:calc(clamp(72px,10vw,140px) + env(safe
  .pgui button{min-height:42px}
  .pgui .sw3{width:42px;height:42px}
  #pgc{height:min(62vh,440px)}
- .pgsave .btn{flex:1 1 100%;justify-content:center}
+ .pgsave-btns{width:100%;display:flex;flex-direction:column;gap:10px}
+ .pgsave .btn{width:100%;flex:1 1 100%;justify-content:center}
  .pgnote{display:none}
  .gh{padding:14px}.sg{gap:22px 10px}.seg{padding:8px 10px 6px}
  .log{max-height:300px}
@@ -624,4 +626,115 @@ section.solid:last-of-type{padding-bottom:calc(clamp(72px,10vw,140px) + env(safe
   padding: 10px 18px;
   background: #0d121b;
   border-top: 2px solid #232b38;
+}
+
+/* ============================================================
+   HLN Brick Loader Animation
+   ============================================================ */
+html[data-loading="true"],
+html[data-loading="true"] body {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+#loader-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: var(--bg);
+}
+
+#loader-cv {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#loader .hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 24px 28px;
+  pointer-events: none;
+}
+
+#loader .percent {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1;
+  font-size: clamp(48px, 9vw, 112px);
+  font-family: var(--fd, 'Pixelify Sans', monospace);
+}
+
+#loader .percent small {
+  font-size: 0.35em;
+  color: var(--mut, var(--muted, #5b6070));
+}
+
+#loader-status {
+  margin-top: 12px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: var(--fm, 'DM Mono', monospace);
+}
+
+#loader .segs {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+#loader .seg {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mut, #5b6070) 30%, transparent);
+  transition: background-color 0.25s, transform 0.25s;
+}
+
+#loader .seg.on {
+  background: var(--red, #e3000b);
+  transform: translateY(-2px);
+}
+
+#loader .segs.full .seg.on {
+  background: var(--green, #00b140);
+}
+
+#loader-wall {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#loader .dots {
+  background-image: radial-gradient(circle, var(--grid, rgba(17, 17, 17, 0.12)) 1.8px, transparent 2.2px);
+  background-size: 28px 28px;
+}
+
+@media (min-width: 768px) {
+  #loader .hud {
+    padding: 0 48px 28px;
+  }
 }
