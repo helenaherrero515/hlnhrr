@@ -842,6 +842,21 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       });
     }
 
+    const zoneEl = document.getElementById("zone");
+    let zoneObserver: IntersectionObserver | null = null;
+    if (zoneEl) {
+      zoneObserver = new IntersectionObserver(
+        (entries) => {
+          S.active = entries[0].isIntersecting;
+          if (glCanvasRef.current) {
+            glCanvasRef.current.style.visibility = S.active ? "visible" : "hidden";
+          }
+        },
+        { rootMargin: "100px" }
+      );
+      zoneObserver.observe(zoneEl);
+    }
+
     // 3D Pointer Lift on Hero Name Bricks
     const heroEl = heroRef.current;
     const cellElements = Array.from(document.querySelectorAll<HTMLElement>("#name i"));
@@ -943,6 +958,7 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       cancelAnimationFrame(waveRaf);
       lenis?.destroy();
       ScrollTrigger.getAll().forEach((t) => t.kill());
+      zoneObserver?.disconnect();
     };
   }, [statTotals]);
 
@@ -1777,7 +1793,6 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       if (!result) return;
 
       const { blob, slug } = result;
-      const file = new File([blob], slug, { type: "image/png" });
 
       // 1. Download and save image to photos/gallery
       downloadBlob(blob, slug);
@@ -1791,40 +1806,33 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
         }
       }
 
-      // 3. Web Share API with image file
-      // Sharing ONLY the file (without conflicting text/url) allows iOS and Android to pass the image directly into Instagram Stories
-      if (
-        typeof navigator !== "undefined" &&
-        navigator.canShare &&
-        navigator.canShare({ files: [file] })
-      ) {
-        try {
-          await navigator.share({
-            files: [file],
-          });
-          setPgSaveMsg("Shared to Instagram! Your build is ready in Stories.");
-          return;
-        } catch (err: unknown) {
-          if (err instanceof Error && err.name === "AbortError") {
-            setPgSaveMsg("Share cancelled. Your build was saved to your photos!");
-            return;
-          }
-        }
-      }
-
-      // 4. Fallback if Web Share is unavailable
-      const isMobile =
-        typeof navigator !== "undefined" &&
-        /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+      // 3. Platform detection & direct Instagram Story trigger
+      const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
+      const isIOS = /iphone|ipad|ipod/i.test(userAgent);
+      const isAndroid = /android/i.test(userAgent);
+      const isMobile = isIOS || isAndroid;
 
       if (isMobile) {
-        setPgSaveMsg("Saved to photos! Opening Instagram — tap Story to add your build.");
+        setPgSaveMsg("Saved to photos & copied to clipboard! Opening Instagram Story camera…");
+        const t0 = Date.now();
         setTimeout(() => {
-          window.location.href = "instagram://camera";
+          if (isIOS) {
+            window.location.href = "instagram://story-camera";
+          } else {
+            window.location.href = "intent://story-camera#Intent;package=com.instagram.android;scheme=instagram;end";
+            setTimeout(() => {
+              window.location.href = "instagram://story-camera";
+            }, 400);
+          }
+          setTimeout(() => {
+            if (typeof document !== "undefined" && document.hidden) return;
+            if (Date.now() - t0 < 3500) {
+              setPgSaveMsg("Build saved to photos! Open the Instagram app and tap your Story to post.");
+            }
+          }, 2200);
         }, 400);
       } else {
-        setPgSaveMsg("Saved Story PNG to downloads! Send to your phone to post to Instagram Story.");
-        window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+        setPgSaveMsg("Saved 1080×1920 Story PNG to downloads & clipboard! Airdrop or send it to your phone to share to your Instagram Story.");
       }
     } catch {
       setPgSaveMsg("Could not prepare the Instagram story. Please try again.");

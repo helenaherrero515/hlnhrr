@@ -3155,6 +3155,7 @@
         requestAnimationFrame(tick);
       };
 
+      window.__ghStats = { total, streak, active };
       animateCount($('#s1'), total);
       animateCount($('#s2'), streak);
       animateCount($('#s3'), active);
@@ -4623,7 +4624,6 @@
             const blob = await new Promise(r => c.toBlob(r, 'image/png'));
             if (!blob) throw new Error('Failed to generate image');
             const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
-            const file = new File([blob], slug, { type: 'image/png' });
 
             // 1. Download/save image to gallery/photos so it's always available
             download(blob, slug);
@@ -4635,33 +4635,33 @@
               } catch (_) {}
             }
 
-            // 3. Web Share API with image file
-            // Sharing ONLY the file (no conflicting text/url) allows iOS and Android to pass the image directly into Instagram Stories
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-              try {
-                await navigator.share({
-                  files: [file]
-                });
-                msg.textContent = 'Shared to Instagram! Your build is ready in Stories.';
-                return;
-              } catch (err) {
-                if (err && err.name === 'AbortError') {
-                  msg.textContent = 'Share cancelled. Your build was saved to your photos!';
-                  return;
-                }
-              }
-            }
+            // 3. Platform detection & direct Instagram Story trigger
+            const ua = navigator.userAgent || '';
+            const isIOS = /iphone|ipad|ipod/i.test(ua);
+            const isAndroid = /android/i.test(ua);
+            const isMobile = isIOS || isAndroid;
 
-            // 4. Fallback if Web Share is unavailable
-            const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
             if (isMobile) {
-              msg.textContent = 'Saved to photos! Opening Instagram — tap Story to add your build.';
+              msg.textContent = 'Saved to photos & copied to clipboard! Opening Instagram Story camera…';
+              const t0 = Date.now();
               setTimeout(() => {
-                window.location.href = 'instagram://camera';
+                if (isIOS) {
+                  window.location.href = 'instagram://story-camera';
+                } else {
+                  window.location.href = 'intent://story-camera#Intent;package=com.instagram.android;scheme=instagram;end';
+                  setTimeout(() => {
+                    window.location.href = 'instagram://story-camera';
+                  }, 400);
+                }
+                setTimeout(() => {
+                  if (document.hidden) return;
+                  if (Date.now() - t0 < 3500) {
+                    msg.textContent = 'Build saved to photos! Open the Instagram app and tap your Story to post.';
+                  }
+                }, 2200);
               }, 400);
             } else {
-              msg.textContent = 'Saved Story PNG to downloads! Send to your phone to post to Instagram Story.';
-              window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
+              msg.textContent = 'Saved 1080×1920 Story PNG to downloads & clipboard! Airdrop or send it to your phone to share to your Instagram Story.';
             }
           } catch (e) {
             msg.textContent = 'Could not prepare the Instagram story. Please try again.';
@@ -5055,7 +5055,7 @@
         if (window.Lenis) {
           lenis = new Lenis({ duration: 1.1, smoothWheel: true });
           if (hasG) lenis.on('scroll', ScrollTrigger.update);
-          if (root.dataset.loading === 'true') {
+          if (document.documentElement.dataset.loading === 'true') {
             lenis.stop();
           }
         }
@@ -5080,12 +5080,12 @@
       }, 150);
     };
 
-    if (root.dataset.loading !== 'true') {
+    if (document.documentElement.dataset.loading !== 'true') {
       onLoaderDone();
     } else {
       window.addEventListener('loader:done', onLoaderDone, { once: true });
       const checkDone = setInterval(() => {
-        if (root.dataset.loading !== 'true' || !document.getElementById('loader')) {
+        if (document.documentElement.dataset.loading !== 'true' || !document.getElementById('loader')) {
           clearInterval(checkDone);
           onLoaderDone();
         }
@@ -5121,7 +5121,7 @@
 
         // Heading reveals
         $$('.h2').forEach(h => {
-          const t = h.textContent;
+          const t = h.textContent || '';
           h.setAttribute('aria-label', t);
           h.innerHTML = t.split(' ').map(w => `<span class="ch" aria-hidden="true">${w}</span>`).join(' ');
           gsap.from(h.querySelectorAll('.ch'), {
@@ -5147,10 +5147,13 @@
           trigger: '.sg',
           start: 'top 85%',
           once: true,
-          onEnter: () => [['s1', tot], ['s2', best], ['s3', act]].forEach(([id, v]) => {
-            const o = { n: 0 }, el = document.getElementById(id);
-            gsap.to(o, { n: v, duration: 1.5, ease: 'power3.out', onUpdate: () => el.textContent = Math.round(o.n) });
-          })
+          onEnter: () => {
+            const stats = window.__ghStats || { total: 0, streak: 0, active: 0 };
+            [['s1', stats.total], ['s2', stats.streak], ['s3', stats.active]].forEach(([id, v]) => {
+              const o = { n: 0 }, el = document.getElementById(id);
+              if (el) gsap.to(o, { n: v, duration: 1.5, ease: 'power3.out', onUpdate: () => el.textContent = String(Math.round(o.n)) });
+            });
+          }
         });
 
         ScrollTrigger.create({
