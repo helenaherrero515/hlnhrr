@@ -19,7 +19,7 @@ export default function ContactPage(): React.ReactElement {
         <RouteIntro eyebrow="Contact" title="Start a conversation about product design and frontend craft." description="The fastest verified contact path is Helena's public email from her CV." />
         <Section id="contact-options" aria-labelledby="contact-options-title" className="pt-0">
           <h2 id="contact-options-title" className="sr-only">Contact options</h2>
-          <ContactWidget profile={profile} socials={socials} resumeHref="/assets/cv/CV_HERRERO,%20HELENA%20R.%20.pdf" />
+          <ContactWidget profile={profile} socials={socials} resumeHref="https://docs.google.com/document/d/1AQhMEeCWqLDh2PBdWWFMSq939V2sKFPsSp4OwDSspLQ/edit?usp=sharing" />
         </Section>
       </PageShell>
       <Footer />

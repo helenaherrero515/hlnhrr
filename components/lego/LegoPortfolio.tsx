@@ -2581,12 +2581,11 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   </a>
                   <a
                     className="btn bt c-red"
-                    href="/assets/cv/CV_HERRERO,%20HELENA%20R.%20.pdf"
-                    download="CV_HERRERO, HELENA R. .pdf"
+                    href="https://docs.google.com/document/d/1AQhMEeCWqLDh2PBdWWFMSq939V2sKFPsSp4OwDSspLQ/edit?usp=sharing"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download CV <span>↓</span>
+                    View CV <span>↗</span>
                   </a>
                 </div>
               </div>

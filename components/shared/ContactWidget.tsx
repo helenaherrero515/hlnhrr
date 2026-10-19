@@ -45,7 +45,7 @@ export function ContactWidget({ profile, socials, resumeHref }: ContactWidgetPro
                 {publicSocials.map((social) => <a key={social.href} href={social.href} className="underline hover:text-[var(--color-ink)]">{social.label}</a>)}
               </div>
             ) : null}
-            {resumeHref ? <a className="mt-3 inline-block underline hover:text-[var(--color-ink)]" href={resumeHref}>View resume</a> : null}
+            {resumeHref ? <a className="mt-3 inline-block underline hover:text-[var(--color-ink)]" href={resumeHref} target="_blank" rel="noopener noreferrer">View resume <span>↗</span></a> : null}
           </div>
         </div>
       </div>
