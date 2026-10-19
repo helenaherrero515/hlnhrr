@@ -1265,8 +1265,10 @@
     .pgsave input { flex: 1; min-width: 0; font: 400 16px var(--fb); color: var(--ink); background: var(--paper); border: 2px solid var(--ink); border-radius: 5px; padding: 9px 12px; min-height: 44px; }
     .pgsave .btn { --bl: 10px; padding: 11px 18px; font-size: 14px; flex-direction: column; gap: 3px; text-align: center; }
     .pgsave .btn small { font: 500 10px var(--fm); letter-spacing: .1em; text-transform: uppercase; opacity: .92; }
-    .pgsave .btn[disabled] { opacity: .6; cursor: wait; }
     .pgshow { flex: 1 1 100%; font: 700 clamp(26px, 4vw, 38px)/1 var(--fd); color: var(--ink); }
+    .pgsave-btns { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .pgsave-btns .btn { flex: 0 0 auto; white-space: nowrap; }
+    .pgsave-hint { color: var(--mut); font: 500 13px/1.4 var(--fm); letter-spacing: .02em; text-transform: none; }
     #pgSaveMsg { flex: 1 1 100%; color: var(--mut); font: 500 12px var(--fm); min-height: 0; }
 
     /* Footer */
@@ -2576,10 +2578,10 @@
             <div class="pgshow">Show it off!</div>
             <label class="mono" for="pgName">Your name<input id="pgName" maxlength="20" placeholder="e.g. helena" autocomplete="off"></label>
             <div class="pgsave-btns">
+              <span class="mono pgsave-hint">wanna share what u built? post in ig story</span>
               <button class="btn bt c-blue" id="pSave" type="button"><span>SAVE AS PNG ↓</span></button>
-              <button class="btn bt c-red" id="pShareIg" type="button"><span>SHARE IT TO IG ↗</span></button>
             </div>
-            <div id="pgSaveMsg" aria-live="polite">Type your name, then save your build as a PNG or share it directly to your Instagram story.</div>
+            <div id="pgSaveMsg" aria-live="polite">Type your name, then save your build as a PNG ready for your Instagram story.</div>
           </div>
           <p class="pgnote mono">Click to place · Arrow keys move · Enter places · R turns · Z undoes</p>
         </div>
@@ -4423,7 +4425,7 @@
 
     /* ===== Instagram Story PNG Export Handler ===== */
     (() => {
-      const btn = $('#pSave'), shareBtn = $('#pShareIg'), nm = $('#pgName'), msg = $('#pgSaveMsg');
+      const btn = $('#pSave'), nm = $('#pgName'), msg = $('#pgSaveMsg');
       if (!btn || !nm) return;
 
       const INK = '#14171c', RED = '#e3000b', YEL = '#ffb400', BLU = '#2aa7f2', GRN = '#5bb838', SITE = 'hlnhrr.pages.dev';
@@ -4591,7 +4593,6 @@
           return;
         }
         btn.disabled = true;
-        if (shareBtn) shareBtn.disabled = true;
         msg.textContent = 'Building your PNG…';
 
         try {
@@ -4600,77 +4601,18 @@
           if (!blob) throw 0;
           const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
           download(blob, slug);
-          msg.textContent = 'Saved PNG! Check your downloads for your LEGO build.';
+          if (navigator.clipboard && window.ClipboardItem) {
+            try {
+              await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            } catch (_) {}
+          }
+          msg.textContent = 'Saved PNG! Check your downloads — ready to post in your IG story.';
         } catch (e) {
           msg.textContent = 'Could not save the image. Please try again.';
         } finally {
           btn.disabled = false;
-          if (shareBtn) shareBtn.disabled = false;
         }
       });
-
-      if (shareBtn) {
-        shareBtn.addEventListener('click', async () => {
-          if (!window.__pgSnap) {
-            msg.textContent = 'The builder needs WebGL to save your build. Please turn it on in your browser.';
-            return;
-          }
-          btn.disabled = true;
-          shareBtn.disabled = true;
-          msg.textContent = 'Preparing your build for Instagram…';
-
-          try {
-            const c = await make(nm.value);
-            const blob = await new Promise(r => c.toBlob(r, 'image/png'));
-            if (!blob) throw new Error('Failed to generate image');
-            const slug = (nm.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'my') + '-lego-story.png';
-
-            // 1. Download/save image to gallery/photos so it's always available
-            download(blob, slug);
-
-            // 2. Copy image to clipboard for Instagram Story "Paste Sticker"
-            if (navigator.clipboard && window.ClipboardItem) {
-              try {
-                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-              } catch (_) {}
-            }
-
-            // 3. Platform detection & direct Instagram Story trigger
-            const ua = navigator.userAgent || '';
-            const isIOS = /iphone|ipad|ipod/i.test(ua);
-            const isAndroid = /android/i.test(ua);
-            const isMobile = isIOS || isAndroid;
-
-            if (isMobile) {
-              msg.textContent = 'Saved to photos & copied to clipboard! Opening Instagram Story camera…';
-              const t0 = Date.now();
-              setTimeout(() => {
-                if (isIOS) {
-                  window.location.href = 'instagram://story-camera';
-                } else {
-                  window.location.href = 'intent://story-camera#Intent;package=com.instagram.android;scheme=instagram;end';
-                  setTimeout(() => {
-                    window.location.href = 'instagram://story-camera';
-                  }, 400);
-                }
-                setTimeout(() => {
-                  if (document.hidden) return;
-                  if (Date.now() - t0 < 3500) {
-                    msg.textContent = 'Build saved to photos! Open the Instagram app and tap your Story to post.';
-                  }
-                }, 2200);
-              }, 400);
-            } else {
-              msg.textContent = 'Saved 1080×1920 Story PNG to downloads & clipboard! Airdrop or send it to your phone to share to your Instagram Story.';
-            }
-          } catch (e) {
-            msg.textContent = 'Could not prepare the Instagram story. Please try again.';
-          } finally {
-            btn.disabled = false;
-            shareBtn.disabled = false;
-          }
-        });
-      }
     })();
 
     /* ===== THE CLIMB — Experience: full-bleed LEGO build you climb while scrolling ===== */

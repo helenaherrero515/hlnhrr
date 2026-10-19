@@ -77,10 +77,9 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
   const [pgBuildLabel, setPgBuildLabel] = useState<string>("");
   const [pgName, setPgName] = useState<string>("");
   const [pgSaveMsg, setPgSaveMsg] = useState<string>(
-    "Type your name, then save your build as a PNG or share it directly to your Instagram story."
+    "Type your name, then save your build as a PNG ready for your Instagram story."
   );
   const [isSavingPng, setIsSavingPng] = useState<boolean>(false);
-  const [isSharingIg, setIsSharingIg] = useState<boolean>(false);
 
   // Guestbook state
   const [guestName, setGuestName] = useState<string>("");
@@ -1775,69 +1774,18 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       const result = await generateStoryBlob();
       if (!result) return;
       downloadBlob(result.blob, result.slug);
-      setPgSaveMsg("Saved PNG! Check your downloads for your LEGO build.");
-    } catch {
-      setPgSaveMsg("Could not save the image. Please try again.");
-    } finally {
-      setIsSavingPng(false);
-    }
-  };
-
-  // Share directly to Instagram Story Handler
-  const handleShareToIg = async () => {
-    setIsSharingIg(true);
-    setPgSaveMsg("Preparing your build for Instagram…");
-
-    try {
-      const result = await generateStoryBlob();
-      if (!result) return;
-
-      const { blob, slug } = result;
-
-      // 1. Download and save image to photos/gallery
-      downloadBlob(blob, slug);
-
-      // 2. Copy image to clipboard for automatic "Paste Sticker" popup in Instagram Story
       if (typeof navigator !== "undefined" && navigator.clipboard && window.ClipboardItem) {
         try {
-          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": result.blob })]);
         } catch {
           // Clipboard write permission may not be available; continue gracefully
         }
       }
-
-      // 3. Platform detection & direct Instagram Story trigger
-      const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
-      const isIOS = /iphone|ipad|ipod/i.test(userAgent);
-      const isAndroid = /android/i.test(userAgent);
-      const isMobile = isIOS || isAndroid;
-
-      if (isMobile) {
-        setPgSaveMsg("Saved to photos & copied to clipboard! Opening Instagram Story camera…");
-        const t0 = Date.now();
-        setTimeout(() => {
-          if (isIOS) {
-            window.location.href = "instagram://story-camera";
-          } else {
-            window.location.href = "intent://story-camera#Intent;package=com.instagram.android;scheme=instagram;end";
-            setTimeout(() => {
-              window.location.href = "instagram://story-camera";
-            }, 400);
-          }
-          setTimeout(() => {
-            if (typeof document !== "undefined" && document.hidden) return;
-            if (Date.now() - t0 < 3500) {
-              setPgSaveMsg("Build saved to photos! Open the Instagram app and tap your Story to post.");
-            }
-          }, 2200);
-        }, 400);
-      } else {
-        setPgSaveMsg("Saved 1080×1920 Story PNG to downloads & clipboard! Airdrop or send it to your phone to share to your Instagram Story.");
-      }
+      setPgSaveMsg("Saved PNG! Check your downloads — ready to post in your IG story.");
     } catch {
-      setPgSaveMsg("Could not prepare the Instagram story. Please try again.");
+      setPgSaveMsg("Could not save the image. Please try again.");
     } finally {
-      setIsSharingIg(false);
+      setIsSavingPng(false);
     }
   };
 
@@ -2529,23 +2477,15 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
                   />
                 </label>
                 <div className="pgsave-btns">
+                  <span className="mono pgsave-hint">wanna share what u built? post in ig story</span>
                   <button
                     className="btn bt c-blue"
                     id="pSavePng"
                     type="button"
-                    disabled={isSavingPng || isSharingIg}
+                    disabled={isSavingPng}
                     onClick={handleSaveAsPng}
                   >
                     <span>{isSavingPng ? "SAVING PNG…" : "SAVE AS PNG ↓"}</span>
-                  </button>
-                  <button
-                    className="btn bt c-red"
-                    id="pShareIg"
-                    type="button"
-                    disabled={isSavingPng || isSharingIg}
-                    onClick={handleShareToIg}
-                  >
-                    <span>{isSharingIg ? "OPENING IG…" : "SHARE IT TO IG ↗"}</span>
                   </button>
                 </div>
                 <div id="pgSaveMsg" aria-live="polite">

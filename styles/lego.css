@@ -287,6 +287,7 @@ html[data-theme="dark"] .plate .mat{background:radial-gradient(circle at 50% 32%
 .pgshow{flex:1 1 100%;font:700 clamp(26px,4vw,38px)/1 var(--fd);color:var(--ink)}
 .pgsave-btns{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .pgsave-btns .btn{flex:0 0 auto;white-space:nowrap}
+.pgsave-hint{color:var(--mut);font:500 13px/1.4 var(--fm);letter-spacing:.02em;text-transform:none}
 #pgSaveMsg{flex:1 1 100%;color:var(--mut);font:500 12px var(--fm);min-height:0}
 
 /* ===== layout + responsive fixes ===== */
