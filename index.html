@@ -214,7 +214,7 @@
     [aria-pressed="true"] .sun { display: none; }
     [aria-pressed="true"] .moon { display: block; }
 
-    /* 3D Canvas - hidden by default so loose lego bricks stay outside hero screen until scrolling down */
+    /* 3D Canvas */
     #gl {
       position: fixed;
       inset: 0;
@@ -222,9 +222,6 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.4s ease;
     }
 
     /* Hero */
@@ -4993,15 +4990,14 @@
     function seq(P) {
       S.asm = ss(clamp(P / .34));
 
-      const intro = clamp(P / .035);
       const out = clamp((P - .36) / .12);
-      mf.style.opacity = String(intro * (1 - out));
-      mf.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,${((1 - intro) * 14).toFixed(1)}px,0)`;
+      mf.style.opacity = String(1 - out);
+      mf.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,0,0)`;
       mf.style.pointerEvents = out > .9 ? 'none' : '';
 
-      const pWords = clamp((P - .015) / .30);
+      const pWords = clamp(P / .30);
       words.forEach((w, i) => {
-        const threshold = (i + .5) / words.length;
+        const threshold = (i + .3) / words.length;
         w.classList.toggle('on', pWords > 0 && pWords >= threshold);
       });
 
@@ -5054,23 +5050,19 @@
 
     /* ===== Lenis + GSAP ===== */
     let lenis = null;
-    const startLenis = () => {
-      if (!lenis && !reduce && window.Lenis) {
-        try {
-          lenis = new Lenis({
-            duration: 1.1,
-            smoothWheel: true,
-            autoResize: true
-          });
-          if (hasG) {
-            lenis.on('scroll', ScrollTrigger.update);
-            gsap.ticker.add(t => lenis.raf(t * 1000));
-            gsap.ticker.lagSmoothing(500, 33);
+    if (!reduce) {
+      try {
+        if (window.Lenis) {
+          lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+          if (hasG) lenis.on('scroll', ScrollTrigger.update);
+          if (root.dataset.loading === 'true') {
+            lenis.stop();
           }
-        } catch (e) {
-          lenis = null;
         }
-      }
+      } catch (e) { lenis = null; }
+    }
+
+    const onLoaderDone = () => {
       if (lenis) {
         lenis.start();
         lenis.resize();
@@ -5089,99 +5081,31 @@
     };
 
     if (root.dataset.loading !== 'true') {
-      startLenis();
+      onLoaderDone();
     } else {
-      window.addEventListener('loader:done', startLenis, { once: true });
+      window.addEventListener('loader:done', onLoaderDone, { once: true });
       const checkDone = setInterval(() => {
         if (root.dataset.loading !== 'true' || !document.getElementById('loader')) {
           clearInterval(checkDone);
-          startLenis();
+          onLoaderDone();
         }
       }, 100);
     }
 
     if (hasG) {
       gsap.registerPlugin(ScrollTrigger);
-
+      if (lenis) {
+        gsap.ticker.add(t => lenis.raf(t * 1000));
+        gsap.ticker.lagSmoothing(0);
+      }
       if (!reduce) {
         ScrollTrigger.create({
           trigger: '#build',
           start: 'top top',
           end: 'bottom bottom',
-          onUpdate: s => {
-            seq(s.progress);
-            const c = $('#gl');
-            if (c && s.progress > 0) {
-              c.style.opacity = '1';
-              c.style.visibility = 'visible';
-            }
-          },
-          onEnter: () => {
-            const c = $('#gl');
-            if (c) {
-              c.style.opacity = '1';
-              c.style.visibility = 'visible';
-            }
-            S.active = true;
-          },
-          onEnterBack: () => {
-            const c = $('#gl');
-            if (c) {
-              c.style.opacity = '1';
-              c.style.visibility = 'visible';
-            }
-            S.active = true;
-          }
+          onUpdate: s => seq(s.progress)
         });
         seq(0);
-
-        // Manage 3D canvas active lifecycle across entire #build section
-        ScrollTrigger.create({
-          trigger: '#build',
-          start: 'top bottom',
-          end: 'bottom top',
-          onEnter: () => {
-            S.active = true;
-          },
-          onEnterBack: () => {
-            S.active = true;
-            const c = $('#gl');
-            if (c) {
-              c.style.opacity = '1';
-              c.style.visibility = 'visible';
-            }
-          },
-          onLeave: () => {
-            S.active = false;
-            const c = $('#gl');
-            if (c) {
-              c.style.opacity = '0';
-              c.style.visibility = 'hidden';
-            }
-          },
-          onLeaveBack: () => {
-            S.active = false;
-            const c = $('#gl');
-            if (c) {
-              c.style.opacity = '0';
-              c.style.visibility = 'hidden';
-            }
-          }
-        });
-
-        // Keep 3D lego scene outside screen display until scrolling down towards #build
-        ScrollTrigger.create({
-          trigger: '#top',
-          start: '50% top',
-          end: 'bottom top',
-          onUpdate: self => {
-            const c = $('#gl');
-            if (c) {
-              c.style.opacity = String(self.progress);
-              c.style.visibility = self.progress > 0.01 ? 'visible' : 'hidden';
-            }
-          }
-        });
 
         // Hero name intro - keeps the lego name solid and intact, never destroyed into loose studs
         gsap.from('.wd', {
@@ -5253,23 +5177,10 @@
     }
 
     new IntersectionObserver(es => {
-      const isIntersecting = es[0].isIntersecting;
-      S.active = isIntersecting;
+      S.active = es[0].isIntersecting;
       const c = $('#gl');
-      if (c) {
-        if (isIntersecting) {
-          c.style.visibility = 'visible';
-          const topEl = $('#top');
-          const heroBottom = topEl ? topEl.getBoundingClientRect().bottom : 0;
-          if (heroBottom <= 0) {
-            c.style.opacity = '1';
-          }
-        } else {
-          c.style.visibility = 'hidden';
-          c.style.opacity = '0';
-        }
-      }
-    }, { rootMargin: '100px' }).observe($('#build'));
+      if (c) c.style.visibility = S.active ? 'visible' : 'hidden';
+    }, { rootMargin: '100px' }).observe($('#zone'));
 
     /* ===== Pointer effects: letter lift & 3D tilt ===== */
     if (matchMedia('(hover:hover)').matches && !reduce) {

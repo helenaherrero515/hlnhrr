@@ -592,17 +592,16 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
     function updateSequence(P: number) {
       S.asm = smoothStep(clamp(P / 0.34));
 
-      const intro = clamp(P / 0.035);
       const out = clamp((P - 0.36) / 0.12);
       if (mfiRef.current) {
-        mfiRef.current.style.opacity = String(intro * (1 - out));
-        mfiRef.current.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,${((1 - intro) * 14).toFixed(1)}px,0)`;
+        mfiRef.current.style.opacity = String(1 - out);
+        mfiRef.current.style.transform = `translate3d(${(-out * 70).toFixed(1)}px,0,0)`;
         mfiRef.current.style.pointerEvents = out > 0.9 ? "none" : "";
       }
 
-      const pWords = clamp((P - 0.015) / 0.30);
+      const pWords = clamp(P / 0.30);
       words.forEach((w, i) => {
-        const threshold = (i + 0.5) / words.length;
+        const threshold = (i + 0.3) / words.length;
         w.classList.toggle("on", pWords > 0 && pWords >= threshold);
       });
 
@@ -667,22 +666,22 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
 
     // Lenis Smooth Scroll Setup
     let lenis: Lenis | null = null;
-    const startLenis = () => {
-      if (!lenis && !isReduced) {
-        try {
-          lenis = new Lenis({
-            duration: 1.1,
-            smoothWheel: true,
-            autoResize: true,
-          });
-          gsap.registerPlugin(ScrollTrigger);
-          lenis.on("scroll", ScrollTrigger.update);
-          gsap.ticker.add((time) => lenis?.raf(time * 1000));
-          gsap.ticker.lagSmoothing(500, 33);
-        } catch {
-          lenis = null;
+    if (!isReduced) {
+      try {
+        lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+        gsap.registerPlugin(ScrollTrigger);
+        lenis.on("scroll", ScrollTrigger.update);
+        gsap.ticker.add((time) => lenis?.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+        if (document.documentElement.dataset.loading === "true") {
+          lenis.stop();
         }
+      } catch {
+        lenis = null;
       }
+    }
+
+    const onLoaderDone = () => {
       if (lenis) {
         lenis.start();
         lenis.resize();
@@ -702,19 +701,19 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
       }, 150);
     };
 
-    if (document.documentElement.dataset.loading === "true") {
-      window.addEventListener("loader:done", startLenis, { once: true });
+    if (document.documentElement.dataset.loading !== "true") {
+      onLoaderDone();
+    } else {
+      window.addEventListener("loader:done", onLoaderDone, { once: true });
       const checkDone = setInterval(() => {
         if (
           document.documentElement.dataset.loading !== "true" ||
           !document.getElementById("loader")
         ) {
           clearInterval(checkDone);
-          startLenis();
+          onLoaderDone();
         }
       }, 100);
-    } else {
-      startLenis();
     }
 
     if (!isReduced) {
@@ -722,80 +721,9 @@ export function LegoPortfolio({ defaultSection }: LegoPortfolioProps) {
         trigger: "#build",
         start: "top top",
         end: "bottom bottom",
-        onUpdate: (self) => {
-          updateSequence(self.progress);
-          const c = glCanvasRef.current;
-          if (c && self.progress > 0) {
-            c.style.opacity = "1";
-            c.style.visibility = "visible";
-          }
-        },
-        onEnter: () => {
-          const c = glCanvasRef.current;
-          if (c) {
-            c.style.opacity = "1";
-            c.style.visibility = "visible";
-          }
-          S.active = true;
-        },
-        onEnterBack: () => {
-          const c = glCanvasRef.current;
-          if (c) {
-            c.style.opacity = "1";
-            c.style.visibility = "visible";
-          }
-          S.active = true;
-        },
+        onUpdate: (self) => updateSequence(self.progress),
       });
       updateSequence(0);
-
-      // Manage 3D canvas active lifecycle across entire #build section
-      ScrollTrigger.create({
-        trigger: "#build",
-        start: "top bottom",
-        end: "bottom top",
-        onEnter: () => {
-          S.active = true;
-        },
-        onEnterBack: () => {
-          S.active = true;
-          const c = glCanvasRef.current;
-          if (c) {
-            c.style.opacity = "1";
-            c.style.visibility = "visible";
-          }
-        },
-        onLeave: () => {
-          S.active = false;
-          const c = glCanvasRef.current;
-          if (c) {
-            c.style.opacity = "0";
-            c.style.visibility = "hidden";
-          }
-        },
-        onLeaveBack: () => {
-          S.active = false;
-          const c = glCanvasRef.current;
-          if (c) {
-            c.style.opacity = "0";
-            c.style.visibility = "hidden";
-          }
-        },
-      });
-
-      // Keep 3D lego scene outside screen display until scrolling down towards #build
-      ScrollTrigger.create({
-        trigger: "#top",
-        start: "50% top",
-        end: "bottom top",
-        onUpdate: (self) => {
-          const c = glCanvasRef.current;
-          if (c) {
-            c.style.opacity = String(self.progress);
-            c.style.visibility = self.progress > 0.01 ? "visible" : "hidden";
-          }
-        },
-      });
 
       // Hero name intro - keeps the lego name solid and intact, never destroyed into loose studs
       gsap.from(".wd", {
