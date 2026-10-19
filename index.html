@@ -5054,10 +5054,6 @@
 
     /* ===== Lenis + GSAP ===== */
     let lenis = null;
-    if (hasG) {
-      gsap.registerPlugin(ScrollTrigger);
-    }
-
     const startLenis = () => {
       if (!lenis && !reduce && window.Lenis) {
         try {
@@ -5104,7 +5100,10 @@
       }, 100);
     }
 
-    if (!reduce) {
+    if (hasG) {
+      gsap.registerPlugin(ScrollTrigger);
+
+      if (!reduce) {
         ScrollTrigger.create({
           trigger: '#build',
           start: 'top top',

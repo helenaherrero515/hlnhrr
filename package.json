@@ -5,11 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "serve": "serve . -l 3000",
-    "build": "next build && node -e \"require('fs').copyFileSync('index.html', 'out/index.html')\"",
+    "check:html": "node -e \"const fs=require('fs'),vm=require('vm'),html=fs.readFileSync('index.html','utf8'),re=/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi;let m;while((m=re.exec(html))!==null){if(m[1].trim())new vm.Script(m[1]);}\"",
+    "build": "npm run check:html && next build && node -e \"require('fs').copyFileSync('index.html', 'out/index.html')\"",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "validate": "npm run lint && npm run typecheck && npm run build"
+    "validate": "npm run check:html && npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@fontsource/iosevka-charon": "^5.3.0",
